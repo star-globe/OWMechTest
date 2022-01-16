@@ -1,0 +1,9 @@
+unity/Library
+unity/Logs
+unity/Packages
+unity/Temp
+unity/UserSettings
+unity/obj
+unity/Temp
+unity/.vs
+*.csproj
