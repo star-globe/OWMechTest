@@ -22,10 +22,14 @@ public class FollowCamera : MonoBehaviour
     [SerializeField]
     float forwardDiffMin = 0.01f;
 
+    [SerializeField]
+    float rotSpeed = 90.0f;
+
+    [SerializeField]
+    float rotLim = 60.0f;
+
     float defLength;
     Camera cam;
-
-    const string mouseY = "Mouse Y";
 
     void Start()
     {
@@ -40,6 +44,7 @@ public class FollowCamera : MonoBehaviour
 
         UpdateCameraPos(cam.transform);
         UpdateCameraTarget(cam.transform);
+        RotateTarget();
     }
 
     private void UpdateCameraPos(Transform cam)
@@ -58,13 +63,26 @@ public class FollowCamera : MonoBehaviour
         cam.transform.position = vec + controllerPos;
     }
 
-    //var mY = Input.GetAxis(mouseY);
-    //diff = target.position - trans.position;
-    //diff = diff.normalized * targetLength;
-    //
-    //var quo = Quaternion.AngleAxis(-mY, Vector3.right);
-    //diff = quo * diff;
-    //target.position = diff + pos;
+    private void RotateTarget()
+    {
+        var foward = (target.position - controller.transform.position).normalized;
+        var mY = InputUtils.GetCenterMouse().y;
+
+        var rotMin = Mathf.Sin(rotLim * Mathf.Deg2Rad);
+
+        if (mY > 0 && foward.y > rotMin)
+            return;
+
+        if (mY < 0 && foward.y < -rotMin)
+            return;
+
+        var deg = mY * rotSpeed * Time.deltaTime;
+
+        var quo = Quaternion.AngleAxis(-deg, controller.transform.right);
+        foward = quo * foward;
+
+        target.position = controller.transform.position + foward * targetLength;
+    }
 
     private void UpdateCameraTarget(Transform cam)
     {

@@ -14,7 +14,10 @@ public static class InputUtils
 
         var pos = Input.mousePosition;
         pos -= new Vector3(x, y, 0);
-        pos = new Vector3(pos.x / x, pos.y / y, 0);
+
+        var posX = Mathf.Clamp(pos.x / x, -1.0f, 1.0f);
+        var posY = Mathf.Clamp(pos.y / y, -1.0f, 1.0f);
+        pos = new Vector3(posX, posY, 0);
 
         return pos;
     }
