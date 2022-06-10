@@ -3,62 +3,50 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PlayerSpawner : MonoBehaviour
+namespace AdvancedGears
 {
-    // Start is called before the first frame update
-    void Start()
+    public class PlayerSpawner : MonoBehaviour
     {
-        StartCoroutine(WaitLoadFields());
-    }
+        [SerializeField]
+        float inter = 0.1f;
 
-    IEnumerator WaitLoadFields()
-    {
-        while (FieldManager.Instance.IsLoadingFields)
+        WaitForSeconds waiter = null;
+        WaitForSeconds Waiter
         {
-            yield return null;
-        }
-
-        GetSpawnContainer();
-
-        SpawnPlayer();
-    }
-
-    private List<SpawnPointContainer> containers = new List<SpawnPointContainer>();
-
-    private void GetSpawnContainer()
-    {
-        containers.Clear();
-        foreach (var scene in FieldManager.Instance.FieldScenes)
-        {
-            if (scene == null)
-                continue;
-
-            var goList = scene.Value.GetRootGameObjects();
-            foreach (var go in goList)
+            get
             {
-                var container = go.GetComponent<SpawnPointContainer>();
-                if (container != null)
-                    containers.Add(container);
-            }
-        }
-    }
-
-    private void SpawnPlayer()
-    {
-        Transform trans = null;
-        foreach (var c in containers)
-        {
-            var p = c.GetSpawnPoint(0);
-            if (p != null)
-            {
-                trans = p.transform;
-                break;
+                waiter = new WaitForSeconds(inter);
+                return waiter;
             }
         }
 
-        if (trans != null)
-            PlayerManager.Instance.CreatePlayer(isSelf: true, 0, trans.position, trans.rotation);
-        else
-            Debug.LogErrorFormat("There is no SpawnPoint. ID:{0}", FieldManager.Instance.CurrentFieldID);
+        void Start()
+        {
+            StartCoroutine(WaitLoadFields());
+        }
+
+        IEnumerator WaitLoadFields()
+        {
+            SpawnPoint point = null;
+            while (point == null)
+            {
+                point = FieldManager.Instance.GetSpawnPoint(0);
+                yield return this.Waiter;
+            }
+
+            SpawnPlayer(point);
+        }
+
+        private void SpawnPlayer(SpawnPoint point)
+        {
+            if (point != null)
+            {
+                var pos = point.GetGroundedPos();
+                var rot = point.transform.rotation;
+                PlayerManager.Instance.CreatePlayer(isSelf: true, 0, pos, rot);
+            }
+            else
+                Debug.LogErrorFormat("There is no SpawnPoint. ID:{0}", FieldManager.Instance.CurrentFieldID);
+        }
     }
 }

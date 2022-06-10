@@ -2,51 +2,55 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FieldSelectMenu : MonoBehaviour
+namespace AdvancedGears
 {
-    [SerializeField]
-    string resourcesFolder;
-
-    [SerializeField]
-    ObjectPool<FieldSelectButton> pool;
-
-    readonly Dictionary<int, FieldSettings> settingsDic = new Dictionary<int, FieldSettings>();
-
-    void Start()
+    public class FieldSelectMenu : MonoBehaviour
     {
-        LoadAllFields();
+        [SerializeField]
+        string resourcesFolder;
 
-        ShowFields();
-    }
+        [SerializeField]
+        ObjectPool<FieldSelectButton> pool;
 
-    private void LoadAllFields()
-    {
-        settingsDic.Clear();
-        var settings = Resources.LoadAll<FieldSettings>(resourcesFolder);
-        foreach (var set in settings)
-            settingsDic[set.FieldID] = set;
-    }
+        //readonly Dictionary<int, FieldSettings> settingsDic = new Dictionary<int, FieldSettings>();
 
-    private void ShowFields()
-    {
-        pool.ReturnAll();
-
-        foreach (var kvp in settingsDic)
+        void Start()
         {
-            var button = pool.Borrow();
-            button.SetData(kvp.Key, kvp.Value.FieldName);
-            button.SetOnClick(SelectField);
+            //LoadAllFields();
+
+            ShowFields();
         }
-    }
 
-    private void SelectField(int id)
-    {
-        if (settingsDic.TryGetValue(id, out var fieldSettings))
+        //private void LoadAllFields()
+        //{
+        //    settingsDic.Clear();
+        //    var settings = Resources.LoadAll<FieldSettings>(resourcesFolder);
+        //    foreach (var set in settings)
+        //        settingsDic[set.FieldID] = set;
+        //}
+
+        private void ShowFields()
         {
-            SceneManager.Instance.LoadBattleScene();
+            pool.ReturnAll();
 
-            foreach (var field in fieldSettings.FieldSceneNames)
-                FieldManager.Instance.AddFieldScene(id, field);
+            var settingsDic = FieldMaster.Instance.SettingsDic;
+            foreach (var kvp in settingsDic)
+            {
+                var button = pool.Borrow();
+                button.SetData(kvp.Key, kvp.Value.FieldName);
+                button.SetOnClick(SelectField);
+            }
+        }
+
+        private void SelectField(int id)
+        {
+            if (FieldMaster.Instance.SettingsDic.TryGetValue(id, out var fieldSettings))
+            {
+                StateManager.Instance.NextState();
+
+                foreach (var field in fieldSettings.FieldSceneNames)
+                    FieldManager.Instance.AddFieldScene(id, field);
+            }
         }
     }
 }

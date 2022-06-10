@@ -1,6 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using AdvancedGears;
 
 public class FieldSettingsScene : MonoBehaviour
 {
@@ -23,6 +23,26 @@ public class FieldSettingsScene : MonoBehaviour
     {
         foreach (var settings in settingsList)
             settings.SearchFieldScenes();
+
+        var scenes = new List<UnityEditor.EditorBuildSettingsScene>(UnityEditor.EditorBuildSettings.scenes);
+        var count = scenes.Count;
+
+        foreach (var settings in settingsList)
+        {
+            foreach (var name in settings.FieldSceneNames)
+            {
+                var index = scenes.FindIndex(scene => string.Equals(scene.path, name));
+                if (index < 0)
+                {
+                    scenes.Add(new UnityEditor.EditorBuildSettingsScene(name, true));
+                }
+            }
+        }
+
+        if (count != scenes.Count)
+        {
+            UnityEditor.EditorBuildSettings.scenes = scenes.ToArray();
+        }
     }
 #endif
 }

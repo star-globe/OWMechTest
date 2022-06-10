@@ -17,3 +17,4 @@ MonoBehaviour:
   folder: Assets/Scenes/Fields/Field_001
   fieldSceneNames:
   - Assets/Scenes/Fields/Field_001/Field_001_1.unity
+  - Assets/Scenes/Fields/Field_001/Field_001_2.unity

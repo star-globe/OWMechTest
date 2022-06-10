@@ -5,7 +5,7 @@ using UnityEngine;
 public class FollowCamera : MonoBehaviour
 {
     [SerializeField]
-    CharacterController controller = null;
+    Transform center = null;
 
     [SerializeField]
     Transform target = null;
@@ -20,6 +20,12 @@ public class FollowCamera : MonoBehaviour
     float cameraDiffMin = 0.01f;
 
     [SerializeField]
+    float camDeltaRadius = 1.0f;
+
+    [SerializeField]
+    float powerRate = 2.0f;
+
+    [SerializeField]
     float forwardDiffMin = 0.01f;
 
     [SerializeField]
@@ -28,12 +34,18 @@ public class FollowCamera : MonoBehaviour
     [SerializeField]
     float rotLim = 60.0f;
 
+    [SerializeField]
+    float inputYMin = 0.2f;
+
     float defLength;
+    float rotDeg = 0.0f;
+    Vector3 defLocal;
     Camera cam;
 
     void Start()
     {
-        defLength = (this.transform.position - controller.transform.position).magnitude;
+        defLength = (this.transform.position - center.position).magnitude;
+        defLocal = this.transform.localPosition;
     }
 
     void FixedUpdate()
@@ -44,44 +56,54 @@ public class FollowCamera : MonoBehaviour
 
         UpdateCameraPos(cam.transform);
         UpdateCameraTarget(cam.transform);
-        RotateTarget();
+        UpdateTarget();
     }
 
     private void UpdateCameraPos(Transform cam)
     {
         var current = cam.position;
         var target = this.transform.position;
-        var controllerPos = controller.transform.position;
+        var controllerPos = center.position;
 
         var diff = target - current;
         if (diff.sqrMagnitude <= cameraDiffMin * cameraDiffMin)
             return;
 
-        diff *= Time.deltaTime / moveTime;
-        var p = current + diff;
-        var vec = (p - controllerPos).normalized * defLength;
-        cam.transform.position = vec + controllerPos;
+        diff -= diff.normalized * cameraDiffMin;
+
+        var rate = (Time.deltaTime / moveTime) * Mathf.Pow((diff.magnitude / camDeltaRadius), powerRate);
+        rate = Mathf.Min(rate, 1.0f);
+
+        diff *= rate;
+        //var p = current + diff;
+        //var vec = (p - controllerPos).normalized * defLength;
+        //cam.transform.position = vec + controllerPos;
+        cam.transform.position = current + diff;
     }
 
-    private void RotateTarget()
+    private void UpdateTarget()
     {
-        var foward = (target.position - controller.transform.position).normalized;
         var mY = InputUtils.GetCenterMouse().y;
 
-        var rotMin = Mathf.Sin(rotLim * Mathf.Deg2Rad);
+        bool canRotate = mY * mY >= inputYMin * inputYMin;
 
-        if (mY > 0 && foward.y > rotMin)
-            return;
+        if (mY > 0)
+            canRotate &= rotDeg < rotLim;
+        else
+            canRotate &= rotDeg > -rotLim;
 
-        if (mY < 0 && foward.y < -rotMin)
-            return;
+        if (canRotate)
+        {
+            rotDeg += mY * rotSpeed * Time.deltaTime;
+        }
 
-        var deg = mY * rotSpeed * Time.deltaTime;
+        var quo = Quaternion.AngleAxis(-rotDeg, Vector3.right);
+        var foward = quo * Vector3.forward;
+        foward = center.localToWorldMatrix * foward;
 
-        var quo = Quaternion.AngleAxis(-deg, controller.transform.right);
-        foward = quo * foward;
+        this.transform.localPosition = quo * defLocal;
 
-        target.position = controller.transform.position + foward * targetLength;
+        target.position = center.position + foward * targetLength;
     }
 
     private void UpdateCameraTarget(Transform cam)

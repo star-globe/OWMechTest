@@ -1,18 +1,20 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GoalObject : MonoBehaviour
+namespace AdvancedGears
 {
-    // Start is called before the first frame update
-    void Start()
+    public class GoalObject : MonoBehaviour
     {
-        
-    }
+        private void OnCollisionEnter(Collision collision)
+        {
+            var character = collision.gameObject.GetComponent<PlayerCharacter>();
+            if (character == null)
+            {
+                return;
+            }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+            StateManager.Instance.NextState();
+        }
     }
 }

@@ -2,44 +2,55 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UniRx;
 
-public class SceneManager : SingletonMonobehaviour<SceneManager>
+namespace AdvancedGears
 {
-    bool isNowLoading = false;
-
-    public void GameStart()
+    public class SceneManager : SingletonMonoBehaviour<SceneManager>
     {
-        LoadSelectMenu();
-    }
-
-    public void LoadSelectMenu()
-    {
-        LoadScene("SelectMenu");
-    }
-
-    public void LoadBattleScene()
-    {
-        LoadScene("Battle");
-    }
-
-    public void LoadScene(string sceneName)
-    {
-        if (isNowLoading)
+        public void Register()
         {
-            Debug.LogError("Now Loading Another Scene.");
+            StateManager.Instance.RegisterStateEvent(GameState.Select, LoadSelectMenu, this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Battle, LoadBattleScene, this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Result, LoadResultScene, this.gameObject);
         }
 
-        StartCoroutine(LoadSceneAsnc(sceneName));
-    }
+        bool isNowLoading = false;
 
-    IEnumerator LoadSceneAsnc(string sceneName)
-    {
-        isNowLoading = true;
+        private void LoadSelectMenu(Unit unit)
+        {
+            LoadScene("SelectMenu");
+        }
 
-        var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
-        while (op.isDone == false)
-            yield return null;
+        private void LoadBattleScene(Unit unit)
+        {
+            LoadScene("Battle");
+        }
 
-        isNowLoading = false;
+        private void LoadResultScene(Unit unit)
+        {
+            LoadScene("Result");
+        }
+
+        private void LoadScene(string sceneName)
+        {
+            if (isNowLoading)
+            {
+                Debug.LogError("Now Loading Another Scene.");
+            }
+
+            StartCoroutine(LoadSceneAsnc(sceneName));
+        }
+
+        IEnumerator LoadSceneAsnc(string sceneName)
+        {
+            isNowLoading = true;
+
+            var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+            while (op.isDone == false)
+                yield return null;
+
+            isNowLoading = false;
+        }
     }
 }

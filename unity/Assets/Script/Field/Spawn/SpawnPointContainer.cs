@@ -2,38 +2,80 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnPointContainer : MonoBehaviour
+namespace AdvancedGears
 {
-    [SerializeField]
-    List<SpawnPoint> points = null;
-    public List<SpawnPoint> Points => points;
-
-    private Dictionary<int,SpawnPoint> pointDictionary = null;
-    public Dictionary<int,SpawnPoint> PointDictionary
+    public class SpawnPointContainer : MonoBehaviour
     {
-        get
+        [SerializeField]
+        List<SpawnPoint> points = null;
+        public List<SpawnPoint> Points => points;
+
+        private Dictionary<int, SpawnPoint> pointDictionary = null;
+        public Dictionary<int, SpawnPoint> PointDictionary
         {
-            if (pointDictionary == null) {
-                pointDictionary = new Dictionary<int,SpawnPoint>();
+            get
+            {
+                if (pointDictionary == null)
+                {
+                    pointDictionary = new Dictionary<int, SpawnPoint>();
 
-                foreach (var p in points)
-                    pointDictionary[p.ID] = p;
+                    foreach (var p in points)
+                        pointDictionary[p.ID] = p;
+                }
+
+                return pointDictionary;
             }
+        }
 
-            return pointDictionary;
+        private void Awake()
+        {
+            FieldManager.Instance.SetSpawnPoints(this.PointDictionary);
+        }
+
+        private void OnDestroy()
+        {
+            FieldManager.Instance?.RemoveSpawnPoints(this.PointDictionary.Keys);
+        }
+
+        public SpawnPoint GetSpawnPoint(int id)
+        {
+            this.PointDictionary.TryGetValue(id, out var point);
+            return point;
+        }
+
+        public void CorrectPoints()
+        {
+            if (points == null)
+                points = new List<SpawnPoint>();
+
+            points.Clear();
+            foreach (var p in FindObjectsOfType<SpawnPoint>())
+                points.Add(p);
+
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+#endif
         }
     }
 
-    public SpawnPoint GetSpawnPoint(int id)
+#if UNITY_EDITOR
+    [UnityEditor.CustomEditor(typeof(SpawnPointContainer))]
+    public class SpawnPointContainerEditor : UnityEditor.Editor
     {
-        this.PointDictionary.TryGetValue(id, out var point);
-        return point;
-    }
+        SpawnPointContainer container = null;
 
-    public void CorrectPoints()
-    {
-        points.Clear();
-        foreach (var p in FindObjectsOfType<SpawnPoint>())
-            points.Add(p);
+        private void OnEnable()
+        {
+            container = target as SpawnPointContainer;
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            if (GUILayout.Button("CorrectPoints"))
+                container?.CorrectPoints();
+        }
     }
+#endif
 }

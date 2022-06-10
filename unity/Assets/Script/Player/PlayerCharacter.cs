@@ -2,14 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCharacter : MonoBehaviour
+namespace AdvancedGears
 {
-    public long ID { get; private set; }
-    public bool IsSelf { get; private set; }
-
-    public void Initialize(long id, bool isSelf)
+    public class PlayerCharacter : MonoBehaviour
     {
-        this.ID = id;
-        this.IsSelf = isSelf;
+        [SerializeField]
+        CapsuleCollider capsuleCollider = null;
+
+        public long ID { get; private set; }
+        public bool IsSelf { get; private set; }
+
+        public void Initialize(long id, bool isSelf)
+        {
+            this.ID = id;
+            this.IsSelf = isSelf;
+        }
+
+        public float PlayerHeight
+        {
+            get
+            {
+                if (capsuleCollider != null)
+                    return capsuleCollider.height;
+
+                return 0;
+            }
+        }
     }
 }

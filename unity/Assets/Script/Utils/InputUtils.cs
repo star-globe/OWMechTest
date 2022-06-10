@@ -1,19 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public static class InputUtils
 {
     public static Vector3 GetCenterMouse()
     {
-        if (Input.mousePresent == false)
-            return Vector3.zero;
+        var pos = Mouse.current.position.ReadValue();
 
         var x = Screen.width / 2;
         var y = Screen.height / 2;
 
-        var pos = Input.mousePosition;
-        pos -= new Vector3(x, y, 0);
+        pos -= new Vector2(x, y);
 
         var posX = Mathf.Clamp(pos.x / x, -1.0f, 1.0f);
         var posY = Mathf.Clamp(pos.y / y, -1.0f, 1.0f);
