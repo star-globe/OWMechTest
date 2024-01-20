@@ -14,7 +14,7 @@ namespace AdvancedGears
     }
 
     [CreateAssetMenu(menuName = "TestProject/Player/PlayerSettings", order = 0)]
-    public class PlayerSettings : ScriptableObject
+    public class PlayerSettings : ScriptableObject, IDBasedMasterSettings
     {
         [SerializeField]
         PlayerType playerType;
@@ -23,31 +23,20 @@ namespace AdvancedGears
         [SerializeField]
         GameObject playerPrefab;
         public GameObject PlayerPrefab => playerPrefab;
+
+        public int ID => (int) playerType;
     }
 
-    public class PlayerMaster : Singleton<PlayerMaster>, IMasterContainer
+    public class PlayerMasterContainer : IDBasedMasterContainer<PlayerSettings>
     {
-        const string resourcesFolder = "PlayerSettings";
+        protected override string resourcesFolder => "PlayerSettings";
+    }
 
-        public readonly Dictionary<PlayerType, PlayerSettings> SettingsDic = new Dictionary<PlayerType, PlayerSettings>();
-
-        public void Load()
+    public class PlayerMaster : Singleton<PlayerMasterContainer>
+    {
+        public static GameObject GetPlayerPrefab(PlayerType type)
         {
-            var settings = Resources.LoadAll<PlayerSettings>(resourcesFolder);
-
-            SettingsDic.Clear();
-            foreach (var set in settings)
-            {
-                SettingsDic[set.PlayerType] = set;
-            }
-        }
-
-        public GameObject GetPlayerPrefab(PlayerType type)
-        {
-            if (this.SettingsDic.TryGetValue(type, out var set))
-                return set.PlayerPrefab;
-
-            return null;
+            return Instance.GetSettings((int) type)?.PlayerPrefab;
         }
     }
 }

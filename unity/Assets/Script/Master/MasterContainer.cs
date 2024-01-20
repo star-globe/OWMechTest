@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 
 namespace AdvancedGears
 {
-    public interface IMasterContainer
-    {
-        void Load();
-    }
+    //public interface IMasterContainer
+    //{
+    //    void Load();
+    //}
 }

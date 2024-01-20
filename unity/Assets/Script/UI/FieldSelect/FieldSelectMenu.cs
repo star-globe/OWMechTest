@@ -33,7 +33,7 @@ namespace AdvancedGears
         {
             pool.ReturnAll();
 
-            var settingsDic = FieldMaster.Instance.SettingsDic;
+            var settingsDic = FieldMaster.Instance.GetDictionary();
             foreach (var kvp in settingsDic)
             {
                 var button = pool.Borrow();
@@ -44,7 +44,8 @@ namespace AdvancedGears
 
         private void SelectField(int id)
         {
-            if (FieldMaster.Instance.SettingsDic.TryGetValue(id, out var fieldSettings))
+            var fieldSettings = FieldMaster.Instance.GetSettings(id);
+            if (fieldSettings != null)
             {
                 StateManager.Instance.NextState();
 

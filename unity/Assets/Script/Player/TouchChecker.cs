@@ -109,10 +109,25 @@ namespace AdvancedGears
                     return TouchState.None;
             }
 
+            var upperCenter = this.Capsule.center + vec * (this.Capsule.height / 2 - this.Capsule.radius);
+            upperCenter = this.Capsule.transform.TransformPoint(upperCenter);
+
             var underCenter = this.Capsule.center - vec * (this.Capsule.height / 2 - this.Capsule.radius);
             underCenter = this.Capsule.transform.TransformPoint(underCenter);
 
-            var diff = point - underCenter;
+            var diffUpper = point - upperCenter;
+            var diffUnder = point - underCenter;
+            Vector3 diff;
+
+            if (diffUpper.sqrMagnitude > diffUnder.sqrMagnitude)
+            {
+                diff = diffUnder;
+            }
+            else
+            {
+                diff = diffUpper;
+            }
+
             var cos = Vector3.Dot(diff, Vector3.down) / diff.magnitude;
             if (cos > Mathf.Cos(groundDeg * Mathf.Deg2Rad)) {
                 normal = Vector3.up;

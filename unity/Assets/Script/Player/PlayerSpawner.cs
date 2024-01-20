@@ -41,9 +41,11 @@ namespace AdvancedGears
         {
             if (point != null)
             {
+                long playerId = 0;
                 var pos = point.GetGroundedPos();
                 var rot = point.transform.rotation;
-                PlayerManager.Instance.CreatePlayer(isSelf: true, 0, pos, rot);
+                PlayerManager.Instance.CreatePlayer(isSelf: true, playerId, UnitSide.Alpha, pos, rot);
+                BattleUIManager.Instance.SetPlayerId(playerId);
             }
             else
                 Debug.LogErrorFormat("There is no SpawnPoint. ID:{0}", FieldManager.Instance.CurrentFieldID);

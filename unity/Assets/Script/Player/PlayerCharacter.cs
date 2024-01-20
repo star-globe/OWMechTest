@@ -1,20 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniRx;
 
 namespace AdvancedGears
 {
-    public class PlayerCharacter : MonoBehaviour
+    public class PlayerCharacter : BaseCharacter
     {
-        [SerializeField]
-        CapsuleCollider capsuleCollider = null;
-
-        public long ID { get; private set; }
         public bool IsSelf { get; private set; }
 
-        public void Initialize(long id, bool isSelf)
+        public void Initialize(long id, UnitSide side, bool isSelf)
         {
-            this.ID = id;
+            base.Initialize(id, side);
             this.IsSelf = isSelf;
         }
 
@@ -22,10 +19,7 @@ namespace AdvancedGears
         {
             get
             {
-                if (capsuleCollider != null)
-                    return capsuleCollider.height;
-
-                return 0;
+                return SelfHeight;
             }
         }
     }

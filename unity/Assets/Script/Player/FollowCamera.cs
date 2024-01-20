@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using AdvancedGears;
 
 public class FollowCamera : MonoBehaviour
 {
@@ -29,13 +30,11 @@ public class FollowCamera : MonoBehaviour
     float forwardDiffMin = 0.01f;
 
     [SerializeField]
-    float rotSpeed = 90.0f;
+    PlayerControllerSettings controllerSettings;
 
-    [SerializeField]
-    float rotLim = 60.0f;
-
-    [SerializeField]
-    float inputYMin = 0.2f;
+    float rotSpeed => controllerSettings.RotSpeed;
+    float inputYMin => PlayerControllerConst.Instance.RotYMin;
+    float rotLim => PlayerControllerConst.Instance.RotYLim;
 
     float defLength;
     float rotDeg = 0.0f;

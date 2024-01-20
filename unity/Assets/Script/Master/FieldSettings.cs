@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 namespace AdvancedGears
 {
     [CreateAssetMenu(menuName = "TestProject/Field/FieldSettings", order = 0)]
-    public class FieldSettings : ScriptableObject
+    public class FieldSettings : ScriptableObject,IDBasedMasterSettings
     {
         [SerializeField]
         string fieldName;
@@ -22,6 +22,8 @@ namespace AdvancedGears
         [SerializeField]
         List<string> fieldSceneNames = null;
         public List<string> FieldSceneNames => fieldSceneNames;
+
+        public int ID => FieldID;
 
 #if UNITY_EDITOR
         public void SearchFieldScenes()
@@ -44,21 +46,12 @@ namespace AdvancedGears
 #endif
     }
 
-    public class FieldMaster : Singleton<FieldMaster> , IMasterContainer
+    public class FieldMasterContainer : IDBasedMasterContainer<FieldSettings>
     {
-        const string resourcesFolder = "FieldSettings";
+        protected override string resourcesFolder => "FieldSettings";
+    }
 
-        public readonly Dictionary<int, FieldSettings> SettingsDic = new Dictionary<int, FieldSettings>();
-
-        public void Load()
-        {
-            var settings = Resources.LoadAll<FieldSettings>(resourcesFolder);
-
-            SettingsDic.Clear();
-            foreach (var set in settings)
-            {
-                SettingsDic[set.FieldID] = set;
-            }
-        }
+    public class FieldMaster : Singleton<FieldMasterContainer>
+    {
     }
 }

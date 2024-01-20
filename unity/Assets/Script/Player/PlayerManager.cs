@@ -6,13 +6,24 @@ namespace AdvancedGears
 {
     public class PlayerManager : SingletonMonoBehaviour<PlayerManager>
     {
-        public PlayerCharacter MyPC { get; private set; }
+        public long MyPlayerId { get; private set; } = -1;
+
+        public PlayerCharacter MyPC
+        {
+            get
+            {
+                if (MyPlayerId < 0)
+                    return null;
+
+                return playerDictionary[MyPlayerId];
+            }
+        }
 
         private readonly Dictionary<long, PlayerCharacter> playerDictionary = new Dictionary<long, PlayerCharacter>();
 
-        public PlayerCharacter CreatePlayer(bool isSelf, long id, Vector3 position, Quaternion rot)
+        public PlayerCharacter CreatePlayer(bool isSelf, long id, UnitSide side, Vector3 position, Quaternion rot)
         {
-            var prefab = PlayerMaster.Instance.GetPlayerPrefab(isSelf ? PlayerType.Self: PlayerType.Other);
+            var prefab = PlayerMaster.GetPlayerPrefab(isSelf ? PlayerType.Self: PlayerType.Other);
             if (prefab == null)
                 return null;
 
@@ -21,19 +32,27 @@ namespace AdvancedGears
             if (pc == null)
                 return null;
 
-            pc.Initialize(id, isSelf);
+            pc.Initialize(id, side, isSelf);
             go.transform.position += pc.PlayerHeight * Vector3.up;
+
+            playerDictionary[id] = pc;
 
             if (isSelf)
             {
-                MyPC = pc;
-            }
-            else
-            {
-                playerDictionary[id] = pc;
+                MyPlayerId = id;
             }
 
             return pc;
+        }
+
+        public PlayerCharacter GetPlayer(long playerId)
+        {
+            if (playerDictionary.TryGetValue(playerId, out var playerChara))
+            {
+                return playerChara;
+            }
+
+            return null;
         }
     }
 }

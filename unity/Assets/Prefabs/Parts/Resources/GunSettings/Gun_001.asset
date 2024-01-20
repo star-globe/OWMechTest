@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36d003706b0e0ec4daf235ba94ea0619, type: 3}
+  m_Name: Gun_001
+  m_EditorClassIdentifier: 
+  partId: 301001
+  categoryType: 301
+  partComponent: {fileID: 8438394016752521268, guid: e86c425f1ae653b439be0104cb9b3a2f,
+    type: 3}
+  gunCategoryType: 1
+  bulletId: 1
+  reloadInter: 10

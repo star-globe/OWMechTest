@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9551ad48999de3c46a8633ce54c04f3e, type: 3}
+  m_Name: PlayerControllerSettings
+  m_EditorClassIdentifier: 
+  vecSpeed: 3
+  accelerateTime: 0.1
+  jumpSpeed: 60
+  horizontalBoostRate: 3
+  floatRate: 0.9
+  rotSpeed: 120

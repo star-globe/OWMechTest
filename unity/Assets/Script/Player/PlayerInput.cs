@@ -67,6 +67,11 @@ namespace AdvancedGears
         [SerializeField]
         float floatRate = 0.9f;
 
+        [SerializeField]
+        PlayerControllerSettings controllerSettings;
+
+        float rotSpeed => controllerSettings.RotSpeed;
+
         bool isBoost = false;
         JumpInfo jumpInfo = new JumpInfo();
 
@@ -114,11 +119,11 @@ namespace AdvancedGears
 
         private void UpdateInput()
         {
-            UpdateXZ(out inputX, out inputZ);
+            InputUtils.UpdateXZ(out inputX, out inputZ);
 
             if (isJump == false && isTouched)
             {
-                if (Keyboard.current.spaceKey.wasPressedThisFrame)
+                if (InputUtils.CheckJump())
                 {
                     Vector3 holNor;
                     if (inputX == 0 && inputZ == 0)
@@ -134,21 +139,10 @@ namespace AdvancedGears
                 }
             }
 
-            if (Keyboard.current.leftShiftKey.wasPressedThisFrame)
+            if (InputUtils.CheckBoost())
             {
                 isBoost = !isBoost;
             }
-        }
-
-        private void UpdateXZ(out float x, out float z)
-        {
-            var w = Keyboard.current.wKey.ReadValue();
-            var s = Keyboard.current.sKey.ReadValue();
-            var a = Keyboard.current.aKey.ReadValue();
-            var d = Keyboard.current.dKey.ReadValue();
-
-            z = w - s;
-            x = d - a;
         }
 
         private void UpdateMove()
@@ -239,7 +233,9 @@ namespace AdvancedGears
             if (mX * mX < rotXMin * rotXMin)
                 return;
 
-            rigid.transform.Rotate(Vector3.up * mX);
+            var rotDeg = mX * rotSpeed * Time.deltaTime;
+
+            rigid.transform.Rotate(Vector3.up * rotDeg);
         }
 
         private Vector3 KickAndJump(Vector3 holNor)
