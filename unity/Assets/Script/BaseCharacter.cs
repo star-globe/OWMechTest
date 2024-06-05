@@ -40,5 +40,17 @@ namespace AdvancedGears
                 return 0;
             }
         }
+
+        public bool IsBoost
+        {
+            get
+            {
+                return CharacterParam.IsBoost;
+            }
+            set
+            {
+                CharacterParam.SetBoost(value);
+            }
+        }
     }
 }

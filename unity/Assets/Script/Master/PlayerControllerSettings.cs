@@ -32,6 +32,19 @@ namespace AdvancedGears
         [SerializeField]
         float rotSpeed = 180f;
         public float RotSpeed => rotSpeed;
+
+        [SerializeField]
+        float quickSpeed = 10.0f;
+        public float QuickSpeed => quickSpeed;
+
+        [SerializeField]
+        float quickTime = 0.5f;
+        public float QuickTime => quickTime;
+
+        [SerializeField]
+        float touchQuickRate = 1.5f;
+        public float TouchQuickRate => touchQuickRate;
+
         #endregion
     }
 }

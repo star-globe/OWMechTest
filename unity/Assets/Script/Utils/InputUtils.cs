@@ -31,15 +31,6 @@ public static class InputUtils
         var mouse = _mainControls.Player.CameraMouse;
         var pos = mouse.ReadValue<Vector2>();
 
-        //var pad = Gamepad.current;
-        //if (pad != null)
-        //{
-        //    var stick = pad.rightStick;
-        //    return new Vector3(stick.x.value, stick.y.value, 0);
-        //}
-        //
-        //var pos = Mouse.current.position.ReadValue();
-
         var x = Screen.width / 2;
         var y = Screen.height / 2;
         
@@ -68,45 +59,15 @@ public static class InputUtils
 
         x = vec.x;
         z = vec.y;
-
-        //var pad = Gamepad.current;
-        //if (pad != null)
-        //{
-        //    var stick = pad.leftStick;
-        //    x = stick.x.value;
-        //    z = stick.y.value;
-        //    return;
-        //}
-        //
-        //var w = Keyboard.current.wKey.ReadValue();
-        //var s = Keyboard.current.sKey.ReadValue();
-        //var a = Keyboard.current.aKey.ReadValue();
-        //var d = Keyboard.current.dKey.ReadValue();
-
-        //z = w - s;
-        //x = d - a;
-
-        //if (z * z < inputLim * inputLim)
-        //    z = 0;
-        //
-        //if (x * x < inputLim * inputLim)
-        //    x = 0;
     }
 
     public static bool CheckJump()
     {
         var action = _mainControls.Player.Jump;
         return action.WasPressedThisFrame();
-        //var pad = Gamepad.current;
-        //if (pad != null)
-        //{
-        //    return pad.rightShoulder.wasPressedThisFrame;
-        //}
-        //
-        //return Keyboard.current.spaceKey.wasPressedThisFrame;
     }
 
-    public static bool CheckQuickMove()
+    public static bool CheckQuick()
     {
         if (_mainControls == null)
         {
@@ -115,13 +76,6 @@ public static class InputUtils
 
         var action = _mainControls.Player.Quick;
         return action.WasPressedThisFrame();
-        //var pad = Gamepad.current;
-        //if (pad != null)
-        //{
-        //    return pad.leftShoulder.wasPressedThisFrame;
-        //}
-        //
-        //return Keyboard.current.leftShiftKey.wasPressedThisFrame;
     }
 
     public static bool CheckBoost()
@@ -133,13 +87,6 @@ public static class InputUtils
 
         var action = _mainControls.Player.Boost;
         return action.WasPressedThisFrame();
-        //var pad = Gamepad.current;
-        //if (pad != null)
-        //{
-        //    return pad.bButton.wasPressedThisFrame;
-        //}
-        //
-        //return Keyboard.current.tabKey.wasPressedThisFrame;
     }
 
     public static bool CheckRightFire()
@@ -151,14 +98,6 @@ public static class InputUtils
 
         var action = _mainControls.Player.RightFire;
         return action.IsPressed();
-
-        //var pad = Gamepad.current;
-        //if (pad != null)
-        //{
-        //    return pad.rightTrigger.isPressed;
-        //}
-        //
-        //return Mouse.current.rightButton.isPressed;
     }
 
     public static bool CheckLeftFire()
@@ -170,13 +109,5 @@ public static class InputUtils
 
         var action = _mainControls.Player.LeftFire;
         return action.IsPressed();
-
-        //var pad = Gamepad.current;
-        //if (pad != null)
-        //{
-        //    return pad.leftTrigger.isPressed;
-        //}
-        //
-        //return Mouse.current.leftButton.isPressed;
     }
 }

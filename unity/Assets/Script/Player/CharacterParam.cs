@@ -13,6 +13,8 @@ namespace AdvancedGears
         public int MaxEnergy { get; private set; }
         public int EnergyRecovery { get; private set; }
 
+        public bool IsBoost { get; private set; } = false;
+
         public void SetInitialInfo(int maxAp, int maxEnergy, int energyRecovery)
         {
             Ap = maxAp;
@@ -37,6 +39,11 @@ namespace AdvancedGears
         {
             var add = (int) (EnergyRecovery * time);
             Energy = Mathf.Min(MaxEnergy, Energy + add);
+        }
+
+        public void SetBoost(bool boost)
+        {
+            this.IsBoost = boost;
         }
     }
 }

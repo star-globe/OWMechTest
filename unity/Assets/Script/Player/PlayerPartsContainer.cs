@@ -42,10 +42,10 @@ namespace AdvancedGears
                 leftGunAttach.SetGun(assembleDataAsset.GetPartId(PartsAttachType.Weapon_Left));
         }
 
-        public void Boost(bool isOn)
+        public void Boost(int vectorBit)
         {
             if (boosterContainer != null)
-                boosterContainer.Boost(isOn);
+                boosterContainer.Boost(vectorBit);
         }
 
         public void RightFire(Vector3 tgt)
@@ -58,6 +58,12 @@ namespace AdvancedGears
         {
             if (leftGunAttach != null)
                 leftGunAttach.Fire(tgt);
+        }
+
+        public void Quick(int vectorBit)
+        {
+            if (boosterContainer != null)
+                boosterContainer.Quick(vectorBit);
         }
     }
 }

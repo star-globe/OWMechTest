@@ -7,7 +7,7 @@ namespace AdvancedGears
     public class BoosterContainer : MonoBehaviour
     {
         [SerializeField]
-        PartConnector[] connectorTrans = null;
+        BoosterPartConnector[] connectorTrans = null;
 
         readonly List<BoosterPart> boosters = new List<BoosterPart>();
 
@@ -23,6 +23,7 @@ namespace AdvancedGears
                 if (part == null)
                     continue;
 
+                part.SetBoostVector(connector.BoostVector);
                 boosters.Add(part);
             }
         }
@@ -32,10 +33,16 @@ namespace AdvancedGears
             SetBoosters(-1);
         }
 
-        public void Boost(bool isOn)
+        public void Boost(int vectorBit)
         {
             foreach (var bst in boosters)
-                bst.Boost(isOn);
+                bst.Boost(vectorBit);
+        }
+
+        public void Quick(int vectorBit)
+        {
+            foreach (var bst in boosters)
+                bst.Quick(vectorBit);
         }
     }
 }

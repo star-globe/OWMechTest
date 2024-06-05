@@ -33,6 +33,11 @@ namespace AdvancedGears
             return InputUtils.CheckJump();
         }
 
+        protected override bool CheckQuick()
+        {
+            return InputUtils.CheckQuick();
+        }
+
         private void SetTarget(out Vector3 target)
         {
             var trans = this.gameObject.transform;

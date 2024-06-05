@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Assertions;
 
 namespace AdvancedGears
@@ -9,6 +10,9 @@ namespace AdvancedGears
     {
         [SerializeField]
         float radius = 100;
+
+        [SerializeField]
+        NavMeshAgent agent;
 
         private bool CheckTarget(out Vector3 target)
         {
@@ -38,6 +42,23 @@ namespace AdvancedGears
             else
             {
                 return false;
+            }
+        }
+
+        protected override void UpdateInput()
+        {
+            UpdateAgent();
+
+            base.UpdateInput();
+        }
+
+        Vector3[] corners = new Vector3[16];
+
+        private void UpdateAgent()
+        {
+            if (agent.pathStatus != NavMeshPathStatus.PathInvalid)
+            {
+                agent.path.GetCornersNonAlloc(corners);
             }
         }
     }

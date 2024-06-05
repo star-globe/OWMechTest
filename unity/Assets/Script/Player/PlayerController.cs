@@ -10,12 +10,14 @@ namespace AdvancedGears
         public bool isJump { get; private set; }
         public float jumpSumTime { get; private set; }
         public Vector3 jumpVector { get; private set; }
+        public Vector3 localNor { get; private set; }
 
-        public void SetJump(Vector3 vector)
+        public void SetJump(Vector3 jumpVec, Vector3 local)
         {
             isJump = true;
             jumpSumTime = 0.0f;
-            jumpVector = vector;
+            jumpVector = jumpVec;
+            this.localNor = local;
         }
 
         public void UpdateJumpSumTime(float sum)
@@ -59,20 +61,24 @@ namespace AdvancedGears
         float touchTime => PlayerControllerConst.Instance.TouchTime;
         float airBrakeRate => PlayerControllerConst.Instance.AirBrakeRate;
         float touchBrakeRateAdd => PlayerControllerConst.Instance.TouchBrakeRateAdd;
+
+        float quickSpeed => controllerSettings.QuickSpeed;
+        float touchQuickRate => controllerSettings.TouchQuickRate;
+        float quickTime => controllerSettings.QuickTime;
         #endregion
 
         [SerializeField]
         PlayerPartsContainer partsContainer = null;
 
-        bool isBoost = false;
         bool IsBoost
         {
-            get { return isBoost; }
+            get
+            {
+                return playerCharacter.IsBoost;
+            }
             set
             {
-                partsContainer.Boost(value);
-
-                isBoost = value;
+                playerCharacter.IsBoost = value;
             }
         }
         JumpInfo jumpInfo = new JumpInfo();
@@ -92,6 +98,25 @@ namespace AdvancedGears
         Vector3 jumpVector
         {
             get { return jumpInfo.jumpVector; }
+        }
+
+        JumpInfo quickInfo = new JumpInfo();
+
+        bool isQuick { get { return quickInfo.isJump; } }
+        float quickSumTime
+        {
+            get
+            {
+                return quickInfo.jumpSumTime;
+            }
+            set
+            {
+                quickInfo.UpdateJumpSumTime(value);
+            }
+        }
+        Vector3 quickVector
+        {
+            get { return quickInfo.jumpVector; }
         }
 
         public UnitSide UnitSide
@@ -121,12 +146,18 @@ namespace AdvancedGears
 
         private void Start()
         {
-            this.IsBoost = false;
+            SyncParam();
+        }
+
+        private void SyncParam()
+        {
+            this.IsBoost = playerCharacter.IsBoost;
         }
 
         private void Update()
         {
             UpdateInput();
+            UpdateEffect();
         }
 
         void FixedUpdate()
@@ -164,6 +195,10 @@ namespace AdvancedGears
         {
             return false;
         }
+        protected virtual bool CheckQuick()
+        {
+            return false;
+        }
         protected virtual bool CheckRightFire(out Vector3 target)
         {
             target = Vector3.zero;
@@ -175,27 +210,30 @@ namespace AdvancedGears
             return false;
         }
 
-        private void UpdateInput()
+        protected virtual void UpdateInput()
         {
             UpdateXZ(out inputX, out inputZ);
-
 
             if (CheckJump())
             {
                 if (isJump == false && isTouched)
                 {
-
                     Vector3 holNor;
+                    Vector3 local;
                     if (inputX == 0 && inputZ == 0)
+                    {
                         holNor = Vector3.zero;
+                        local = Vector3.up;
+                    }
                     else
                     {
                         holNor = new Vector3(inputX, 0, inputZ);
                         holNor.Normalize();
+                        local = holNor;
                         holNor = rigid.transform.TransformDirection(holNor);
                     }
 
-                    jumpInfo.SetJump(KickAndJump(holNor));
+                    jumpInfo.SetJump(KickAndJump(holNor), local);
                     rigid.velocity = Vector3.zero;
                 }
                 else
@@ -206,6 +244,35 @@ namespace AdvancedGears
             if (CheckBoost())
             {
                 this.IsBoost = !this.IsBoost;
+            }
+            if (CheckQuick())
+            {
+                if (isQuick == false)
+                {
+                    Vector3 localVec;
+                    Vector3 jumpVec;
+                    if (inputX == 0 && inputZ == 0)
+                    {
+                        localVec = Vector3.forward;
+                    }
+                    else
+                    {
+                        localVec = new Vector3(inputX, 0, inputZ);
+                        localVec.Normalize();
+                        jumpVec = rigid.transform.TransformDirection(localVec);
+                    }
+
+                    var speed = quickSpeed;
+                    if (isTouched)
+                        speed *= touchQuickRate;
+
+                    quickInfo.SetJump(jumpVector * quickSpeed, localVec);
+                    rigid.velocity = Vector3.zero;
+                }
+                else
+                {
+                    Debug.LogFormat("IsQuick:{0} IsTouched:{1}", isQuick, isTouched);
+                }
             }
 
             Vector3 tgt;
@@ -222,16 +289,13 @@ namespace AdvancedGears
 
         protected virtual void Fire(Vector3 tgt, bool isRight)
         {
-            if (partsContainer != null)
+            if (isRight)
             {
-                if (isRight)
-                {
-                    partsContainer.RightFire(tgt);
-                }
-                else
-                {
-                    partsContainer.LeftFire(tgt);
-                }
+                partsContainer.RightFire(tgt);
+            }
+            else
+            {
+                partsContainer.LeftFire(tgt);
             }
         }
 
@@ -298,6 +362,21 @@ namespace AdvancedGears
                 }
             }
 
+            if (isQuick)
+            {
+                bool forceReset = false;
+                if (quickSumTime < quickTime)
+                    vec += quickVector * delta / quickTime;
+                else
+                    forceReset = isTouched;
+
+                quickSumTime += delta;
+                if (quickSumTime >= quickTime || forceReset)
+                {
+                    quickInfo.ResetJump();
+                }
+            }
+
             if (this.IsBoost && !isInput && !isJump)
             {
                 vec = new Vector3(-vel.x, 0, -vel.z);
@@ -317,6 +396,34 @@ namespace AdvancedGears
             }
 
             rigid.AddForce(vec, ForceMode.VelocityChange);
+        }
+
+        private void UpdateEffect()
+        {
+            if (IsBoost)
+            {
+                int bit = 0;
+                if (isFloating)
+                {
+                    bit = -1;
+                }
+                else
+                {
+                    bit = ActionUtils.ConvertBitXZ(inputX, inputZ);
+                }
+
+                partsContainer.Boost(bit);
+            }
+
+            if (isQuick && quickInfo.jumpSumTime == 0)
+            {
+                partsContainer.Quick(ActionUtils.ConvertBit(quickInfo.localNor));
+            }
+
+            if (isJump && jumpInfo.jumpSumTime == 0)
+            {
+                partsContainer.Quick(ActionUtils.ConvertBit(jumpInfo.localNor));
+            }
         }
 
         private bool isFloating

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vecSpeed: 3
   accelerateTime: 0.1
-  jumpSpeed: 60
-  horizontalBoostRate: 3
+  jumpSpeed: 30
+  horizontalBoostRate: 2
   floatRate: 0.9
-  rotSpeed: 120
+  rotSpeed: 100
