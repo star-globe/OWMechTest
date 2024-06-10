@@ -21,17 +21,22 @@ namespace AdvancedGears
         ParticleSystem quick;
 
         int boostBit = 0;
+        bool isOn = false;
 
         public void SetBoostVector(BoostVector vec)
         {
-            boostBit = 1 >> (byte) vec;
+            boostBit = 1 << (byte) vec;
         }
 
         public void Boost(int vectorBit)
         {
             if (particle != null)
             {
-                bool isOn = (boostBit & vectorBit) != 0;
+                bool on = (boostBit & vectorBit) != 0;
+                if (this.isOn == on)
+                    return;
+
+                this.isOn = on;
                 if (isOn)
                     particle.Play();
                 else

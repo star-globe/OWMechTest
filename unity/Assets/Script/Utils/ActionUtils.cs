@@ -29,20 +29,20 @@ public static class ActionUtils
         int bit = 0;
         if (x > 0)
         {
-            bit |= 1 >> (byte) BoostVector.Right;
+            bit |= 1 << (byte) BoostVector.Right;
         }
         else if (x < 0)
         {
-            bit |= 1 >> (byte) BoostVector.Left;
+            bit |= 1 << (byte) BoostVector.Left;
         }
 
         if (z > 0)
         {
-            bit |= 1 >> (byte) BoostVector.Forward;
+            bit |= 1 << (byte) BoostVector.Forward;
         }
         else if (z < 0)
         {
-            bit |= 1 >> (byte) BoostVector.Back;
+            bit |= 1 << (byte) BoostVector.Back;
         }
 
         return bit;

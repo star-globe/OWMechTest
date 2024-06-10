@@ -400,9 +400,9 @@ namespace AdvancedGears
 
         private void UpdateEffect()
         {
+            int bit = 0;
             if (IsBoost)
             {
-                int bit = 0;
                 if (isFloating)
                 {
                     bit = -1;
@@ -411,9 +411,9 @@ namespace AdvancedGears
                 {
                     bit = ActionUtils.ConvertBitXZ(inputX, inputZ);
                 }
-
-                partsContainer.Boost(bit);
             }
+
+            partsContainer.Boost(bit);
 
             if (isQuick && quickInfo.jumpSumTime == 0)
             {
