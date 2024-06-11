@@ -42,6 +42,10 @@ namespace AdvancedGears
         public float QuickTime => quickTime;
 
         [SerializeField]
+        float quickInterval = 0.5f;
+        public float QuickInterval => quickInterval;
+
+        [SerializeField]
         float touchQuickRate = 1.5f;
         public float TouchQuickRate => touchQuickRate;
 

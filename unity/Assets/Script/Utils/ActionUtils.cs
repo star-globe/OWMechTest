@@ -47,4 +47,16 @@ public static class ActionUtils
 
         return bit;
     }
+
+    public static int FloatingBit
+    {
+        get
+        {
+            int bit = 0;
+            bit |= 1 << (byte) BoostVector.Forward;
+            bit |= 1 << (byte) BoostVector.Back;
+
+            return bit;
+        }
+    }
 }

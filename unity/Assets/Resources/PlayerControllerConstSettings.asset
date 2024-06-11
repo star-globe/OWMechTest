@@ -18,5 +18,6 @@ MonoBehaviour:
   wallJumpRate: 1
   jumpTime: 2
   touchTimeRate: 0.2
+  jumpInterval: 0.2
   airBrakeRate: 1
   touchBrakeRateAdd: 0.5

@@ -33,6 +33,10 @@ namespace AdvancedGears
         public float TouchTime => jumpTime * touchTimeRate;
 
         [SerializeField]
+        float jumpInterval = 0.2f;
+        public float JumpInterval => jumpInterval;
+
+        [SerializeField]
         float airBrakeRate = 0.2f;
         public float AirBrakeRate => airBrakeRate;
 
@@ -65,6 +69,7 @@ namespace AdvancedGears
         public float RotYLim => this.Settings.RotYLim;
         public float WallJumpRate => this.Settings.WallJumpRate;
         public float JumpTime => this.Settings.JumpTime;
+        public float JumpInterval => this.Settings.JumpInterval;
         public float TouchTime => this.Settings.TouchTime;
         public float AirBrakeRate => this.Settings.AirBrakeRate;
         public float TouchBrakeRateAdd => this.Settings.TouchBrakeRateAdd;

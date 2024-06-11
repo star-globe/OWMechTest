@@ -18,3 +18,7 @@ MonoBehaviour:
   horizontalBoostRate: 2
   floatRate: 0.9
   rotSpeed: 100
+  quickSpeed: 40
+  quickTime: 1.5
+  quickInterval: 0.5
+  touchQuickRate: 1.5
