@@ -110,4 +110,26 @@ public static class InputUtils
         var action = _mainControls.Player.LeftFire;
         return action.IsPressed();
     }
+
+    public static bool CheckHyperBoost()
+    {
+        if (_mainControls == null)
+        {
+            return false;
+        }
+
+        var action = _mainControls.Player.HyperBoost;
+        return action.WasPressedThisFrame();
+    }
+
+    public static bool CheckModeSwitch()
+    {
+        if (_mainControls == null)
+        {
+            return false;
+        }
+
+        var action = _mainControls.Player.ModeSwitch;
+        return action.WasPressedThisFrame();
+    }
 }

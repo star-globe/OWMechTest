@@ -25,17 +25,17 @@ namespace AdvancedGears
 
         protected override bool CheckBoost()
         {
-            return InputUtils.CheckBoost();
+            return base.CheckBoost() && InputUtils.CheckBoost();
         }
 
         protected override bool CheckJump()
         {
-            return InputUtils.CheckJump();
+            return base.CheckJump() && InputUtils.CheckJump();
         }
 
         protected override bool CheckQuick()
         {
-            return InputUtils.CheckQuick();
+            return base.CheckQuick() && InputUtils.CheckQuick();
         }
 
         private void SetTarget(out Vector3 target)

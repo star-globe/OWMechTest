@@ -17,6 +17,9 @@ namespace AdvancedGears
         [SerializeField]
         CapsuleCollider capsuleCollider = null;
 
+        [SerializeField]
+        PlayerParameterSettings paramSettings;
+
         public CharacterParam CharacterParam { get; private set; } = null;
 
         public long ID { get; private set; }
@@ -27,7 +30,7 @@ namespace AdvancedGears
             this.ID = id;
             this.Side = side;
             CharacterParam = new CharacterParam();
-            CharacterParam.SetInitialInfo(1000, 1000, 400);
+            CharacterParam.SetInitialInfo(paramSettings);
         }
 
         public float SelfHeight
@@ -50,6 +53,57 @@ namespace AdvancedGears
             set
             {
                 CharacterParam.SetBoost(value);
+            }
+        }
+
+        public bool IsQuickBoost
+        {
+            get
+            {
+                return CharacterParam.IsQuickBoost;
+            }
+        }
+
+        public void IgnitQuickBoost()
+        {
+            CharacterParam.SetQuickBoost(true);
+            CharacterParam.ConsumeQuick();
+        }
+
+        public void QuitQuickBoost()
+        {
+            CharacterParam.SetQuickBoost(false);
+        }
+
+        public bool IsHyperBoost
+        {
+            get
+            {
+                return CharacterParam.IsHyperBoost;
+            }
+            set
+            {
+                CharacterParam.SetHyperBoost(value);
+            }
+        }
+
+        public void RecoveryEnegy(float time)
+        {
+            CharacterParam.Recovery(time);
+        }
+
+        public void UpdateParam(float time, bool isFloat)
+        {
+            CharacterParam.Recovery(time);
+
+            if (IsBoost && !isFloat)
+            {
+                CharacterParam.ConsumeBoostEnergy(time);
+            }
+
+            if (IsHyperBoost)
+            {
+                CharacterParam.ConsumeHyper(time);
             }
         }
     }

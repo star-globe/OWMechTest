@@ -98,6 +98,24 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HyperBoost"",
+                    ""type"": ""Button"",
+                    ""id"": ""924de03f-bd49-46e2-87f6-573ebcb5a1b9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ModeSwitch"",
+                    ""type"": ""Button"",
+                    ""id"": ""784696d0-15b7-4375-9780-5eb1b0b8979f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -298,6 +316,50 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
                     ""action"": ""CameraMouse"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f5fc69b8-fb44-4ba7-b275-785f0758580b"",
+                    ""path"": ""<Gamepad>/leftStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HyperBoost"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a44e6870-8d5f-4439-94e2-48411d29eadb"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HyperBoost"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1ad5bc05-8428-41c1-bd8c-d5731f727be3"",
+                    ""path"": ""<Gamepad>/rightStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ModeSwitch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d06f6319-4166-4ea9-a14c-c42645922693"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ModeSwitch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -314,6 +376,8 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
         m_Player_Quick = m_Player.FindAction("Quick", throwIfNotFound: true);
         m_Player_RightFire = m_Player.FindAction("RightFire", throwIfNotFound: true);
         m_Player_LeftFire = m_Player.FindAction("LeftFire", throwIfNotFound: true);
+        m_Player_HyperBoost = m_Player.FindAction("HyperBoost", throwIfNotFound: true);
+        m_Player_ModeSwitch = m_Player.FindAction("ModeSwitch", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -383,6 +447,8 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Quick;
     private readonly InputAction m_Player_RightFire;
     private readonly InputAction m_Player_LeftFire;
+    private readonly InputAction m_Player_HyperBoost;
+    private readonly InputAction m_Player_ModeSwitch;
     public struct PlayerActions
     {
         private @MainControls m_Wrapper;
@@ -395,6 +461,8 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
         public InputAction @Quick => m_Wrapper.m_Player_Quick;
         public InputAction @RightFire => m_Wrapper.m_Player_RightFire;
         public InputAction @LeftFire => m_Wrapper.m_Player_LeftFire;
+        public InputAction @HyperBoost => m_Wrapper.m_Player_HyperBoost;
+        public InputAction @ModeSwitch => m_Wrapper.m_Player_ModeSwitch;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -428,6 +496,12 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
             @LeftFire.started += instance.OnLeftFire;
             @LeftFire.performed += instance.OnLeftFire;
             @LeftFire.canceled += instance.OnLeftFire;
+            @HyperBoost.started += instance.OnHyperBoost;
+            @HyperBoost.performed += instance.OnHyperBoost;
+            @HyperBoost.canceled += instance.OnHyperBoost;
+            @ModeSwitch.started += instance.OnModeSwitch;
+            @ModeSwitch.performed += instance.OnModeSwitch;
+            @ModeSwitch.canceled += instance.OnModeSwitch;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -456,6 +530,12 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
             @LeftFire.started -= instance.OnLeftFire;
             @LeftFire.performed -= instance.OnLeftFire;
             @LeftFire.canceled -= instance.OnLeftFire;
+            @HyperBoost.started -= instance.OnHyperBoost;
+            @HyperBoost.performed -= instance.OnHyperBoost;
+            @HyperBoost.canceled -= instance.OnHyperBoost;
+            @ModeSwitch.started -= instance.OnModeSwitch;
+            @ModeSwitch.performed -= instance.OnModeSwitch;
+            @ModeSwitch.canceled -= instance.OnModeSwitch;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -483,5 +563,7 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
         void OnQuick(InputAction.CallbackContext context);
         void OnRightFire(InputAction.CallbackContext context);
         void OnLeftFire(InputAction.CallbackContext context);
+        void OnHyperBoost(InputAction.CallbackContext context);
+        void OnModeSwitch(InputAction.CallbackContext context);
     }
 }

@@ -40,6 +40,31 @@ namespace AdvancedGears
         }
     }
 
+    public struct HyperBoostInfo
+    {
+        public bool isOn { get; private set; }
+        public Vector2 inputVector { get; private set; }
+        public Vector3 localBoostVector { get; private set; }
+
+        public void SetBoost(Vector2 input, float boostVal)
+        {
+            inputVector = input;
+            localBoostVector = new Vector3(input.x, 0, input.y) * boostVal;
+            isOn = true;
+        }
+
+        public void ResetBoost()
+        {
+            localBoostVector = Vector3.zero;
+            isOn = false;
+        }
+
+        public bool CheckInputVector(Vector2 input)
+        {
+            return Vector2.Dot(input, inputVector) >= 0;
+        }
+    }
+
     public class PlayerController : MonoBehaviour
     {
         [SerializeField]
@@ -166,6 +191,7 @@ namespace AdvancedGears
         private void Update()
         {
             UpdateInput();
+            UpdateParam();
             UpdateEffect();
         }
 
@@ -198,15 +224,19 @@ namespace AdvancedGears
 
         protected virtual bool CheckJump()
         {
-            return false;
+            return playerCharacter.CharacterParam.CanJump;
         }
         protected virtual bool CheckBoost()
         {
-            return false;
+            return playerCharacter.CharacterParam.CanBoost;
         }
         protected virtual bool CheckQuick()
         {
-            return false;
+            return playerCharacter.CharacterParam.CanQuick;
+        }
+        protected virtual bool CheckHyperBoost()
+        {
+            return playerCharacter.CharacterParam.CanHyperBoost;
         }
         protected virtual bool CheckRightFire(out Vector3 target)
         {
@@ -276,6 +306,7 @@ namespace AdvancedGears
                         speed *= touchQuickRate;
 
                     quickInfo.SetJump(quickVec * quickSpeed, localVec, quickInterval);
+                    playerCharacter.IgnitQuickBoost();
                     //rigid.velocity = Vector3.zero;
                 }
                 else
@@ -283,7 +314,9 @@ namespace AdvancedGears
                     Debug.LogFormat("IsQuick:{0} IsTouched:{1}", isQuick, isTouched);
                 }
             }
-
+            if (CheckHyperBoost())
+            {
+            }
             Vector3 tgt;
             if (CheckRightFire(out tgt))
             {
@@ -294,6 +327,12 @@ namespace AdvancedGears
             {
                 Fire(tgt, isRight: false);
             }
+        }
+
+        void UpdateParam()
+        {
+            var time = Time.deltaTime;
+            playerCharacter.UpdateParam(time, isFloating);
         }
 
         protected virtual void Fire(Vector3 tgt, bool isRight)
@@ -387,6 +426,7 @@ namespace AdvancedGears
                 if (quickSumTime >= quickTime || forceReset)
                 {
                     quickInfo.ResetJump();
+                    playerCharacter.QuitQuickBoost();
                 }
             }
             else

@@ -488,8 +488,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectorTrans:
-  - {fileID: 209475458652074914}
-  - {fileID: 6353848761094750141}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1 &4972714698680965442
 GameObject:
   m_ObjectHideFlags: 0
@@ -1013,6 +1013,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   capsuleCollider: {fileID: 1782852313489705339}
+  paramSettings: {fileID: 11400000, guid: a8d46df8e183a6d43871221a04b7930d, type: 2}
 --- !u!136 &1782852313489705339
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1061,6 +1062,7 @@ MonoBehaviour:
   controllerSettings: {fileID: 11400000, guid: 73710241aa44cc749ad9db7dcca12955, type: 2}
   partsContainer: {fileID: 2832605969727241905}
   radius: 100
+  agent: {fileID: 0}
 --- !u!114 &2832605969727241905
 MonoBehaviour:
   m_ObjectHideFlags: 0
