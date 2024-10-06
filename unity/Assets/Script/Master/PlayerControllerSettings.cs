@@ -49,6 +49,9 @@ namespace AdvancedGears
         float touchQuickRate = 1.5f;
         public float TouchQuickRate => touchQuickRate;
 
+        [SerializeField]
+        float hyperBoostSpeed = 10.0f;
+        public float HyperBoostSpeed => hyperBoostSpeed;
         #endregion
     }
 }

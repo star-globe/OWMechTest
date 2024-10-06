@@ -99,6 +99,8 @@ namespace AdvancedGears
         float touchQuickRate => controllerSettings.TouchQuickRate;
         float quickTime => controllerSettings.QuickTime;
         float quickInterval => controllerSettings.QuickInterval;
+
+        float hyperBoostSpeed => controllerSettings.HyperBoostSpeed;
         #endregion
 
         [SerializeField]
@@ -153,6 +155,10 @@ namespace AdvancedGears
             get { return quickInfo.jumpVector; }
         }
 
+        HyperBoostInfo hypBstInfo = new HyperBoostInfo();
+
+        bool isHyperBoost { get { return hypBstInfo.isOn; } }
+
         public UnitSide UnitSide
         {
             get
@@ -206,7 +212,12 @@ namespace AdvancedGears
             get
             {
                 if (this.IsBoost)
-                    return vecSpeed * horizontalBoostRate;
+                {
+                    if (this.isHyperBoost)
+                        return hyperBoostSpeed;
+                    else
+                        return vecSpeed * horizontalBoostRate;
+                }
                 else
                     return vecSpeed;
             }
@@ -314,8 +325,41 @@ namespace AdvancedGears
                     Debug.LogFormat("IsQuick:{0} IsTouched:{1}", isQuick, isTouched);
                 }
             }
-            if (CheckHyperBoost())
+            if (isHyperBoost)
             {
+                bool checkInverse()
+                {
+                    if (inputX != 0 || inputZ != 0)
+                    {
+                        var local = new Vector2(inputX, inputZ);
+                        local.Normalize();
+                        return Vector2.Dot(hypBstInfo.inputVector, local) < 0;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+
+                if (isJump || checkInverse())
+                {
+                    hypBstInfo.ResetBoost();
+                }
+            }
+            else if (CheckHyperBoost())
+            {
+                Vector2 localVec;
+                if (inputX == 0 && inputZ == 0)
+                {
+                    localVec = Vector2.up;
+                }
+                else
+                {
+                    localVec = new Vector2(inputX, inputZ);
+                    localVec.Normalize();
+                }
+
+                hypBstInfo.SetBoost(localVec, hyperBoostSpeed);
             }
             Vector3 tgt;
             if (CheckRightFire(out tgt))
@@ -369,6 +413,7 @@ namespace AdvancedGears
             canAccel &= !isFloating || this.IsBoost;
 
             Vector3 vec = Vector3.zero;
+            var delta = Time.deltaTime;
 
             if (canAccel)
             {
@@ -376,10 +421,18 @@ namespace AdvancedGears
                 if (this.isFloating)
                     accelTime *= 2;
 
-                hVec *= vecSpeed * Time.deltaTime / accelTime;
+                if (this.isHyperBoost)
+                {
+                    var bstVec = rigid.transform.TransformDirection(hypBstInfo.localBoostVector);
+                    hVec += bstVec * (delta / accelTime);
+                }
+                else
+                {
+                    hVec *= vecSpeed * delta / accelTime;
 
-                if (this.IsBoost)
-                    hVec *= horizontalBoostRate;
+                    if (this.IsBoost)
+                        hVec *= horizontalBoostRate;
+                }
 
                 vec += hVec;
 
@@ -394,7 +447,6 @@ namespace AdvancedGears
                 }
             }
 
-            var delta = Time.deltaTime;
             if (isJump)
             {
                 bool forceReset = false;
