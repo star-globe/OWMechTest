@@ -16,8 +16,9 @@ MonoBehaviour:
   rotYMin: 0.15
   rotYLim: 80
   wallJumpRate: 1
-  jumpTime: 2
+  jumpTime: 0.05
   touchTimeRate: 0.2
   jumpInterval: 0.2
   airBrakeRate: 1
   touchBrakeRateAdd: 0.5
+  quickYdelta: 0.2

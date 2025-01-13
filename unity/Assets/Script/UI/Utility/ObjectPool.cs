@@ -12,7 +12,9 @@ public class ObjectPool<T> where T : Component
     T baseObject = null;
 
     private readonly Queue<T> sleepQueue = new Queue<T>();
-    private readonly List<T> activeList = new List<T>();
+    public readonly List<T> activeList = new List<T>();
+
+    public int ActiveCount => activeList.Count;
 
     public T Borrow()
     {
@@ -39,6 +41,15 @@ public class ObjectPool<T> where T : Component
         return comp;
     }
 
+    public T Get(int index)
+    {
+        if (index >= 0 && index < activeList.Count)
+        {
+            return activeList[index];
+        }
+
+        return null;
+    }
     public void Return(T comp)
     {
         if (comp == null)

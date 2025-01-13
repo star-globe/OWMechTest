@@ -43,6 +43,10 @@ namespace AdvancedGears
         [SerializeField]
         float touchBrakeRateAdd = 0.2f;
         public float TouchBrakeRateAdd => touchBrakeRateAdd;
+
+        [SerializeField]
+        float quickYdelta = 0.1f;
+        public float QuickYDelta => quickYdelta;
     }
 
     public class PlayerControllerConst : Singleton<PlayerControllerConst>
@@ -73,6 +77,7 @@ namespace AdvancedGears
         public float TouchTime => this.Settings.TouchTime;
         public float AirBrakeRate => this.Settings.AirBrakeRate;
         public float TouchBrakeRateAdd => this.Settings.TouchBrakeRateAdd;
+        public float QuickYDelta => this.Settings.QuickYDelta;
 
         public void Load()
         {

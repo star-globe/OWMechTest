@@ -24,7 +24,7 @@ namespace AdvancedGears
 
         public void UpdateJumpSumTime(float sum)
         {
-            jumpSumTime += sum;
+            jumpSumTime = sum;
         }
 
         public void ReduceIntervalTime(float cool)
@@ -94,6 +94,7 @@ namespace AdvancedGears
         float jumpInterval => PlayerControllerConst.Instance.JumpInterval;
         float airBrakeRate => PlayerControllerConst.Instance.AirBrakeRate;
         float touchBrakeRateAdd => PlayerControllerConst.Instance.TouchBrakeRateAdd;
+        float quickYDelta => PlayerControllerConst.Instance.QuickYDelta;
 
         float quickSpeed => controllerSettings.QuickSpeed;
         float touchQuickRate => controllerSettings.TouchQuickRate;
@@ -284,6 +285,7 @@ namespace AdvancedGears
                     }
 
                     jumpInfo.SetJump(KickAndJump(holNor), local, jumpInterval);
+                    playerCharacter.IgnitJumpBoost();
                     //rigid.velocity = Vector3.zero;
                 }
                 else
@@ -308,6 +310,11 @@ namespace AdvancedGears
                     {
                         localVec = new Vector3(inputX, 0, inputZ);
                         localVec.Normalize();
+                    }
+
+                    if (!isFloating)
+                    {
+                        localVec += Vector3.up * quickYDelta;
                     }
 
                     var quickVec = rigid.transform.TransformDirection(localVec);
@@ -344,9 +351,10 @@ namespace AdvancedGears
                 if (isJump || checkInverse())
                 {
                     hypBstInfo.ResetBoost();
+                    playerCharacter.IsHyperBoost = false;
                 }
             }
-            else if (CheckHyperBoost())
+            else if (CheckHyperBoost() && IsBoost)
             {
                 Vector2 localVec;
                 if (inputX == 0 && inputZ == 0)
@@ -360,6 +368,7 @@ namespace AdvancedGears
                 }
 
                 hypBstInfo.SetBoost(localVec, hyperBoostSpeed);
+                playerCharacter.IsHyperBoost = true;
             }
             Vector3 tgt;
             if (CheckRightFire(out tgt))
@@ -459,6 +468,7 @@ namespace AdvancedGears
                 if (jumpSumTime >= jumpTime || forceReset)
                 {
                     jumpInfo.ResetJump();
+                    playerCharacter.QuitJumpBoost();
                 }
             }
             else
@@ -486,7 +496,7 @@ namespace AdvancedGears
                 quickInfo.ReduceIntervalTime(delta);
             }
 
-            if (this.IsBoost && !isInput && !isJump)
+            if (this.IsBoost && !isInput && !isJump && !isQuick)
             {
                 vec = new Vector3(-vel.x, 0, -vel.z);
                 var brake = this.airBrakeRate;
@@ -505,6 +515,8 @@ namespace AdvancedGears
             }
 
             rigid.AddForce(vec, ForceMode.VelocityChange);
+
+            playerCharacter.SetSpeed(rigid.velocity.magnitude);
         }
 
         private void UpdateEffect()
@@ -533,6 +545,14 @@ namespace AdvancedGears
             {
                 partsContainer.Quick(ActionUtils.ConvertBit(jumpInfo.localNor));
             }
+
+            int hyperBoostBit = 0;
+            if (isHyperBoost)
+            {
+                hyperBoostBit = ActionUtils.ConvertBit(hypBstInfo.localBoostVector);
+            }
+
+            partsContainer.HyperBoost(hyperBoostBit);
         }
 
         private bool isFloating

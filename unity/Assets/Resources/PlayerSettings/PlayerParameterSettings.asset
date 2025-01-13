@@ -14,11 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxAp: 10000
   maxEnergy: 10000
-  energyRecovery: 2500
+  energyRecovery: 3500
   boostEnergy: 1500
-  jumpEnergy: 3500
-  quickBoostEnergy: 3000
-  hyperBoostEnergy: 2000
+  jumpEnergy: 2000
+  quickBoostEnergy: 2500
+  hyperBoostEnergy: 4000
   quickTime: 0.5
   quickInterval: 0.5
   touchQuickRate: 1.5
+  lockCircleSize: 250
+  lockLength: 250

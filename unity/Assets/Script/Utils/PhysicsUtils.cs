@@ -51,6 +51,35 @@ public static class PhysicsUtils
         return length < float.MaxValue;
     }
 
+    public static int OverlapShpere(Vector3 pos, float radius, UnitSide selfSide, int layerMask, string tag, BaseCharacter[] results)
+    {
+        int characterCount = 0;
+        var count = Physics.OverlapSphereNonAlloc(pos, radius, colliders, layerMask);
+        for (int i = 0; i < count; i++)
+        {
+            var col = colliders[i];
+            if (string.Equals(col.gameObject.tag, tag) == false)
+                continue;
+
+            BaseCharacter character = null;
+            if (selfSide != UnitSide.None)
+            {
+                character = col.gameObject.GetComponent<BaseCharacter>();
+                if (character == null || character.Side == selfSide)
+                    continue;
+            }
+
+            if (character != null && characterCount < results.Length)
+            {
+                results[characterCount] = character;
+                characterCount++;
+            }
+        }
+
+        return characterCount;
+    }
+
+
     public static bool CheckOverlapScorn(Vector3 start, Vector3 forward, float angleRad, UnitSide selfSide, int layerMask, string tag, out Vector3 targetPos)
     {
         targetPos = Vector3.zero;

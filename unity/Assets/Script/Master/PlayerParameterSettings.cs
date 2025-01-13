@@ -49,6 +49,13 @@ namespace AdvancedGears
         float touchQuickRate = 1.5f;
         public float TouchQuickRate => touchQuickRate;
 
+        [SerializeField]
+        int lockCircleSize = 250;
+        public int LockCircleSize => lockCircleSize;
+
+        [SerializeField]
+        int lockLength = 250;
+        public int LockLength => lockLength;
         #endregion
     }
 }

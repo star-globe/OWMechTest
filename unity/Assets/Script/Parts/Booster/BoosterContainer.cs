@@ -44,5 +44,11 @@ namespace AdvancedGears
             foreach (var bst in boosters)
                 bst.Quick(vectorBit);
         }
+
+        public void HyperBoost(int vectorBit)
+        {
+            foreach (var bst in boosters)
+                bst.HyperBoost(vectorBit);
+        }
     }
 }

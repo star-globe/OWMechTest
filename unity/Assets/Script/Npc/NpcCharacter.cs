@@ -7,11 +7,11 @@ namespace AdvancedGears
 {
     public class NpcCharacter : BaseCharacter
     {
-        public bool IsCompany {get;private set;}
-        public void Initialize(long id, UnitSide side, bool isCompany)
+        public int LogicID {get;private set;}
+        public void Initialize(long id, UnitSide side, int logicId)
         {
             base.Initialize(id, side);
-            this.IsCompany = isCompany;
+            this.LogicID = logicId;
         }
     }
 }

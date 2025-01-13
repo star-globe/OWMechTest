@@ -65,5 +65,11 @@ namespace AdvancedGears
             if (boosterContainer != null)
                 boosterContainer.Quick(vectorBit);
         }
+
+        public void HyperBoost(int vectorBit)
+        {
+            if (boosterContainer != null)
+                boosterContainer.HyperBoost(vectorBit);
+        }
     }
 }

@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,42 +14,76 @@ namespace AdvancedGears
 
     public class BoosterPart : PartComponent
     {
-        [SerializeField]
-        ParticleSystem particle;
+        [Serializable]
+        class BoosterParticleSystem
+        {
+            [SerializeField]
+            ParticleSystem particle;
+
+            [SerializeField]
+            bool isPulse = false;
+
+            bool isOn = false;
+            int boostBit = 0;
+
+            public void SetBoostVector(BoostVector vec)
+            {
+                boostBit = 1 << (byte) vec;
+            }
+
+            public void Boost(int vectorBit)
+            {
+                if (isPulse)
+                {
+                    particle.Play();
+                }
+                else
+                {
+                    bool on = (boostBit & vectorBit) != 0;
+                    if (this.isOn == on)
+                        return;
+
+                    this.isOn = on;
+                    if (isOn)
+                        particle.Play();
+                    else
+                        particle.Stop();
+                }
+            }
+        }
 
         [SerializeField]
-        ParticleSystem quick;
+        BoosterParticleSystem normal;
+
+        [SerializeField]
+        BoosterParticleSystem quick;
+
+        [SerializeField]
+        BoosterParticleSystem hyper;
 
         int boostBit = 0;
         bool isOn = false;
 
         public void SetBoostVector(BoostVector vec)
         {
-            boostBit = 1 << (byte) vec;
+            normal.SetBoostVector(vec);
+            quick.SetBoostVector(vec);
+            hyper.SetBoostVector(vec);
         }
 
         public void Boost(int vectorBit)
         {
-            if (particle != null)
-            {
-                bool on = (boostBit & vectorBit) != 0;
-                if (this.isOn == on)
-                    return;
+            normal.Boost(vectorBit);
+        }
 
-                this.isOn = on;
-                if (isOn)
-                    particle.Play();
-                else
-                    particle.Stop();
-            }
+        public void HyperBoost(int vectorBit)
+        {
+            hyper.Boost(vectorBit);
         }
 
         public void Quick(int vectorBit)
         {
-            if (quick != null && (boostBit & vectorBit) != 0)
-            {
-                quick.Play();
-            }
+            quick.Boost(vectorBit);
         }
     }
 }

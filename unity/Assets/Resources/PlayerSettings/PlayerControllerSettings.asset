@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vecSpeed: 3
   accelerateTime: 0.1
-  jumpSpeed: 30
+  jumpSpeed: 5
   horizontalBoostRate: 2
   floatRate: 0.9
   rotSpeed: 100
-  quickSpeed: 40
-  quickTime: 1.5
-  quickInterval: 0.5
+  quickSpeed: 5
+  quickTime: 0.1
+  quickInterval: 0.3
   touchQuickRate: 1.5
+  hyperBoostSpeed: 10

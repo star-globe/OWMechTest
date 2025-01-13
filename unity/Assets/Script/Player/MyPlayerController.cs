@@ -38,6 +38,11 @@ namespace AdvancedGears
             return base.CheckQuick() && InputUtils.CheckQuick();
         }
 
+        protected override bool CheckHyperBoost()
+        {
+            return base.CheckHyperBoost() && InputUtils.CheckHyperBoost();
+        }
+
         private void SetTarget(out Vector3 target)
         {
             var trans = this.gameObject.transform;
