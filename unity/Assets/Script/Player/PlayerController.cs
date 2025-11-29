@@ -414,7 +414,7 @@ namespace AdvancedGears
 
             bool canAccel = isInput;
 
-            var vel = rigid.velocity;
+            var vel = rigid.linearVelocity;
             var dotVec = vel.x * hVec.x + vel.z * hVec.z;
 
             canAccel &= dotVec < LimitSpeed;
@@ -516,7 +516,7 @@ namespace AdvancedGears
 
             rigid.AddForce(vec, ForceMode.VelocityChange);
 
-            playerCharacter.SetSpeed(rigid.velocity.magnitude);
+            playerCharacter.SetSpeed(rigid.linearVelocity.magnitude);
         }
 
         private void UpdateEffect()

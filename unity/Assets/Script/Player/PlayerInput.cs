@@ -135,7 +135,7 @@ namespace AdvancedGears
                     }
 
                     jumpInfo.SetJump(KickAndJump(holNor));
-                    rigid.velocity = Vector3.zero;
+                    rigid.linearVelocity = Vector3.zero;
                 }
             }
 
@@ -149,7 +149,7 @@ namespace AdvancedGears
         {
             bool canAccel = inputX != 0 || inputZ != 0;
 
-            var vel = rigid.velocity;
+            var vel = rigid.linearVelocity;
             var sqr = vel.x * vel.x + vel.z * vel.z;
 
             canAccel &= sqr < LimitSpeed * LimitSpeed;

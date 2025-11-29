@@ -26,7 +26,7 @@ namespace AdvancedGears
             if (rigid == null)
                 return;
 
-            var velocity = rigid.velocity;
+            var velocity = rigid.linearVelocity;
 
             var mag = velocity.x * velocity.x + velocity.z * velocity.z;
             if (mag >= speed * speed)
