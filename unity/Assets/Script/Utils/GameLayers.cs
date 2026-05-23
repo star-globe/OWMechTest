@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace AdvancedGears
 {
+    public static class GameLayers
     {
         public const string MyPlayer      = "MyPlayer";
         public const string OtherPlayer  = "OtherPlayer";
