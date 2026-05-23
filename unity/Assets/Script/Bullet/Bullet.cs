@@ -56,16 +56,12 @@ namespace AdvancedGears
             this.gameObject.SetActive(false);
         }
 
-        const string tagStr = "HitObject";
         private void OnCollisionEnter(Collision collision)
         {
-            if (string.Equals(collision.gameObject.tag, tagStr))
+            if (((1 << collision.gameObject.layer) & GameLayers.HitLayerMask) != 0)
             {
                 var receiver = collision.gameObject.GetComponent<HitReceiver>();
-                if (receiver != null)
-                {
-                    receiver.Damage(Attack);
-                }
+                receiver?.Damage(Attack);
             }
 
             Vanish();

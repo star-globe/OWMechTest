@@ -20,7 +20,7 @@ public static class PhysicsUtils
     }
 
     private readonly static Collider[] colliders = new Collider[256];
-    public static bool CheckOverlapShpere(Vector3 pos, float radius, UnitSide selfSide, int layerMask, string tag, out Vector3 targetPos)
+    public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, UnitSide selfSide, int layerMask, string tag, out Vector3 targetPos)
     {
         targetPos = Vector3.zero;
         float length = float.MaxValue;
@@ -31,12 +31,12 @@ public static class PhysicsUtils
             if (string.Equals(col.gameObject.tag, tag) == false)
                 continue;
 
-            if (selfSide != UnitSide.None)
-            {
-                var character = col.gameObject.GetComponent<PlayerCharacter>();
-                if (character == null || character.Side == selfSide)
-                    continue;
-            }
+            var baseObject = col.gameObject.GetComponent<BaseObject>();
+            if (baseObject == null)
+                continue;
+
+            if (selfSide != UnitSide.None && baseObject.Side == selfSide)
+                continue;
 
             var colPos = col.gameObject.transform.position;
             var diff = colPos - pos;
@@ -51,32 +51,31 @@ public static class PhysicsUtils
         return length < float.MaxValue;
     }
 
-    public static int OverlapShpere(Vector3 pos, float radius, UnitSide selfSide, int layerMask, string tag, BaseCharacter[] results)
+    public static int OverlapShpereOthers(Vector3 pos, float radius, UnitSide selfSide, int layerMask, string tag, BaseObject[] results)
     {
-        int characterCount = 0;
+        int objectCount = 0;
         var count = Physics.OverlapSphereNonAlloc(pos, radius, colliders, layerMask);
         for (int i = 0; i < count; i++)
         {
             var col = colliders[i];
-            if (string.Equals(col.gameObject.tag, tag) == false)
+            if (!string.IsNullOrEmpty(tag) && string.Equals(col.gameObject.tag, tag) == false)
                 continue;
 
-            BaseCharacter character = null;
-            if (selfSide != UnitSide.None)
-            {
-                character = col.gameObject.GetComponent<BaseCharacter>();
-                if (character == null || character.Side == selfSide)
-                    continue;
-            }
+            var baseObject = col.gameObject.GetComponent<BaseObject>();
+            if (baseObject == null)
+                continue;
 
-            if (character != null && characterCount < results.Length)
+            if (selfSide != UnitSide.None && baseObject.Side == selfSide)
+                continue;
+
+            if (objectCount < results.Length)
             {
-                results[characterCount] = character;
-                characterCount++;
+                results[objectCount] = baseObject;
+                objectCount++;
             }
         }
 
-        return characterCount;
+        return objectCount;
     }
 
 

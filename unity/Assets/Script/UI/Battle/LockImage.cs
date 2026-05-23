@@ -9,7 +9,16 @@ public class LockImage : MonoBehaviour
     [SerializeField]
     Image squareImage;
 
-    BaseCharacter target;
+    [SerializeField]
+    Color inCircleColor;
+
+    [SerializeField]
+    Color outCircleColor;
+
+    [SerializeField]
+    Color blockedColor;
+
+    BaseObject target;
     public long ID
     {
         get
@@ -23,6 +32,8 @@ public class LockImage : MonoBehaviour
 
     Camera worldCam;
 
+    float circleSize = 0f;
+
     RectTransform rect = null;
     RectTransform RectTransform
     {
@@ -35,10 +46,11 @@ public class LockImage : MonoBehaviour
 
     public bool IsInside { get; private set; } = false;
 
-    public void SetTarget(BaseCharacter tgt, Camera cam)
+    public void SetTarget(BaseObject tgt, Camera cam, float circleSize)
     {
         this.target = tgt;
         this.worldCam = cam;
+        this.circleSize = circleSize;
         IsInside = true;
     }
 
@@ -59,12 +71,22 @@ public class LockImage : MonoBehaviour
         var widthSqrMax = center.x * center.x;
         var heightSqrMax = center.y * center.y;
 
-        var pos = worldCam.WorldToScreenPoint(target.transform.position) - center;
+        var targetPos = target.transform.position + target.SelfHeight * 0.5f * Vector3.up;
+
+        var pos = worldCam.WorldToScreenPoint(targetPos) - center;
 
         this.RectTransform.anchoredPosition = pos;
 
         IsInside = pos.z >= 0 &&
                    pos.x * pos.x <= widthSqrMax &&
                    pos.y * pos.y <= heightSqrMax;
+
+        var halfCircle = 0.5f * circleSize;
+        bool inCircle = (pos.x * pos.x + pos.y * pos.y) < halfCircle * halfCircle;
+
+        var toTarget = targetPos - worldCam.transform.position;
+        bool blocked = Physics.Raycast(worldCam.transform.position, toTarget.normalized, toTarget.magnitude, GameLayers.RaycastObstacleMask);
+
+        squareImage.color = blocked ? blockedColor : (inCircle ? inCircleColor : outCircleColor);
     }
 }

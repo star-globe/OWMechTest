@@ -21,7 +21,7 @@ namespace AdvancedGears
             }
         }
 
-        BaseCharacter[] targetArray = new BaseCharacter[256];
+        BaseObject[] targetArray = new BaseObject[256];
         int targetCount;
 
         int lockCircleSize = 0;
@@ -51,7 +51,7 @@ namespace AdvancedGears
 
         private void UpdateMarks(Transform playerTrans, int lockLength, UnitSide side)
         {
-            targetCount = PhysicsUtils.OverlapShpere(playerTrans.position, lockLength, side, -1, "Player", targetArray);
+            targetCount = PhysicsUtils.OverlapShpereOthers(playerTrans.position, lockLength, UnitSide.None, GameLayers.TargetableLayerMask, string.Empty, targetArray);
 
             cam = cam ?? Camera.main;
 
@@ -74,7 +74,7 @@ namespace AdvancedGears
                     continue;
 
                 var mark = lockMarkPool.Borrow();
-                mark.SetTarget(tgt, cam);
+                mark.SetTarget(tgt, cam, lockCircleSize);
             }
 
             for (int i = 0; i < lockMarkPool.ActiveCount; i++)
