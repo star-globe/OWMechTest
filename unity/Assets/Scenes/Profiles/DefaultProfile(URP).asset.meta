@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 30c76ed8c1bfdec468bc22dee567578c
+guid: 9672b2e52a1f44845bd1cf0d1a207aed
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 11400000
@@ -11,5 +11,5 @@ AssetOrigin:
   productId: 127325
   packageName: Particle Pack
   packageVersion: 3.1
-  assetPath: Assets/Scenes/Profiles/DefaultProfile.asset
+  assetPath: Assets/Scenes/Profiles/DefaultProfile(URP).asset
   uploadId: 896138
