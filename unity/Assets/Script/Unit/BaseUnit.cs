@@ -22,6 +22,9 @@ namespace AdvancedGears
         /// <summary>生存確認</summary>
         public bool IsAlive => UnitParam != null && UnitParam.IsAlive;
 
+        public override int Ap    => UnitParam?.Ap    ?? int.MinValue;
+        public override int MaxAp => UnitParam?.MaxAp ?? int.MinValue;
+
         // ── Lifecycle ─────────────────────────────────────────
         public override void Initialize(long id, UnitSide side)
         {

@@ -146,10 +146,11 @@ public class LockTargetImage : MonoBehaviour
 
         if (hpText != null)
         {
-            var chara = target as BaseCharacter;
-            if (chara != null && chara.CharacterParam != null)
+            var ap = target.Ap;
+            var maxAp = target.MaxAp;
+            if (ap != int.MinValue && maxAp != int.MinValue)
             {
-                int hp = chara.CharacterParam.Ap;
+                int hp = ap;
                 if (hp != prevHp)
                 {
                     prevHp = hp;

@@ -12,6 +12,9 @@ namespace AdvancedGears
 
         public CharacterParam CharacterParam { get; private set; } = null;
 
+        public override int Ap    => CharacterParam?.Ap    ?? int.MinValue;
+        public override int MaxAp => CharacterParam?.MaxAp ?? int.MinValue;
+
         public override void Initialize(long id, UnitSide side)
         {
             base.Initialize(id, side);

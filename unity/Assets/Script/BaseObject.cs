@@ -31,6 +31,9 @@ namespace AdvancedGears
         public long ID { get; private set; }
         public UnitSide Side { get; private set; }
 
+        public virtual int Ap    => int.MinValue;
+        public virtual int MaxAp => int.MinValue;
+
         public virtual void Initialize(long id, UnitSide side)
         {
             this.ID = id;
