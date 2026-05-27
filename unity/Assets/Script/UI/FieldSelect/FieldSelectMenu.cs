@@ -14,6 +14,11 @@ namespace AdvancedGears
 
         //readonly Dictionary<int, FieldSettings> settingsDic = new Dictionary<int, FieldSettings>();
 
+        private void Awake()
+        {
+            pool.Initialize();
+        }
+
         void Start()
         {
             //LoadAllFields();

@@ -16,6 +16,12 @@ public class ObjectPool<T> where T : Component
 
     public int ActiveCount => activeList.Count;
 
+    public void Initialize()
+    {
+        if (baseObject.gameObject.activeSelf)
+            baseObject.gameObject.SetActive(false);
+    }
+
     public T Borrow()
     {
         if (baseObject == null)

@@ -28,6 +28,23 @@ namespace AdvancedGears
 
         Camera cam = null;
 
+        [SerializeField]
+        LockTargetImage lockTargetImage;
+
+        [SerializeField]
+        float leftLockCompletionTime = 1.0f;
+
+        [SerializeField]
+        float rightLockCompletionTime = 1.0f;
+
+        CurrentLockStateInfo lockStateInfo;
+        long currentLockTargetId = long.MinValue;
+
+        private void Awake()
+        {
+            lockMarkPool.Initialize();
+        }
+
         void Update()
         {
             var pc = PlayerManager.Instance.GetPlayer(playerId);
@@ -37,6 +54,11 @@ namespace AdvancedGears
             var param = pc.CharacterParam;
             if (param == null)
                 return;
+
+            if (lockStateInfo == null)
+                lockStateInfo = new CurrentLockStateInfo(leftLockCompletionTime, rightLockCompletionTime);
+
+            lockStateInfo.AddTime(Time.deltaTime);
 
             if (lockCircleSize != param.LockCircleSize)
             {
@@ -80,7 +102,7 @@ namespace AdvancedGears
             for (int i = 0; i < lockMarkPool.ActiveCount; i++)
             {
                 var mark = lockMarkPool.activeList[i];
-                if (!mark.IsInside)
+                if (!mark.IsInside || !mark.IsTargetActive)
                     returnList.Add(mark);
             }
 
@@ -88,6 +110,32 @@ namespace AdvancedGears
                 lockMarkPool.Return(m);
 
             returnList.Clear();
+
+            if (lockTargetImage == null)
+                return;
+
+            LockImage closestMark = null;
+            float closestDistSqr = float.MaxValue;
+            for (int i = 0; i < lockMarkPool.ActiveCount; i++)
+            {
+                var mark = lockMarkPool.activeList[i];
+                if (mark.IsInCircle && mark.WorldDistanceSqr < closestDistSqr)
+                {
+                    closestDistSqr = mark.WorldDistanceSqr;
+                    closestMark = mark;
+                }
+            }
+
+            var newTargetId = closestMark != null ? closestMark.ID : long.MinValue;
+            if (newTargetId != currentLockTargetId)
+            {
+                currentLockTargetId = newTargetId;
+                lockStateInfo?.ResetDuration();
+                lockTargetImage.SetTarget(closestMark?.Target, cam, lockStateInfo);
+            }
+            var shouldBeActive = currentLockTargetId != long.MinValue;
+            if (lockTargetImage.gameObject.activeSelf != shouldBeActive)
+                lockTargetImage.gameObject.SetActive(shouldBeActive);
         }
     }
 }

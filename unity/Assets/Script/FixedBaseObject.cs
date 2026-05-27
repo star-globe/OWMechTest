@@ -6,7 +6,7 @@ namespace AdvancedGears
     {
         protected virtual void Awake()
         {
-            Initialize(gameObject.GetInstanceID(), UnitSide.None);
+            Initialize(gameObject.GetEntityId().GetHashCode(), UnitSide.None);
         }
     }
 }

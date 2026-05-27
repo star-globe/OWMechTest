@@ -45,6 +45,17 @@ public class LockImage : MonoBehaviour
     }
 
     public bool IsInside { get; private set; } = false;
+    public bool IsInCircle { get; private set; } = false;
+    public float ScreenDistanceSqr { get; private set; } = float.MaxValue;
+    public float WorldDistanceSqr { get; private set; } = float.MaxValue;
+    public bool IsTargetActive
+    {
+        get
+        {
+            return target != null && target.gameObject.activeSelf;
+        }
+    }
+    public BaseObject Target => target;
 
     public void SetTarget(BaseObject tgt, Camera cam, float circleSize)
     {
@@ -64,6 +75,9 @@ public class LockImage : MonoBehaviour
         if (target == null || worldCam == null)
         {
             IsInside = true;
+            IsInCircle = false;
+            ScreenDistanceSqr = float.MaxValue;
+            WorldDistanceSqr = float.MaxValue;
             return;
         }
 
@@ -81,10 +95,13 @@ public class LockImage : MonoBehaviour
                    pos.x * pos.x <= widthSqrMax &&
                    pos.y * pos.y <= heightSqrMax;
 
+        ScreenDistanceSqr = pos.x * pos.x + pos.y * pos.y;
         var halfCircle = 0.5f * circleSize;
-        bool inCircle = (pos.x * pos.x + pos.y * pos.y) < halfCircle * halfCircle;
+        bool inCircle = ScreenDistanceSqr < halfCircle * halfCircle;
+        IsInCircle = IsInside && inCircle;
 
         var toTarget = targetPos - worldCam.transform.position;
+        WorldDistanceSqr = toTarget.sqrMagnitude;
         bool blocked = Physics.Raycast(worldCam.transform.position, toTarget.normalized, toTarget.magnitude, GameLayers.RaycastObstacleMask);
 
         squareImage.color = blocked ? blockedColor : (inCircle ? inCircleColor : outCircleColor);
