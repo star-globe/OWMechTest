@@ -22,5 +22,5 @@ MonoBehaviour:
   quickTime: 0.5
   quickInterval: 0.5
   touchQuickRate: 1.5
-  lockCircleSize: 500
+  lockCircleSize: 700
   lockLength: 250
