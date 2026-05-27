@@ -18,6 +18,8 @@ namespace AdvancedGears
 
             PlayerControllerConst.Instance.Load();
             GlobalParamMaster.Instance.Load();
+
+            UnitMaster.Instance.Load();
         }
     }
 

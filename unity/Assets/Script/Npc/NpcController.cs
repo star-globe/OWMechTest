@@ -14,14 +14,11 @@ namespace AdvancedGears
         [SerializeField]
         NavMeshAgent agent;
 
-        int? _enemyLayerMask = null;
-        int EnemyLayerMask => _enemyLayerMask ??= LayerMask.GetMask(GameLayers.MyPlayer, GameLayers.OtherPlayer, GameLayers.NonPlayer, GameLayers.Unit);
-
         private bool CheckTarget(out Vector3 target)
         {
             var pos = this.transform.position;
             // 敵味方情報が必要
-            return PhysicsUtils.CheckOverlapShpereOthers(pos, radius, this.UnitSide, EnemyLayerMask, string.Empty, out target);
+            return PhysicsUtils.CheckOverlapShpereOthers(pos, radius, this.UnitSide.ToNpcExcludeMask(), GameLayers.EnemyLayerMask, string.Empty, out target);
         }
 
         protected override bool CheckLeftFire(out Vector3 target)

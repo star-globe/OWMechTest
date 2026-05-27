@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c0a1242217b01f4293d65ff6e945fb4, type: 3}
+  m_Name: TankParameterSettings
+  m_EditorClassIdentifier:
+  maxAp: 2000
+  bulletId: 1
+  fireInterval: 4
+  turretRotationSpeedX: 20
+  turretRotationSpeedY: 30
+  elevationMin: -5
+  elevationMax: 20
+  forwardSpeed: 5
+  turnSpeed: 60

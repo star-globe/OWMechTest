@@ -22,5 +22,9 @@ namespace AdvancedGears
         private static int? _raycastObstacleMask;
         public static int RaycastObstacleMask =>
             _raycastObstacleMask ??= ~LayerMask.GetMask(MyPlayer, OtherPlayer, NonPlayer, Unit, TargetableObject, HitableObject);
+
+        private static int? _enemyLayerMask;
+        public static int EnemyLayerMask =>
+            _enemyLayerMask ??= LayerMask.GetMask(MyPlayer, OtherPlayer, NonPlayer, Unit);
     }
 }

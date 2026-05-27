@@ -20,7 +20,12 @@ public static class PhysicsUtils
     }
 
     private readonly static Collider[] colliders = new Collider[256];
-    public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, UnitSide selfSide, int layerMask, string tag, out Vector3 targetPos)
+
+    /// <summary>
+    /// 指定した除外マスク（UnitSide ビットマスク）に一致しない最近傍の BaseObject の座標を返す。
+    /// excludeSideMask は UnitSideExtensions.ToExcludeMask() で生成する。
+    /// </summary>
+    public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, string tag, out Vector3 targetPos)
     {
         targetPos = Vector3.zero;
         float length = float.MaxValue;
@@ -35,7 +40,7 @@ public static class PhysicsUtils
             if (baseObject == null)
                 continue;
 
-            if (selfSide != UnitSide.None && baseObject.Side == selfSide)
+            if ((excludeSideMask & (1 << (int)baseObject.Side)) != 0)
                 continue;
 
             var colPos = col.gameObject.transform.position;
@@ -51,7 +56,11 @@ public static class PhysicsUtils
         return length < float.MaxValue;
     }
 
-    public static int OverlapShpereOthers(Vector3 pos, float radius, UnitSide selfSide, int layerMask, string tag, BaseObject[] results)
+    /// <summary>
+    /// 指定した除外マスク（UnitSide ビットマスク）に一致しない BaseObject を results に格納し、件数を返す。
+    /// excludeSideMask は UnitSideExtensions.ToExcludeMask() で生成する。
+    /// </summary>
+    public static int OverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, string tag, BaseObject[] results)
     {
         int objectCount = 0;
         var count = Physics.OverlapSphereNonAlloc(pos, radius, colliders, layerMask);
@@ -65,7 +74,7 @@ public static class PhysicsUtils
             if (baseObject == null)
                 continue;
 
-            if (selfSide != UnitSide.None && baseObject.Side == selfSide)
+            if ((excludeSideMask & (1 << (int)baseObject.Side)) != 0)
                 continue;
 
             if (objectCount < results.Length)

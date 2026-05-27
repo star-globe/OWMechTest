@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
+using System.Runtime.CompilerServices;
+using UnityEngine.UI;
 
 namespace AdvancedGears
 {
@@ -10,6 +12,18 @@ namespace AdvancedGears
         None = 0,
         Alpha,
         Bravo
+    }
+
+    public static class UnitSideExtensions
+    {
+        // NPC用の除外マスク
+        public static int ToNpcExcludeMask(this UnitSide side)
+        {
+            int mask = 1 << (int) side;
+            if (side != UnitSide.None)
+                mask |= 1 << (int) UnitSide.None;
+            return mask;
+        }
     }
 
     public class BaseObject : MonoBehaviour

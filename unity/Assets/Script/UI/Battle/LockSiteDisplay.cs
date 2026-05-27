@@ -75,7 +75,7 @@ namespace AdvancedGears
         {
             cam = cam ?? Camera.main;
 
-            targetCount = PhysicsUtils.OverlapShpereOthers(cam.transform.position, lockLength, UnitSide.None, GameLayers.TargetableLayerMask, string.Empty, targetArray);
+            targetCount = PhysicsUtils.OverlapShpereOthers(cam.transform.position, lockLength, 1 << (int)side, GameLayers.TargetableLayerMask, string.Empty, targetArray);
 
             var center = 0.5f * new Vector3(Screen.width, Screen.height);
             var widthSqrMax = center.x * center.x;
