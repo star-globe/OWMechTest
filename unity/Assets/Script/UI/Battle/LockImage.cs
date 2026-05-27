@@ -63,6 +63,7 @@ public class LockImage : MonoBehaviour
         this.worldCam = cam;
         this.circleSize = circleSize;
         IsInside = true;
+        UpdateRectPosition();
     }
 
     private void LateUpdate()

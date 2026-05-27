@@ -66,16 +66,16 @@ namespace AdvancedGears
                 cicle.rectTransform.sizeDelta = Vector2.one * lockCircleSize;
             }
 
-            UpdateMarks(pc.transform, param.LockLength, pc.Side);
+            UpdateMarks(param.LockLength / GlobalParamMaster.Instance.WorldSizeRate, pc.Side);
         }
 
         private List<LockImage> returnList = new List<LockImage>();
 
-        private void UpdateMarks(Transform playerTrans, int lockLength, UnitSide side)
+        private void UpdateMarks(float lockLength, UnitSide side)
         {
-            targetCount = PhysicsUtils.OverlapShpereOthers(playerTrans.position, lockLength, UnitSide.None, GameLayers.TargetableLayerMask, string.Empty, targetArray);
-
             cam = cam ?? Camera.main;
+
+            targetCount = PhysicsUtils.OverlapShpereOthers(cam.transform.position, lockLength, UnitSide.None, GameLayers.TargetableLayerMask, string.Empty, targetArray);
 
             var center = 0.5f * new Vector3(Screen.width, Screen.height);
             var widthSqrMax = center.x * center.x;
@@ -102,7 +102,7 @@ namespace AdvancedGears
             for (int i = 0; i < lockMarkPool.ActiveCount; i++)
             {
                 var mark = lockMarkPool.activeList[i];
-                if (!mark.IsInside || !mark.IsTargetActive)
+                if (!mark.IsInside || mark.WorldDistanceSqr > lockLength * lockLength || !mark.IsTargetActive)
                     returnList.Add(mark);
             }
 

@@ -32,6 +32,9 @@ public class LockTargetImage : MonoBehaviour
     Camera worldCam;
     CurrentLockStateInfo lockStateInfo;
 
+    int prevDistanceTenth = int.MinValue;
+    int prevHp = int.MinValue;
+
     RectTransform rect = null;
     RectTransform RectTransform
     {
@@ -87,6 +90,8 @@ public class LockTargetImage : MonoBehaviour
         this.target = tgt;
         this.worldCam = cam;
         this.lockStateInfo = stateInfo;
+        prevDistanceTenth = int.MinValue;
+        prevHp = int.MinValue;
     }
 
     private void LateUpdate()
@@ -130,16 +135,32 @@ public class LockTargetImage : MonoBehaviour
         if (distanceText != null)
         {
             float dist = Vector3.Distance(worldCam.transform.position, targetPos);
-            distanceText.text = $"{textBackgroundTag}{Mathf.RoundToInt(dist)}</mark>";
+            int distTenth = Mathf.RoundToInt(dist * 10);
+            if (distTenth != prevDistanceTenth)
+            {
+                prevDistanceTenth = distTenth;
+                dist *= GlobalParamMaster.Instance.WorldSizeRate;
+                distanceText.text = $"{textBackgroundTag}{dist.ToString("F1")}</mark>";
+            }
         }
 
         if (hpText != null)
         {
             var chara = target as BaseCharacter;
             if (chara != null && chara.CharacterParam != null)
-                hpText.text = $"{textBackgroundTag}{chara.CharacterParam.Ap}</mark>";
+            {
+                int hp = chara.CharacterParam.Ap;
+                if (hp != prevHp)
+                {
+                    prevHp = hp;
+                    hpText.text = $"{textBackgroundTag}{hp}</mark>";
+                }
+            }
             else
+            {
+                prevHp = int.MinValue;
                 hpText.text = string.Empty;
+            }
         }
     }
 }

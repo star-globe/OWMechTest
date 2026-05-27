@@ -17,6 +17,7 @@ namespace AdvancedGears
             EffectMaster.Instance.Load();
 
             PlayerControllerConst.Instance.Load();
+            GlobalParamMaster.Instance.Load();
         }
     }
 
