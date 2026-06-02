@@ -20,6 +20,7 @@ namespace AdvancedGears
             GlobalParamMaster.Instance.Load();
 
             UnitMaster.Instance.Load();
+            MissionMaster.Instance.Load();
         }
     }
 

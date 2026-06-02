@@ -8,7 +8,45 @@ namespace AdvancedGears
 {
     public class FieldManager : SingletonMonoBehaviour<FieldManager>
     {
-        public int CurrentFieldID { get; private set; } = -1;
+        public int CurrentFieldID   { get; private set; } = -1;
+
+        /// <summary>ブリーフィング確認中の選択ミッションID（まだロードしていない）</summary>
+        public int PendingMissionID { get; private set; } = -1;
+
+        public void SetPendingMission(int missionId)
+        {
+            PendingMissionID = missionId;
+        }
+
+        /// <summary>
+        /// ブリーフィング確認後、出撃時に呼ぶ。
+        /// PendingMission に対応するフィールドシーンとミッション依存シーンをロードする。
+        /// </summary>
+        public void LoadPendingMission()
+        {
+            if (PendingMissionID < 0) return;
+
+            var missionSettings = MissionMaster.Instance.GetSettings(PendingMissionID);
+            if (missionSettings == null)
+            {
+                Debug.LogErrorFormat("[FieldManager] MissionSettings not found. ID:{0}", PendingMissionID);
+                return;
+            }
+
+            // フィールドシーン（地形・固定オブジェクト）をロード
+            var fieldSettings = FieldMaster.Instance.GetSettings(missionSettings.FieldId);
+            if (fieldSettings != null)
+            {
+                foreach (var scene in fieldSettings.FieldSceneNames)
+                    AddFieldScene(missionSettings.FieldId, scene);
+            }
+
+            // ミッション依存シーン（ミッション固有の配置物）を Additive でロード
+            foreach (var scene in missionSettings.MissionSceneNames)
+                AddFieldScene(missionSettings.FieldId, scene);
+
+            PendingMissionID = -1;
+        }
 
         readonly HashSet<string> fieldSceneNames = new HashSet<string>();
         readonly Dictionary<int, SpawnPoint> spawnPoints = new Dictionary<int, SpawnPoint>();
