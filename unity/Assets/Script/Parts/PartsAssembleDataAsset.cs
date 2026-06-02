@@ -1,9 +1,6 @@
 using System;
-using System.Text;
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 namespace AdvancedGears
@@ -39,28 +36,47 @@ namespace AdvancedGears
 
             return partId;
         }
+
+        public Dictionary<PartsAttachType, int> GetPartId_All()
+        {
+            return data?.GetDictionary();
+        }
     }
 
     public class PlayerPartsAssembleDataAsset : PartsAssembleDataAsset
     {
+        const string SaveKey = "PlayerAssembleData";
+
         public void Load()
         {
-            var text = PlayerPrefs.GetString("PlayerAssembleData", string.Empty);
-            byte[] data = Encoding.ASCII.GetBytes(text);
-
-            PartsAssembleData assembleData = null;
-
-            var b = new BinaryFormatter();
-            using (var stream = new MemoryStream(data))
+            var json = PlayerPrefs.GetString(SaveKey, string.Empty);
+            if (string.IsNullOrEmpty(json))
             {
-                assembleData = (PartsAssembleData) b.Deserialize(stream);
-            }
-
-            if (assembleData == null)
-            {
-                Debug.LogError("There is no PlayerAssembleData");
+                Debug.LogWarning("[PlayerPartsAssembleDataAsset] 保存データが存在しません。");
                 return;
             }
+
+            var assembleData = JsonUtility.FromJson<PartsAssembleData>(json);
+            if (assembleData == null)
+            {
+                Debug.LogError("[PlayerPartsAssembleDataAsset] JSONのデシリアライズに失敗しました。");
+                return;
+            }
+
+            SetData(assembleData);
+        }
+
+        public void Save(PartsAssembleData assembleData)
+        {
+            if (assembleData == null)
+            {
+                Debug.LogError("[PlayerPartsAssembleDataAsset] 保存するデータがnullです。");
+                return;
+            }
+
+            var json = JsonUtility.ToJson(assembleData);
+            PlayerPrefs.SetString(SaveKey, json);
+            PlayerPrefs.Save();
 
             SetData(assembleData);
         }
@@ -74,6 +90,16 @@ namespace AdvancedGears
 
         Dictionary<PartsAttachType, int> attachDic = null;
 
+        public static PartsAssembleData CreateFromDictionary(Dictionary<PartsAttachType, int> dic)
+        {
+            var data = new PartsAssembleData();
+            var list = new List<PartsTuple>();
+            foreach (var kvp in dic)
+                list.Add(new PartsTuple { attachType = kvp.Key, partId = kvp.Value });
+            data.tuples = list.ToArray();
+            return data;
+        }
+
         public Dictionary<PartsAttachType, int> GetDictionary()
         {
             if (tuples == null)
@@ -85,12 +111,23 @@ namespace AdvancedGears
             if (attachDic == null)
             {
                 attachDic = new Dictionary<PartsAttachType, int>();
-
                 foreach (var t in tuples)
-                    attachDic.Add(t.attachType, t.partId);
+                    attachDic[t.attachType] = t.partId;
             }
 
             return attachDic;
+        }
+
+        public void SetPartId(PartsAttachType type, int partId)
+        {
+            var dic = GetDictionary();
+            if (dic == null) return;
+            dic[type] = partId;
+            // tuples を同期
+            var list = new List<PartsTuple>();
+            foreach (var kvp in dic)
+                list.Add(new PartsTuple { attachType = kvp.Key, partId = kvp.Value });
+            tuples = list.ToArray();
         }
     }
 

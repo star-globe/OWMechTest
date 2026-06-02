@@ -71,11 +71,11 @@ namespace AdvancedGears
             StateManager.Instance?.NextState();    // Briefing → Battle
         }
 
-        /// <summary>カスタマイズ：#8 実装後に接続するプレースホルダー。</summary>
+        /// <summary>カスタマイズ：カスタマイズシーンへ遷移し、戻り先としてブリーフィングを記憶させる。</summary>
         private void OnClickCustomize()
         {
-            // TODO: Issue #8 カスタマイズ画面の実装後にシーン遷移を実装する
-            Debug.Log("[BriefingManager] カスタマイズ画面は未実装です。(Issue #8)");
+            CustomizeManager.SetReturnState(GameState.Briefing);
+            StateManager.Instance?.GoToState(GameState.Customize);
         }
 
         /// <summary>戻る：ミッション選択画面に戻る。</summary>
