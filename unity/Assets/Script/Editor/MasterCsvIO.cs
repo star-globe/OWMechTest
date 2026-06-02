@@ -19,7 +19,7 @@ namespace AdvancedGears.Editor
                 var values = fields.Select(f => EscapeCsv(f.GetValue(r)?.ToString() ?? ""));
                 sb.AppendLine(string.Join(",", values));
             }
-            File.WriteAllText(path, sb.ToString(), new UTF8Encoding(withBom: true));
+            File.WriteAllText(path, sb.ToString(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
         }
 
         public static List<FieldInfo> GetExportableFields(Type type)

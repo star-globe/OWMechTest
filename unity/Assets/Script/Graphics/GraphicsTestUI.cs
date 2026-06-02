@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +11,7 @@ public class GraphicsTestUI : MonoBehaviour
     [SerializeField] GraphicsStyleSwitcher[] switchers;
     [SerializeField] Button greyboxButton;
     [SerializeField] Button stylizedButton;
-    [SerializeField] Text  currentStyleLabel;
+    [SerializeField] TMP_Text currentStyleLabel;
 
     void Start()
     {
@@ -34,6 +35,6 @@ public class GraphicsTestUI : MonoBehaviour
     void RefreshLabel()
     {
         if (currentStyleLabel == null || switchers.Length == 0) return;
-        currentStyleLabel.text = $"Style: {switchers[0].currentStyle}";
+        currentStyleLabel.text = $"Style: {switchers[0].CurrentStyle}";
     }
 }
