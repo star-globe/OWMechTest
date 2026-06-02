@@ -14,6 +14,7 @@ namespace AdvancedGears
         Briefing  = 3,   // ミッション選択後、出撃前の確認画面
         Battle    = 4,
         Result    = 5,
+        Customize = 6,   // 機体カスタマイズ画面（任意アクセス）
     }
 
     public class StateManager : SingletonMonoBehaviour<StateManager>
@@ -45,6 +46,16 @@ namespace AdvancedGears
             }
 
             State = nextState;
+        }
+
+        public void GoToState(GameState target)
+        {
+            if (subjectDic.ContainsKey(target))
+            {
+                subjectDic[target].OnNext(Unit.Default);
+            }
+
+            State = target;
         }
 
         public void RegisterStateEvent(GameState state, Action<Unit> action, GameObject gameObject)

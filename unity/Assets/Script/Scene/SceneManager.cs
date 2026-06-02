@@ -10,10 +10,11 @@ namespace AdvancedGears
     {
         public void Register()
         {
-            StateManager.Instance.RegisterStateEvent(GameState.Select,   LoadSelectMenu,    this.gameObject);
-            StateManager.Instance.RegisterStateEvent(GameState.Briefing, LoadBriefingScene, this.gameObject);
-            StateManager.Instance.RegisterStateEvent(GameState.Battle,   LoadBattleScene,   this.gameObject);
-            StateManager.Instance.RegisterStateEvent(GameState.Result,   LoadResultScene,   this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Select,    LoadSelectMenu,       this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Briefing,  LoadBriefingScene,    this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Battle,    LoadBattleScene,      this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Result,    LoadResultScene,      this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Customize, LoadCustomizeScene,   this.gameObject);
         }
 
         bool isNowLoading = false;
@@ -36,6 +37,11 @@ namespace AdvancedGears
         private void LoadResultScene(Unit unit)
         {
             LoadScene("Result");
+        }
+
+        private void LoadCustomizeScene(Unit unit)
+        {
+            LoadScene("Customize");
         }
 
         private void LoadScene(string sceneName)
