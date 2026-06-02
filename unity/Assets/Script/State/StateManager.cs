@@ -8,11 +8,12 @@ namespace AdvancedGears
 {
     public enum GameState
     {
-        None = 0,
-        Start,
-        Select,
-        Battle,
-        Result
+        None      = 0,
+        Start     = 1,
+        Select    = 2,
+        Briefing  = 3,   // ステージ選択後、出撃前の確認画面
+        Battle    = 4,
+        Result    = 5,
     }
 
     public class StateManager : SingletonMonoBehaviour<StateManager>
@@ -31,10 +32,11 @@ namespace AdvancedGears
 
             switch (State)
             {
-                case GameState.Start:   nextState = GameState.Select;   break;
-                case GameState.Select:  nextState = GameState.Battle;   break;
-                case GameState.Battle:  nextState = GameState.Result;   break;
-                case GameState.Result:  nextState = GameState.Select;   break;
+                case GameState.Start:    nextState = GameState.Select;    break;
+                case GameState.Select:   nextState = GameState.Briefing;  break;
+                case GameState.Briefing: nextState = GameState.Battle;    break;
+                case GameState.Battle:   nextState = GameState.Result;    break;
+                case GameState.Result:   nextState = GameState.Select;    break;
             }
 
             if (subjectDic.ContainsKey(nextState))

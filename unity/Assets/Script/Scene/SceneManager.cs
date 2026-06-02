@@ -10,9 +10,10 @@ namespace AdvancedGears
     {
         public void Register()
         {
-            StateManager.Instance.RegisterStateEvent(GameState.Select, LoadSelectMenu, this.gameObject);
-            StateManager.Instance.RegisterStateEvent(GameState.Battle, LoadBattleScene, this.gameObject);
-            StateManager.Instance.RegisterStateEvent(GameState.Result, LoadResultScene, this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Select,   LoadSelectMenu,    this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Briefing, LoadBriefingScene, this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Battle,   LoadBattleScene,   this.gameObject);
+            StateManager.Instance.RegisterStateEvent(GameState.Result,   LoadResultScene,   this.gameObject);
         }
 
         bool isNowLoading = false;
@@ -20,6 +21,11 @@ namespace AdvancedGears
         private void LoadSelectMenu(Unit unit)
         {
             LoadScene("SelectMenu");
+        }
+
+        private void LoadBriefingScene(Unit unit)
+        {
+            LoadScene("Briefing");
         }
 
         private void LoadBattleScene(Unit unit)
