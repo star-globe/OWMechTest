@@ -1,21 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace AdvancedGears
 {
     [CreateAssetMenu(menuName = "TestProject/Effect/EffectSettings", order = 0)]
     public class EffectSettings : ScriptableObject, IDBasedMasterSettings
     {
-        [SerializeField]
-        int effectId;
+        [SerializeField] int effectId;
         public int EffectID => effectId;
-
-        [SerializeField]
-        GameObject effectPrefab;
-
         public int ID => EffectID;
+
+        [SerializeField] GameObject effectPrefab;
+        public GameObject EffectPrefab => effectPrefab;
+
+        [Tooltip("エフェクトの最大同時再生数。超えた分はスキップされる。")]
+        [SerializeField] int maxPoolSize = 5;
+        public int MaxPoolSize => maxPoolSize;
     }
 
     public class EffectMasterContainer : IDBasedMasterContainer<EffectSettings>
