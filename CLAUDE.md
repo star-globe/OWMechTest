@@ -22,6 +22,9 @@ Issueに着手する際は必ず以下のフローに従うこと。
 - Issueの内容を読み、実装方針を提示する
 - 他のオープンなIssueとの競合・依存関係を予測して報告する
 - 人間の承認を得てから実装に進む
+- IssueごとにBranchを作成する。ブランチ名はIssueの内容を予測できる文言にすること
+  - 命名規則: `feature/issue-{番号}-{内容を表す短い英語}`
+  - 例: `feature/issue-7-squad-ai`, `feature/issue-9-briefing-screen`
 
 ### 2. 実装後の自己チェック
 - Issueの完了条件をすべて満たしているか確認する
