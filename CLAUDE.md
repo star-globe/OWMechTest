@@ -4,6 +4,23 @@
 WarGameProject
 カスタマイズ可能な人型兵器を駆り、戦術によって勝利を得るアクションシミュレーター
 
+## 技術スタック
+
+| 項目 | バージョン / 詳細 |
+|------|-----------------|
+| Unity | **6000.4.6f1**（Unity 6 LTS） |
+| レンダーパイプライン | **URP**（Universal Render Pipeline） |
+| スクリプティングバックエンド | Mono / .NET Standard 2.1（apiCompatibilityLevel: 6） |
+| 言語 | C# |
+| 主要ライブラリ | UniRx、ProBuilder、NavMesh |
+
+### コード記述上の注意
+- **Unity 6 対応の API を使用すること**（Unity 5 / 2019-2022 系の deprecated API は使わない）
+- `switch` 式・パターンマッチング等の C# 8.0 以降の構文は使用可能
+- `Rigidbody.velocity` は Unity 6 で **`linearVelocity`** に変更されている（`velocity` は廃止）
+- Physics API など Unity バージョンで挙動が変わる箇所は必ず Unity 6 のドキュメントを参照すること
+- 実装前に既存コードのパターンを確認し、プロジェクト内の記述スタイルに合わせること
+
 ## 仕様書
 GitHubWikiをサブモジュールとして `unity/docs/wiki/` に格納しています。
 wikiを参照するコマンドを実行する際は`unity/docs/wiki/`で`git pull`を実行してwikiを更新してください。
