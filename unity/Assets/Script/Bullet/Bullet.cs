@@ -62,6 +62,11 @@ namespace AdvancedGears
             {
                 var receiver = collision.gameObject.GetComponent<HitReceiver>();
                 receiver?.Damage(Attack);
+                EffectManager.Instance?.PlayEffect(EffectID.HitSpark, transform.position, Quaternion.LookRotation(collision.contacts[0].normal));
+            }
+            else
+            {
+                EffectManager.Instance?.PlayEffect(EffectID.HitSpark, transform.position);
             }
 
             Vanish();

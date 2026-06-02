@@ -22,8 +22,13 @@ namespace AdvancedGears
 
             if (hitPoint <= 0)
             {
+                EffectManager.Instance?.PlayEffect(EffectID.Explosion, transform.position);
                 deadComp?.DeadAction();
                 hitPoint = 0;
+            }
+            else
+            {
+                EffectManager.Instance?.PlayEffect(EffectID.ExplosionSmall, transform.position);
             }
         }
     }
