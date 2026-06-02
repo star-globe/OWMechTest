@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,58 +6,34 @@ namespace AdvancedGears
 {
     public class NpcManager : SingletonMonoBehaviour<NpcManager>
     {
+        public NpcCharacter CompanyNpc { get; private set; }
+
         private readonly Dictionary<long, NpcCharacter> npcDictionary = new Dictionary<long, NpcCharacter>();
 
-        // ─── NPC 生成 ─────────────────────────────────────────
-
-        public NpcCharacter CreateNpc(long id, UnitSide side, int logicId,
-                                      Vector3 position, Quaternion rot,
-                                      GameObject prefab,
-                                      SquadData squad = null, SquadRole role = SquadRole.None)
+        public NpcCharacter CreateNpc(bool isCompany, long id, UnitSide side, Vector3 position, Quaternion rot)
         {
-            if (prefab == null)
-            {
-                Debug.LogError("[NpcManager] prefab is null.");
-                return null;
-            }
+            //var prefab = PlayerMaster.GetPlayerPrefab(isSelf ? PlayerType.Self: PlayerType.Other);
+            //if (prefab == null)
+            //    return null;
+//
+            //var go = Instantiate(prefab, position, rot);
+            //var pc = go.GetComponent<PlayerCharacter>();
+            //if (pc == null)
+            //    return null;
+//
+            //pc.Initialize(id, side, isSelf);
+            //go.transform.position += pc.PlayerHeight * Vector3.up;
+//
+            //if (isSelf)
+            //{
+            //    MyPC = pc;
+            //}
+            //else
+            //{
+            //    playerDictionary[id] = pc;
+            //}
 
-            var go = Instantiate(prefab, position, rot);
-            var npc = go.GetComponent<NpcCharacter>();
-            if (npc == null)
-            {
-                Debug.LogErrorFormat("[NpcManager] NpcCharacter not found on prefab: {0}", prefab.name);
-                Destroy(go);
-                return null;
-            }
-
-            npc.Initialize(id, side, logicId);
-            npcDictionary[id] = npc;
-
-            // 部隊に参加
-            if (squad != null)
-            {
-                var controller = go.GetComponent<NpcController>();
-                if (controller != null)
-                    controller.JoinSquad(squad, role);
-            }
-
-            return npc;
-        }
-
-        public NpcCharacter GetNpc(long id)
-        {
-            npcDictionary.TryGetValue(id, out var npc);
-            return npc;
-        }
-
-        public void RemoveNpc(long id)
-        {
-            if (npcDictionary.TryGetValue(id, out var npc))
-            {
-                if (npc != null)
-                    Destroy(npc.gameObject);
-                npcDictionary.Remove(id);
-            }
+            return null;
         }
     }
 }
