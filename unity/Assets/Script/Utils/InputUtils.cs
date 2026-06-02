@@ -132,4 +132,15 @@ public static class InputUtils
         var action = _mainControls.Player.ModeSwitch;
         return action.WasPressedThisFrame();
     }
+
+    public static bool CheckSubFire()
+    {
+        if (_mainControls == null)
+        {
+            return false;
+        }
+
+        var action = _mainControls.Player.SubFire;
+        return action.WasPressedThisFrame();
+    }
 }
