@@ -114,5 +114,6 @@ namespace AdvancedGears
 
         Weapon_Right = 301,
         Weapon_Left,
+        Weapon_Sub,
     }
 }

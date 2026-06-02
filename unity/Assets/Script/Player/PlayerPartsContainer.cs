@@ -18,6 +18,9 @@ namespace AdvancedGears
         GunAttach leftGunAttach = null;
 
         [SerializeField]
+        GunAttach subGunAttach = null;
+
+        [SerializeField]
         PartsAssembleDataAsset assembleDataAsset;
 
         private void Awake()
@@ -40,6 +43,9 @@ namespace AdvancedGears
 
             if (leftGunAttach != null)
                 leftGunAttach.SetGun(assembleDataAsset.GetPartId(PartsAttachType.Weapon_Left));
+
+            if (subGunAttach != null)
+                subGunAttach.SetGun(assembleDataAsset.GetPartId(PartsAttachType.Weapon_Sub));
         }
 
         public void Boost(int vectorBit)
@@ -58,6 +64,12 @@ namespace AdvancedGears
         {
             if (leftGunAttach != null)
                 leftGunAttach.Fire(tgt);
+        }
+
+        public void SubFire(Vector3 tgt)
+        {
+            if (subGunAttach != null)
+                subGunAttach.Fire(tgt);
         }
 
         public void Quick(int vectorBit)
