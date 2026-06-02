@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering.RenderGraphModule;
 
 /// <summary>
 /// URPレンダラーアセットに追加するスクリーンスペースアウトライン。
@@ -39,14 +40,44 @@ public class OutlineRendererFeature : ScriptableRendererFeature
             renderPassEvent = settings.renderPassEvent;
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        class PassData
+        {
+            public TextureHandle source;
+            public Material material;
+        }
+
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
             if (_settings.outlineMaterial == null) return;
 
-            CommandBuffer cmd = CommandBufferPool.Get("Outline");
-            Blit(cmd, ref renderingData, _settings.outlineMaterial, 0);
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
+            var resourceData = frameData.Get<UniversalResourceData>();
+            var source = resourceData.activeColorTexture;
+
+            var desc = renderGraph.GetTextureDesc(source);
+            desc.name = "OutlineTemp";
+            desc.clearBuffer = false;
+            var temp = renderGraph.CreateTexture(desc);
+
+            // アウトライン適用: activeColor → temp
+            using (var builder = renderGraph.AddRasterRenderPass<PassData>("Outline", out var passData))
+            {
+                passData.source = source;
+                passData.material = _settings.outlineMaterial;
+                builder.UseTexture(passData.source);
+                builder.SetRenderAttachment(temp, 0);
+                builder.SetRenderFunc(static (PassData data, RasterGraphContext ctx) =>
+                    Blitter.BlitTexture(ctx.cmd, data.source, new Vector4(1, 1, 0, 0), data.material, 0));
+            }
+
+            // 結果をコピーバック: temp → activeColor
+            using (var builder = renderGraph.AddRasterRenderPass<PassData>("OutlineCopyBack", out var passData))
+            {
+                passData.source = temp;
+                builder.UseTexture(passData.source);
+                builder.SetRenderAttachment(source, 0);
+                builder.SetRenderFunc(static (PassData data, RasterGraphContext ctx) =>
+                    Blitter.BlitTexture(ctx.cmd, data.source, new Vector4(1, 1, 0, 0), 0, false));
+            }
         }
     }
 }

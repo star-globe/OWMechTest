@@ -20,6 +20,8 @@ public class GraphicsStyleSwitcher : MonoBehaviour
     [Header("現在のスタイル")]
     [SerializeField] Style currentStyle = Style.Greybox;
 
+    public Style CurrentStyle => currentStyle;
+
     void Start() => Apply(currentStyle);
 
     public void SwitchToGreybox()     => Apply(Style.Greybox);
