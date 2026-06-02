@@ -52,9 +52,10 @@ namespace AdvancedGears
             var fieldSettings = FieldMaster.Instance.GetSettings(id);
             if (fieldSettings != null)
             {
-                // フィールドの実ロードはブリーフィング確認後に行う
-                FieldManager.Instance.SetPendingField(id);
-                StateManager.Instance.NextState();  // Select → Briefing
+                StateManager.Instance.NextState();
+
+                foreach (var field in fieldSettings.FieldSceneNames)
+                    FieldManager.Instance.AddFieldScene(id, field);
             }
         }
     }

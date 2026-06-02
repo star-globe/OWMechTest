@@ -8,30 +8,7 @@ namespace AdvancedGears
 {
     public class FieldManager : SingletonMonoBehaviour<FieldManager>
     {
-        public int CurrentFieldID  { get; private set; } = -1;
-
-        /// <summary>ブリーフィング確認中の選択フィールドID（まだロードしていない）</summary>
-        public int PendingFieldID  { get; private set; } = -1;
-
-        /// <summary>ブリーフィング画面からフィールドを選択したときに呼ぶ。ロードは行わない。</summary>
-        public void SetPendingField(int fieldId)
-        {
-            PendingFieldID = fieldId;
-        }
-
-        /// <summary>ブリーフィング確認後、出撃時に呼ぶ。PendingField の各シーンをロードする。</summary>
-        public void LoadPendingField()
-        {
-            if (PendingFieldID < 0) return;
-
-            var settings = FieldMaster.Instance.GetSettings(PendingFieldID);
-            if (settings == null) return;
-
-            foreach (var scene in settings.FieldSceneNames)
-                AddFieldScene(PendingFieldID, scene);
-
-            PendingFieldID = -1;
-        }
+        public int CurrentFieldID { get; private set; } = -1;
 
         readonly HashSet<string> fieldSceneNames = new HashSet<string>();
         readonly Dictionary<int, SpawnPoint> spawnPoints = new Dictionary<int, SpawnPoint>();

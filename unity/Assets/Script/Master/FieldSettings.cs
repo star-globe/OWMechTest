@@ -23,11 +23,6 @@ namespace AdvancedGears
         List<string> fieldSceneNames = null;
         public List<string> FieldSceneNames => fieldSceneNames;
 
-        [SerializeField]
-        [TextArea(2, 5)]
-        string missionObjective = "敵拠点を制圧せよ。";
-        public string MissionObjective => missionObjective;
-
         public int ID => FieldID;
 
 #if UNITY_EDITOR
