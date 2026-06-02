@@ -260,6 +260,11 @@ namespace AdvancedGears
             target = Vector3.zero;
             return false;
         }
+        protected virtual bool CheckSubFire(out Vector3 target)
+        {
+            target = Vector3.zero;
+            return false;
+        }
 
         protected virtual void UpdateInput()
         {
@@ -380,6 +385,11 @@ namespace AdvancedGears
             {
                 Fire(tgt, isRight: false);
             }
+
+            if (CheckSubFire(out tgt))
+            {
+                SubFire(tgt);
+            }
         }
 
         void UpdateParam()
@@ -398,6 +408,11 @@ namespace AdvancedGears
             {
                 partsContainer.LeftFire(tgt);
             }
+        }
+
+        protected virtual void SubFire(Vector3 tgt)
+        {
+            partsContainer.SubFire(tgt);
         }
 
         private void UpdateMove()

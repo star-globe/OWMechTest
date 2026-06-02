@@ -181,6 +181,15 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SubFire"",
+                    ""type"": ""Button"",
+                    ""id"": ""a1b2c3d4-e5f6-7890-abcd-ef1234567890"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -425,6 +434,28 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
                     ""action"": ""ModeSwitch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f1e2d3c4-b5a6-9870-fedc-ba9876543210"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SubFire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e2d3c4b5-a6f1-8709-edcb-a98765432101"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SubFire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -443,6 +474,7 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
         m_Player_LeftFire = m_Player.FindAction("LeftFire", throwIfNotFound: true);
         m_Player_HyperBoost = m_Player.FindAction("HyperBoost", throwIfNotFound: true);
         m_Player_ModeSwitch = m_Player.FindAction("ModeSwitch", throwIfNotFound: true);
+        m_Player_SubFire = m_Player.FindAction("SubFire", throwIfNotFound: true);
     }
 
     ~@MainControls()
@@ -533,6 +565,7 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_LeftFire;
     private readonly InputAction m_Player_HyperBoost;
     private readonly InputAction m_Player_ModeSwitch;
+    private readonly InputAction m_Player_SubFire;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -584,6 +617,10 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ModeSwitch".
         /// </summary>
         public InputAction @ModeSwitch => m_Wrapper.m_Player_ModeSwitch;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SubFire".
+        /// </summary>
+        public InputAction @SubFire => m_Wrapper.m_Player_SubFire;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -640,6 +677,9 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
             @ModeSwitch.started += instance.OnModeSwitch;
             @ModeSwitch.performed += instance.OnModeSwitch;
             @ModeSwitch.canceled += instance.OnModeSwitch;
+            @SubFire.started += instance.OnSubFire;
+            @SubFire.performed += instance.OnSubFire;
+            @SubFire.canceled += instance.OnSubFire;
         }
 
         /// <summary>
@@ -681,6 +721,9 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
             @ModeSwitch.started -= instance.OnModeSwitch;
             @ModeSwitch.performed -= instance.OnModeSwitch;
             @ModeSwitch.canceled -= instance.OnModeSwitch;
+            @SubFire.started -= instance.OnSubFire;
+            @SubFire.performed -= instance.OnSubFire;
+            @SubFire.canceled -= instance.OnSubFire;
         }
 
         /// <summary>
@@ -791,5 +834,6 @@ public partial class @MainControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnModeSwitch(InputAction.CallbackContext context);
+        void OnSubFire(InputAction.CallbackContext context);
     }
 }
