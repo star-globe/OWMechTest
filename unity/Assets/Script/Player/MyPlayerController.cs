@@ -65,5 +65,12 @@ namespace AdvancedGears
 
             return InputUtils.CheckRightFire();
         }
+
+        protected override bool CheckSubFire(out Vector3 target)
+        {
+            SetTarget(out target);
+
+            return InputUtils.CheckSubFire();
+        }
     }
 }
