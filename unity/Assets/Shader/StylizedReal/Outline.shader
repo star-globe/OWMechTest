@@ -79,8 +79,9 @@ Shader "StylizedReal/Outline"
                              + step(_NormalThreshold, normalEdge);
                 outline = saturate(outline);
 
-                // Unity 6: LOAD_TEXTURE2D_X は整数座標を要求するため SAMPLE に変更
-                half4 src = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_BlitTexture, uv);
+                // Unity 6: _BlitTexture_TexelSize.zw (width, height) から整数座標を算出して LOAD
+                uint2 pixelCoord = uint2(uv * _BlitTexture_TexelSize.zw);
+                half4 src = LOAD_TEXTURE2D_X(_BlitTexture, pixelCoord);
                 return lerp(src, _OutlineColor, outline);
             }
             ENDHLSL
