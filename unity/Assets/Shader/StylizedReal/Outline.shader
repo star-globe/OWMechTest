@@ -20,7 +20,8 @@ Shader "StylizedReal/Outline"
             Name "Outline"
 
             HLSLPROGRAM
-            #pragma vertex FullscreenVert
+            // Unity 6 URP: Blit.hlsl が提供する Vert を使用（旧 FullscreenVert は廃止）
+            #pragma vertex Vert
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -78,7 +79,8 @@ Shader "StylizedReal/Outline"
                              + step(_NormalThreshold, normalEdge);
                 outline = saturate(outline);
 
-                half4 src = LOAD_TEXTURE2D_X(_BlitTexture, uv * _ScreenParams.xy);
+                // Unity 6: LOAD_TEXTURE2D_X は整数座標を要求するため SAMPLE に変更
+                half4 src = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_BlitTexture, uv);
                 return lerp(src, _OutlineColor, outline);
             }
             ENDHLSL
