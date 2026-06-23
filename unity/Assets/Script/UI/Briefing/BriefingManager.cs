@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,10 +12,10 @@ namespace AdvancedGears
     public class BriefingManager : MonoBehaviour
     {
         [Header("表示UI")]
-        [SerializeField] Text missionNameText;
-        [SerializeField] Text fieldNameText;
-        [SerializeField] Text missionObjectiveText;
-        [SerializeField] Text timeLimitText;
+        [SerializeField] TextMeshProUGUI missionNameText;
+        [SerializeField] TextMeshProUGUI fieldNameText;
+        [SerializeField] TextMeshProUGUI missionObjectiveText;
+        [SerializeField] TextMeshProUGUI timeLimitText;
 
         [Header("ボタン")]
         [SerializeField] Button sortieButton;
@@ -64,10 +65,9 @@ namespace AdvancedGears
                 fieldNameText.text = field != null ? field.FieldName : $"Field {mission.FieldId}";
         }
 
-        /// <summary>出撃：フィールドとミッション依存シーンをロードして戦闘へ。</summary>
+        /// <summary>出撃：Battle シーンへ遷移。フィールド読み込みは SceneManager が Battle ロード後に行う。</summary>
         private void OnClickSortie()
         {
-            FieldManager.Instance?.LoadPendingMission();
             StateManager.Instance?.NextState();    // Briefing → Battle
         }
 
@@ -82,7 +82,7 @@ namespace AdvancedGears
         private void OnClickBack()
         {
             FieldManager.Instance?.SetPendingMission(-1);
-            UnityEngine.SceneManagement.SceneManager.LoadScene("SelectMenu");
+            StateManager.Instance?.GoToState(GameState.Select);
         }
     }
 }
