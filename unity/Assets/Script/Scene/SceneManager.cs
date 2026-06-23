@@ -59,6 +59,12 @@ namespace AdvancedGears
             isNowLoading = true;
 
             var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+            if (op == null)
+            {
+                Debug.Log($"Failed to Load Scene. Scene:{sceneName}");
+                yield break;
+            }
+
             while (op.isDone == false)
                 yield return null;
 
