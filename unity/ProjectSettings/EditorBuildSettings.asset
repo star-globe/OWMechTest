@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/SelectMenu.unity
     guid: 80c1334dadbfa2643b743861d7d101f6
   - enabled: 1
+    path: Assets/Scenes/Briefing.unity
+    guid: dda2ceb7796ebbb49aa2f7dce8a68169
+  - enabled: 1
     path: Assets/Scenes/Fields/Field_000/Field_000_1.unity
     guid: f5fa2934e0f01e345bf8d4759716d644
   - enabled: 1
