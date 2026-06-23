@@ -31,7 +31,25 @@ namespace AdvancedGears
 
         private void LoadBattleScene(Unit unit)
         {
-            LoadScene("Battle");
+            StartCoroutine(LoadBattleWithFields());
+        }
+
+        IEnumerator LoadBattleWithFields()
+        {
+            isNowLoading = true;
+            var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Battle", LoadSceneMode.Single);
+            if (op == null)
+            {
+                Debug.LogError("Failed to Load Scene. Scene:Battle");
+                isNowLoading = false;
+                yield break;
+            }
+            while (!op.isDone)
+                yield return null;
+            isNowLoading = false;
+
+            // Battle ロード完了後にフィールドシーンを Additive で読み込む
+            FieldManager.Instance?.LoadPendingMission();
         }
 
         private void LoadResultScene(Unit unit)

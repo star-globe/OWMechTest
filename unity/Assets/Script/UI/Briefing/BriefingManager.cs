@@ -65,10 +65,9 @@ namespace AdvancedGears
                 fieldNameText.text = field != null ? field.FieldName : $"Field {mission.FieldId}";
         }
 
-        /// <summary>出撃：フィールドとミッション依存シーンをロードして戦闘へ。</summary>
+        /// <summary>出撃：Battle シーンへ遷移。フィールド読み込みは SceneManager が Battle ロード後に行う。</summary>
         private void OnClickSortie()
         {
-            FieldManager.Instance?.LoadPendingMission();
             StateManager.Instance?.NextState();    // Briefing → Battle
         }
 
