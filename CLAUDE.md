@@ -31,6 +31,18 @@ wikiを参照するコマンドを実行する際は`unity/docs/wiki/`で`git pu
 - プレイヤー操作: docs/wiki/プレイヤー操作.md
 - レイヤー管理: docs/wiki/レイヤー管理.md
 
+## UI 実装ポリシー
+
+UI を実装・編集する際は以下のルールに従うこと。
+
+- `Assets/Prefabs/UI/` 以下に各画面用のフォルダを作成し、プレハブを格納する  
+  例: `Assets/Prefabs/UI/Briefing/BriefingPanel.prefab`
+- シーン上の Canvas は `Assets/Prefabs/UI/UICanvas.prefab` をベースとして配置し、その子に各 UI パーツを置く
+- テキストには `TextMeshProUGUI` を使用する
+- 実際の UI 編集作業はローカルクライアントから **UnityMCP** を使用して実施する（Claude Code からは Unity シーン・プレハブを直接編集しない）
+
+---
+
 ## 開発フロー
 
 Issueに着手する際は必ず以下のフローに従うこと。
