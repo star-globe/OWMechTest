@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,8 +7,8 @@ namespace AdvancedGears
 {
     public class MissionSelectButton : MonoBehaviour
     {
-        [SerializeField] Text missionNameText;
-        [SerializeField] Text fieldNameText;
+        [SerializeField] TextMeshProUGUI missionNameText;
+        [SerializeField] TextMeshProUGUI fieldNameText;
         [SerializeField] Button button;
 
         private int missionId;

@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,10 +12,10 @@ namespace AdvancedGears
     public class BriefingManager : MonoBehaviour
     {
         [Header("表示UI")]
-        [SerializeField] Text missionNameText;
-        [SerializeField] Text fieldNameText;
-        [SerializeField] Text missionObjectiveText;
-        [SerializeField] Text timeLimitText;
+        [SerializeField] TextMeshProUGUI missionNameText;
+        [SerializeField] TextMeshProUGUI fieldNameText;
+        [SerializeField] TextMeshProUGUI missionObjectiveText;
+        [SerializeField] TextMeshProUGUI timeLimitText;
 
         [Header("ボタン")]
         [SerializeField] Button sortieButton;
@@ -82,7 +83,7 @@ namespace AdvancedGears
         private void OnClickBack()
         {
             FieldManager.Instance?.SetPendingMission(-1);
-            UnityEngine.SceneManagement.SceneManager.LoadScene("SelectMenu");
+            StateManager.Instance?.GoToState(GameState.Select);
         }
     }
 }
