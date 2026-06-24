@@ -42,6 +42,9 @@ UI を実装・編集する際は以下のルールに従うこと。
 - `Assets/Prefabs/UI/` 以下に各画面用のフォルダを作成し、プレハブを格納する  
   例: `Assets/Prefabs/UI/Briefing/BriefingPanel.prefab`
 - シーン上の Canvas は `Assets/Prefabs/UI/UICanvas.prefab` をベースとして配置し、その子に各 UI パーツを置く
+- **各 UI パネルはプレハブとしてシーンに配置すること**。シーン上のオブジェクトはプレハブインスタンスとして参照を持った状態にし、プレハブ参照が切れた（Unpacked / Missing Prefab）状態で放置しない
+  - 正しい手順: プレハブファイルを `Assets/Prefabs/UI/` に作成 → シーンへはそのプレハブをドラッグまたは `manage_prefabs` でインスタンスとして配置
+  - プレハブへの変更は「プレハブを編集してシーンに反映」で行い、シーン上のインスタンスを直接 Unpack してから編集する方法は避ける
 - テキストには `TextMeshProUGUI` を使用する
 - 実際の UI 編集作業はローカルクライアントから **UnityMCP** を使用して実施する（Claude Code からは Unity シーン・プレハブを直接編集しない）
 
