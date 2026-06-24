@@ -71,25 +71,50 @@ namespace AdvancedGears
 
         void OnCollisionEnter(Collision collision)
         {
-            var colId = collision.gameObject.GetInstanceID();
-            foreach (ContactPoint contact in collision.contacts)
-            {
-                var state = CheckPoint(contact.point, out var normal);
-                if (state == TouchState.None)
-                    continue;
+            UpdateCollisionState(collision);
+        }
 
-                if (touchStateDic.TryGetValue(colId, out var tuple) &&
-                    tuple.Item1 == TouchState.Ground)
-                    continue;
-
-                touchStateDic[colId] = (state,normal);
-            }
+        void OnCollisionStay(Collision collision)
+        {
+            UpdateCollisionState(collision);
         }
 
         void OnCollisionExit(Collision collision)
         {
             var colId = collision.gameObject.GetInstanceID();
             touchStateDic.Remove(colId);
+        }
+
+        private void UpdateCollisionState(Collision collision)
+        {
+            var colId = collision.gameObject.GetInstanceID();
+            TouchState bestState = TouchState.None;
+            Vector3 bestNormal = Vector3.zero;
+
+            foreach (ContactPoint contact in collision.contacts)
+            {
+                var state = CheckPoint(contact.point, out var normal);
+                if (state == TouchState.None)
+                    continue;
+
+                if (state == TouchState.Ground)
+                {
+                    bestState = TouchState.Ground;
+                    bestNormal = normal;
+                    break;
+                }
+
+                if (bestState == TouchState.None)
+                {
+                    bestState = state;
+                    bestNormal = normal;
+                }
+            }
+
+            if (bestState == TouchState.None)
+                touchStateDic.Remove(colId);
+            else
+                touchStateDic[colId] = (bestState, bestNormal);
         }
 
         private TouchState CheckPoint(Vector3 point, out Vector3 normal)
