@@ -1,0 +1,2 @@
+NotoSansJP-VariableFont_wght.ttfをフォントとして採用
+日本語リストはhttps://yurinchi2525.com/fontlist/の第一水準漢字を採用
