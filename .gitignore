@@ -7,3 +7,7 @@ unity/obj
 unity/Temp
 unity/.vs
 *.csproj
+
+# Font source files
+*.ttf
+*.otf
