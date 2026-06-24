@@ -4,7 +4,7 @@
 
 ## 概要
 
-<!-- ゲームプレイGIFをここに挿入 -->
+<img width="480" height="270" alt="omtest_play" src="https://github.com/user-attachments/assets/5a5c147f-bfb4-43c9-8483-42403b514188" />
 
 プレイヤーは機体パーツを自由に組み合わせてメカをカスタマイズし、
 NPC部隊が連携して動くオープンフィールドで戦うアクションシミュレーターです。
