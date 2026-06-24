@@ -15,6 +15,6 @@ MonoBehaviour:
   missionId: 1
   missionName: Mission 1 - Field_1
   fieldId: 1
-  missionObjective: "\u30D5\u30A3\u30FC\u30EB\u30C91\u306E\u62E0\u70B9\u3092\u78BA\u4FDD\u3057\u3001\u5236\u5727\u305B\u3088\u3002"
+  missionObjective: "\u30D5\u30A3\u30FC\u30EB\u30C91\u306E\u30B4\u30FC\u30EB\u5730\u70B9\u3001\u6700\u3082\u9AD8\u3044\u70B9\u306B\u5230\u9054\u305B\u3088"
   timeLimitSeconds: 0
   missionSceneNames: []
