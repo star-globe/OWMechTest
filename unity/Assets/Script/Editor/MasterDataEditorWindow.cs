@@ -13,17 +13,7 @@ namespace AdvancedGears.Editor
     /// </summary>
     public class MasterDataEditorWindow : EditorWindow
     {
-        // 表示対象のマスタ型一覧
-        private static readonly Type[] MasterTypes =
-        {
-            typeof(BulletSettings),
-            typeof(FieldSettings),
-            typeof(GunSettings),
-            typeof(BoosterSettings),
-            typeof(UnitSettings),
-            typeof(PlayerParameterSettings),
-            typeof(PlayerControllerSettings),
-        };
+        private Type[] masterTypes;
 
         private int selectedTypeIndex;
         private Vector2 scrollPos;
@@ -36,7 +26,21 @@ namespace AdvancedGears.Editor
             GetWindow<MasterDataEditorWindow>("Master Data Viewer");
         }
 
-        private void OnEnable() => Refresh();
+        // IDBasedMasterSettings を実装した ScriptableObject サブクラスを自動検索
+        private static Type[] FindMasterTypes() => AppDomain.CurrentDomain
+            .GetAssemblies()
+            .SelectMany(a => { try { return a.GetTypes(); } catch { return Array.Empty<Type>(); } })
+            .Where(t => !t.IsAbstract
+                     && typeof(ScriptableObject).IsAssignableFrom(t)
+                     && typeof(IDBasedMasterSettings).IsAssignableFrom(t))
+            .OrderBy(t => t.Name)
+            .ToArray();
+
+        private void OnEnable()
+        {
+            masterTypes = FindMasterTypes();
+            Refresh();
+        }
 
         private void OnGUI()
         {
@@ -49,7 +53,7 @@ namespace AdvancedGears.Editor
         {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-            var typeNames = MasterTypes.Select(t => t.Name).ToArray();
+            var typeNames = masterTypes.Select(t => t.Name).ToArray();
             EditorGUI.BeginChangeCheck();
             selectedTypeIndex = EditorGUILayout.Popup(selectedTypeIndex, typeNames,
                 GUILayout.Width(220));
@@ -69,7 +73,7 @@ namespace AdvancedGears.Editor
 
         private void Refresh()
         {
-            var type = MasterTypes[selectedTypeIndex];
+            var type = masterTypes[selectedTypeIndex];
             var loaded = Resources.LoadAll(string.Empty, type);
             records = loaded.Cast<ScriptableObject>()
                             .OrderBy(r => r.name)
@@ -127,7 +131,7 @@ namespace AdvancedGears.Editor
 
         private void ExportCsv()
         {
-            var type = MasterTypes[selectedTypeIndex];
+            var type = masterTypes[selectedTypeIndex];
             var path = EditorUtility.SaveFilePanel("CSV エクスポート", "Assets", type.Name, "csv");
             if (string.IsNullOrEmpty(path))
                 return;
