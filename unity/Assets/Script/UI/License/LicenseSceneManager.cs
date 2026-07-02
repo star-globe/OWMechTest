@@ -11,7 +11,7 @@ namespace AdvancedGears
         [SerializeField] Button backButton;
 
         private const string LicenseResourcePath = "Licenses/ThirdPartyLicenses";
-        private const string BackSceneName = "SelectMenu";
+        private const string BackSceneName = "MainScene";
 
         private void Start()
         {

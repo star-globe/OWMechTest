@@ -46,6 +46,8 @@ UI を実装・編集する際は以下のルールに従うこと。
   - 正しい手順: プレハブファイルを `Assets/Prefabs/UI/` に作成 → シーンへはそのプレハブをドラッグまたは `manage_prefabs` でインスタンスとして配置
   - プレハブへの変更は「プレハブを編集してシーンに反映」で行い、シーン上のインスタンスを直接 Unpack してから編集する方法は避ける
 - テキストには `TextMeshProUGUI` を使用する
+- `TextMeshProUGUI` のフォントは **`Assets/Fonts/NotoSansJP/NotoSansJP-VariableFont_wght SDF.asset`**（GUID: `255d0acb36bcebb44a76ca265a789374`）をデフォルトとして指定すること
+- UnityMCP で GameObject を作成した場合、Scale が 0 になることがある。**特に指定がない限り Scale は (1, 1, 1) に設定すること**
 - 実際の UI 編集作業はローカルクライアントから **UnityMCP** を使用して実施する（Claude Code からは Unity シーン・プレハブを直接編集しない）
 
 ---
