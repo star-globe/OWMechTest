@@ -61,7 +61,7 @@ namespace AdvancedGears
                 return;
             }
 
-            unit.Initialize((long)go.GetInstanceID(), unitSide);
+            unit.Initialize((long)EntityId.ToULong(go.GetEntityId()), unitSide);
         }
     }
 }

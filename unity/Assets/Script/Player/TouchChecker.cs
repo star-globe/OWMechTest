@@ -81,13 +81,13 @@ namespace AdvancedGears
 
         void OnCollisionExit(Collision collision)
         {
-            var colId = collision.gameObject.GetInstanceID();
+            var colId = (int)EntityId.ToULong(collision.gameObject.GetEntityId());
             touchStateDic.Remove(colId);
         }
 
         private void UpdateCollisionState(Collision collision)
         {
-            var colId = collision.gameObject.GetInstanceID();
+            var colId = (int)EntityId.ToULong(collision.gameObject.GetEntityId());
             TouchState bestState = TouchState.None;
             Vector3 bestNormal = Vector3.zero;
 
