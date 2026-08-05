@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4343401049040387876}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: PostProcess
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -47,7 +47,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8813283809143076831}
   - component: {fileID: 1056727525450023911}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: BlurDriver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3581419877252932507}
   - component: {fileID: 5858575226171370376}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Global Volume
   m_TagString: Untagged
   m_Icon: {fileID: 0}

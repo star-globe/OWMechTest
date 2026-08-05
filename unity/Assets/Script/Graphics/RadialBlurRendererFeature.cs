@@ -158,6 +158,17 @@ public sealed class RadialBlurRendererFeature : ScriptableRendererFeature
                     Blitter.BlitTexture(ctx.cmd, data.source, new Vector4(1, 1, 0, 0), data.material, 0);
                 });
             }
+
+            using (var builder = renderGraph.AddRasterRenderPass<PassData>("RadialBlurComposite", out var passData))
+            {
+                passData.source = temp;
+                builder.UseTexture(passData.source);
+                builder.SetRenderAttachment(source, 0);
+                builder.SetRenderFunc(static (PassData data, RasterGraphContext ctx) =>
+                {
+                    Blitter.BlitTexture(ctx.cmd, data.source, new Vector4(1,1,0,0), 0, true);
+                });
+            }
         }
 
         #endregion
