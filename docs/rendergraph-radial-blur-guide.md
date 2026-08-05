@@ -40,7 +40,32 @@ Unity 6 で追加されたツールで、パスの依存関係・リソースの
 `Project Settings > Quality` を確認する。本プロジェクトは品質レベルによって `vSyncCount` が 0 と 1 で混在している。
 
 - **計測時は vSyncCount = 0 の品質レベルに固定する**（vSync 1 だと 16.6ms に張り付いて差が消える）
-- `Application.targetFrameRate = -1` にしておく
+- **Game ビューのツールバーにある VSync トグルも OFF にする。** これは QualitySettings とは独立に効くため、Quality を Don't Sync にしてもここが ON だと fps が頭打ちになる
+- Android 実機で測る場合は `Player Settings > Android > Optimized Frame Pacing` を OFF にする（フレーム間隔が平滑化されて計測がぶれる）
+
+`Application.targetFrameRate` は Project Settings には存在せず、**ランタイム専用 API なのでコードからしか設定できない**。
+本プロジェクトは現状どこでも設定しておらず、デフォルトの `-1`（プラットフォーム標準）のまま。
+エディタ/デスクトップでは `-1` = 無制限なので、**エディタ計測では追加設定は不要**。
+
+実機では `-1` が 30fps 相当に解釈されることがあるため、計測用の使い捨てコンポーネントを別途置く。
+`InitializeObject` など製品コードには混ぜない。
+
+```csharp
+public class BenchmarkSettings : MonoBehaviour
+{
+    [SerializeField] int _targetFrameRate = 300;
+
+    void Awake()
+    {
+        QualitySettings.vSyncCount = 0;          // vSync 有効時 targetFrameRate は無視される
+        Application.targetFrameRate = _targetFrameRate;
+    }
+}
+```
+
+なお**モバイルはコンポジタ側で vSync が強制されるため、そもそも fps では GPU 負荷を測れない**。
+実機の数値は AGI / Xcode の GPU 時間を読む（§4-3）。targetFrameRate の設定は
+「30fps に張り付いて差が見えなくなる」のを防ぐためのもの。
 
 ### 1-4. 現状のベースライン記録
 
