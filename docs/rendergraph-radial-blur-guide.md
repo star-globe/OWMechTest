@@ -538,6 +538,71 @@ After5: 1/8,  6タップ, ラジアル + dither   ← 破綻する側の限界�
 
 ---
 
+## 4-5. トラブルシュート: `IsActive()` が false のまま
+
+エフェクトが出ないときの最頻出パターン。まず `RecordRenderGraph` の先頭に一時的に入れて切り分ける
+（毎フレーム出るので Console の Collapse を ON にする）。
+
+```csharp
+var stack = VolumeManager.instance.stack;
+var vc = stack.GetComponent<RadialBlurVolumeComponent>();
+Debug.Log($"comp={vc != null} value={vc?.intensity.value} override={vc?.intensity.overrideState}");
+```
+
+| ログ | 意味 |
+|---|---|
+| `override=False` | プロファイルのオーバーライドがブレンドされていない（下記1） |
+| `override=True, value=0` | Volume は拾われている。値を 0 で上書きしている犯人がいる（下記2） |
+| `comp=False` | VolumeManager にコンポーネントが登録されていない（稀） |
+| `value>0` | `IsActive()` は true のはず。別の箇所の問題 |
+
+### 1. `overrideState` が false のまま（本命）
+
+`ClampedFloatParameter` のコンストラクタは `overrideState` のデフォルトが **false**。
+プロファイルでパラメータ左のチェックを入れない限り、その値はブレンド時に無視され、
+スタックにはクラス定義側の初期値 0 が残る。
+
+**重要: `intensity.value` を書き換えても、`overrideState` が false なら一切反映されない。**
+チェックボックスを手で入れるより、ドライバ側で明示的に立てるほうが確実
+（プロファイルアセットを作り直しても壊れない）。
+
+```csharp
+void Start()
+{
+    _volume.profile.TryGet(out _radialBlur);
+    _radialBlur.intensity.overrideState    = true;   // ← 必須
+    _radialBlur.sampleCount.overrideState  = true;
+    _radialBlur.downsample.overrideState   = true;
+    _radialBlur.centerRadius.overrideState = true;
+}
+```
+
+### 2. `RadialBlurDriver` が毎フレーム 0 で上書きしている
+
+ドライバはブースト非入力時に `target = 0f` を毎フレーム書き込む。
+**インスペクタで手動で Intensity を上げても、次の Update で 0 に戻される。**
+手動テスト中はドライバのコンポーネントを無効化すること。
+
+### 3. `volume.profile` のクローンと、編集しているアセットが別物
+
+`_volume.profile`（`sharedProfile` ではない）に初回アクセスした時点で Unity はクローンを生成し
+Volume に差し替える。**Play 中に Project ウィンドウで `RadialBlurProfile.asset` を編集しても、
+走っているクローンには反映されない。**
+Play 中は Hierarchy の Volume を選択し、そこに表示されるプロファイル（`(Clone)` 付き）を編集する。
+
+### 4. Volume が拾われる条件
+
+`Battle.unity` の Main Camera には `UniversalAdditionalCameraData` が付いていない
+（`m_VolumeLayerMask` 等が一切シリアライズされていない）。この場合 URP は
+`volumeLayerMask = Default レイヤーのみ` にフォールバックする。
+
+- Volume の GameObject が **Default レイヤー**にあるか
+- Volume コンポーネントの **Weight が 1** か、**Mode が Global** か
+- GameObject と Volume コンポーネントが**有効**か
+- Volume を置いたシーンが実際にロードされているか
+
+---
+
 ## 5. 落とし穴チェックリスト
 
 実装中に踏んだものにチェックを入れて、面接での失敗談ネタとして残す。
@@ -552,6 +617,9 @@ After5: 1/8,  6タップ, ラジアル + dither   ← 破綻する側の限界�
 - [ ] `sampler_LinearClamp` ではなく Repeat を使い画面端が破綻
 - [ ] 出力が使われずパスごとカリングされて「何も起きない」（Render Graph Viewer で確認できる）
 - [ ] `volume.sharedProfile` を書き換えて .asset に差分が出る
+- [ ] `overrideState` が false で、`intensity.value` を書き換えても反映されない（§4-5）
+- [ ] ドライバがブースト非入力時に毎フレーム 0 で上書きし、手動テストができない（§4-5）
+- [ ] Play 中に Project ウィンドウのプロファイルアセットを編集し、クローン側に反映されない（§4-5）
 - [ ] タップ数削減でバンディング発生 → dither で解決
 - [ ] RTHandle を自前で `Alloc` / `Release` しようとする → **Render Graph では不要**。ここは旧 API の知識が邪魔をするポイント
 
