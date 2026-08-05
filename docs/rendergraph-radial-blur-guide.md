@@ -196,6 +196,20 @@ uv += step * noise;   // ループ前に開始位置をずらす
 
 既存の `OutlineRendererFeature.cs` が `RecordRenderGraph` のお手本になっている。ただし**あれは往復 Blit をそのまま残しているので、構造はそのままコピーしない**。
 
+#### クラス構造
+
+`RadialBlurRendererFeature.cs` 1ファイルに、**3階層の入れ子**で書く（既存 Outline と同じ構成）。
+
+```
+RadialBlurRendererFeature : ScriptableRendererFeature   … public、ファイル名と一致必須
+ └ RadialBlurPass : ScriptableRenderPass                … 入れ子。public 不要
+    └ PassData                                          … さらに入れ子。パス固有のデータ
+```
+
+`ScriptableRendererFeature` だけは Unity がインスペクタで列挙する都合上 public かつファイル名一致が必要だが、
+入れ子の Pass / PassData にはその制約がない。`PassData` を Pass の中に閉じ込めるのは、
+パスごとに必要なデータが異なるため外に出すと使い回しの誘惑が生まれるから。URP のサンプルもこの形。
+
 ```csharp
 public class RadialBlurRendererFeature : ScriptableRendererFeature
 {
@@ -217,6 +231,26 @@ public class RadialBlurRendererFeature : ScriptableRendererFeature
     }
 
     protected override void Dispose(bool disposing) { /* 生成したマテリアルインスタンスがあれば破棄 */ }
+
+    // ↓ Pass はこの中に入れ子で定義する
+    class RadialBlurPass : ScriptableRenderPass
+    {
+        readonly Material _material;
+        readonly bool _useLegacyGaussian;
+
+        public RadialBlurPass(Material material, bool useLegacyGaussian)
+        {
+            _material = material;
+            _useLegacyGaussian = useLegacyGaussian;
+        }
+
+        class PassData { /* Step 4 参照 */ }
+
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
+        {
+            // 次の「RecordRenderGraph の骨子」がここに入る
+        }
+    }
 }
 ```
 
