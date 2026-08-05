@@ -733,3 +733,49 @@ RadialBlur > Intensity を 0.5 にすると、シーンの Volume を経由せ�
 | 7 | （余力）既存アウトラインの最適化 |
 
 段階3の「Before 計測」を飛ばさないこと。**先に最適化版を作ってしまうと Before の数字が永遠に取れなくなる。**
+
+---
+
+## 8. 補足: UI にポストエフェクトを掛けたい場合
+
+本プロジェクトの Canvas は `UICanvas.prefab` を含め**すべて Screen Space - Overlay**（`m_RenderMode: 0`）。
+そのため今回のエフェクトは UI に掛かっていない。
+
+### Overlay の UI には Renderer Feature から原理的に触れない
+
+Overlay Canvas は **SRP のカメラループが終わった後**に Unity の UI システムがバックバッファへ直接描画する。
+`RenderPassEvent` は SRP のカメラループ内での順序指定なので、最後の `AfterRendering`(1000) を指定しても
+Overlay UI より手前になる。設定で回避できる話ではなく、描画経路が違う。
+
+### 掛けたい場合の選択肢
+
+| | 方法 | 備考 |
+|---|---|---|
+| 1 | Canvas を **Screen Space - Camera** に変更 | 最も簡単。UI が Transparent キューに入り SRP 管理下になるため、`BeforeRenderingPostProcessing`(550) の現行 Feature が**コード変更なしで**UI にも掛かる。Render Camera と Plane Distance の設定が必要 |
+| 2 | **Camera Stacking**（Base + Overlay カメラ） | UI だけ別扱いにするなど細かい制御ができる。カメラ管理のコストが増える |
+| 3 | **RenderTexture 経由** | 最も柔軟。常時 RT 1枚分のメモリと Blit コストが乗る |
+
+1 を選ぶ場合の注意:
+- UI が Transparent キューに入るため、他の半透明オブジェクトとのソート順が変わる
+- Plane Distance が近すぎると他オブジェクトが UI を貫通する
+- **`UICanvas.prefab` を変更すると Briefing / SelectMenu / License / Result すべてに波及する。**
+  Battle だけ変えたいなら Canvas を分ける
+
+### 本題材では UI をぼかさないのが正解
+
+ブースト中にロックオンレティクルや残弾表示がぼけるとゲームとして成立しない。
+**UI が鮮明なままなのは結果的に正しい挙動**であり、
+「HUD の可読性を優先して Overlay のままにした。掛けたければ Screen Space - Camera に変えれば
+同じ Feature がそのまま効く」と仕様上の判断として説明できる状態にしておく。
+
+### 「UI にポストエフェクト」の実需は別物であることが多い
+
+実務で必要になるのは、ポーズ画面やメニューで**背景をぼかしてモーダルを浮かせる**フロストガラス表現。
+これは Renderer Feature ではなく別の作りが適切。
+
+- シーンを RenderTexture に描く（または Opaque Texture を使う）
+- それをブラーしてパネルの背景 `Image` に貼る
+- UI 自体は鮮明なまま
+
+本プロジェクトでは Briefing / SelectMenu が該当。
+今回のブラーシェーダーとダウンサンプルのノウハウはそのまま流用できるため、次の題材として自然につながる。
