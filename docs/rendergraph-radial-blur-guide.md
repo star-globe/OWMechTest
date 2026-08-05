@@ -202,7 +202,8 @@ public class RadialBlurVolumeComponent : VolumeComponent, IPostProcessComponent
 
 **Volume Mask の注意:** `UniversalAdditionalCameraData.volumeLayerMask` のデフォルトは
 **Default レイヤーのみ**（本プロジェクトのシーンにこの値はシリアライズされておらず、デフォルトのまま）。
-`GameLayers.cs` の `MyPlayer` / `Unit` などの独自レイヤーに Volume を置くとカメラに拾われない。
+UI(5) / Postprocessing(10) / `GameLayers.cs` の独自レイヤーに Volume を置くとカメラに拾われない。
+**Canvas の下で作ると UI レイヤーを引き継いでここで詰まる**（§4-5 で実際に踏んだ）。
 
 複数のフィールドシーンで使うことになるので、`Assets/Prefabs/Volume/RadialBlurVolume.prefab`
 としてプレハブ化しておくと配置が楽。Step 5 の `RadialBlurDriver` も同じ GameObject に付ける。
@@ -614,40 +615,48 @@ Volume に差し替える。**Play 中に Project ウィンドウで `RadialBlur
 走っているクローンには反映されない。**
 Play 中は Hierarchy の Volume を選択し、そこに表示されるプロファイル（`(Clone)` 付き）を編集する。
 
-### 4. そもそもシーンに Volume が存在しない（実際に踏んだ）
+### 4. Volume の GameObject が Volume Mask 外のレイヤーにある（実際の原因）
 
-**既定ボリュームプロファイル（`Assets/DefaultVolumeProfile.asset`）だけでは `IsActive()` は true にならない。**
+**本プロジェクトで実際に起きたのはこれ。** `PostProcess.prefab` 内の `Global Volume` が
+`m_Layer: 5`（UI レイヤー）にあり、カメラに拾われていなかった。
 
-既定プロファイルはスタックに「値」を供給するが、スタック側の `overrideState` が true になるのは
-**シーンの Volume が実際に上書きしたときだけ**。シーンに Volume が無いと
-`override=False` / `value=`（既定プロファイルの値）となり、intensity の既定値 0 のまま `IsActive()` は false。
+`Battle.unity` の Main Camera には `UniversalAdditionalCameraData` が付いていないため、
+URP は **`volumeLayerMask` = Default (layer 0) のみ** にフォールバックする。
+UI レイヤーの Volume は評価対象外となり、スタックには既定プロファイルの値だけが残って
+`override=False, value=0` になる。プロファイル側の設定（`intensity: m_Value: 1`）は正しくても効かない。
 
-さらに `RadialBlurDriver` をシーンに配置していないと `Start()` が一度も走らないため、
-**ドライバ側で `overrideState = true` を書いても実行されない**。
-「コードは正しいのに効かない」ように見えるが、そのコードが動いていないだけ。
+**原因が Canvas 由来なことが多い。** Volume を Canvas の下や UI オブジェクトとして作ると、
+RectTransform と UI レイヤーを引き継いでしまう。Volume は UI 要素ではないので
+Canvas の外で作り、通常の `Transform` にすること。
 
-確認方法: シーンファイルを GUID で検索する（シーン YAML はコンポーネントを名前ではなく GUID で参照するため、
-クラス名での grep は当てにならない）。
+#### 本プロジェクトのレイヤー定義
 
-```bash
-DRIVER=$(grep guid Assets/Script/Graphics/RadialBlurDriver.cs.meta | cut -d' ' -f2)
-grep -c "sharedProfile" Assets/Scenes/Battle.unity   # Volume コンポーネントの有無
-grep -c "$DRIVER"       Assets/Scenes/Battle.unity   # Driver の有無
-```
+| # | レイヤー |
+|---|---|
+| 0 | **Default** |
+| 5 | UI |
+| 10 | **Postprocessing** |
+| 11 | MyPlayer |
 
-**切り分けの近道:** `Assets/DefaultVolumeProfile.asset` を選択して RadialBlur > Intensity を 0.5 にすれば、
-シーンに Volume を作らずに `IsActive()` を true にできる。パイプラインが通っているかの確認に使う。
+レイヤー 10 に `Postprocessing` が用意されているので、本来はそこに置くのが設計意図に沿う。
+ただしその場合は **Main Camera の Volume Mask に `Postprocessing` を追加する**必要がある
+（カメラを選択すると URP が `UniversalAdditionalCameraData` を自動追加する）。
+まず Default で動作確認し、後から整理するのが安全。
 
-### 5. Volume が拾われる条件
+#### その他の確認項目
 
-`Battle.unity` の Main Camera には `UniversalAdditionalCameraData` が付いていない
-（`m_VolumeLayerMask` 等が一切シリアライズされていない）。この場合 URP は
-`volumeLayerMask = Default レイヤーのみ` にフォールバックする。
-
-- Volume の GameObject が **Default レイヤー**にあるか
 - Volume コンポーネントの **Weight が 1** か、**Mode が Global** か
 - GameObject と Volume コンポーネントが**有効**か
 - Volume を置いたシーンが実際にロードされているか
+- `RadialBlurDriver` の `reflectBoost` が false だと `Update()` が即 return する（手動テスト時は意図通り）
+
+**切り分けの近道:** `Assets/DefaultVolumeProfile.asset`（既定ボリュームプロファイル）の
+RadialBlur > Intensity を 0.5 にすると、シーンの Volume を経由せずに `IsActive()` を true にできる。
+これで true になるならレイヤー/マスク側、ならなければコード側の問題と切り分けられる。
+
+**調査時の注意:** シーン YAML はコンポーネントを GUID で参照し、
+**プレハブインスタンスは差分しか持たない**。クラス名や `sharedProfile` でシーンファイルを grep しても
+プレハブ内の Volume は見つからないので、プレハブ側を直接確認すること。
 
 ---
 
@@ -665,7 +674,7 @@ grep -c "$DRIVER"       Assets/Scenes/Battle.unity   # Driver の有無
 - [ ] `sampler_LinearClamp` ではなく Repeat を使い画面端が破綻
 - [ ] 出力が使われずパスごとカリングされて「何も起きない」（Render Graph Viewer で確認できる）
 - [ ] `volume.sharedProfile` を書き換えて .asset に差分が出る
-- [ ] シーンに Volume / Driver を配置しておらず、既定プロファイルの値 0 のまま動かない（§4-5）
+- [ ] Volume の GameObject が Volume Mask 外のレイヤー（UI 等）にあり、カメラに拾われない（§4-5）
 - [ ] 書き戻しパスが無く、出力を誰も消費しないためパスごとカリングされる（§3 Step 3）
 - [ ] シェーダーでオフセットをスカラーで宣言し `.x` に切り詰められる（§3 Step 2）
 - [ ] `overrideState` が false で、`intensity.value` を書き換えても反映されない（§4-5）
