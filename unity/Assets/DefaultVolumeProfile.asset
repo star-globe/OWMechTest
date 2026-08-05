@@ -534,6 +534,7 @@ MonoBehaviour:
   - {fileID: 7481301594736456450}
   - {fileID: 1550128395392551442}
   - {fileID: 8977534351505336749}
+  - {fileID: 6312310003817966026}
 --- !u!114 &723917381270654552
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -731,6 +732,31 @@ MonoBehaviour:
   saturation:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &6312310003817966026
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ecea533a5320a540a26f8f780cfad6f, type: 3}
+  m_Name: RadialBlurVolumeComponent
+  m_EditorClassIdentifier: Assembly-CSharp::RadialBlurVolumeComponent
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0
+  sampleCount:
+    m_OverrideState: 1
+    m_Value: 8
+  downsample:
+    m_OverrideState: 1
+    m_Value: 2
+  centerRadius:
+    m_OverrideState: 1
+    m_Value: 0.2
 --- !u!114 &7481301594736456450
 MonoBehaviour:
   m_ObjectHideFlags: 3

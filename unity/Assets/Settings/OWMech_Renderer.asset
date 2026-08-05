@@ -26,8 +26,9 @@ MonoBehaviour:
     probeSamplingDebugMesh: {fileID: 0}
     probeSamplingDebugTexture: {fileID: 0}
     probeVolumeBlendStatesCS: {fileID: 0}
-  m_RendererFeatures: []
-  m_RendererFeatureMap: 
+  m_RendererFeatures:
+  - {fileID: 7531608756956298682}
+  m_RendererFeatureMap: bafd99a142a68568
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 0}
   m_AssetVersion: 3
@@ -56,3 +57,19 @@ MonoBehaviour:
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
   m_TileOnlyMode: 0
+--- !u!114 &7531608756956298682
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5abac4718a2972f4283c6fc6ddf5f0d0, type: 3}
+  m_Name: RadialBlurRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::RadialBlurRendererFeature
+  m_Active: 1
+  _material: {fileID: 2100000, guid: 65cd5bb69494d9b41b0d4fd97e5af983, type: 2}
+  _renderPassEvent: 550
+  _useLegacyGaussian: 0
