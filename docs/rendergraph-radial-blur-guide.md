@@ -97,23 +97,29 @@ public RadialBlurPass(Material material, bool useLegacyGaussian)
 }
 ```
 
-#### 有効化する場合のゲートは3箇所
+#### 検討した選択肢
 
-1. `OWMech_Renderer.asset` の Post-processing > Enabled
-2. **各シーンのカメラの Post Processing チェックボックス** — Renderer 側だけ ON にしても効かない。忘れやすい
-3. シーンに Global Volume を配置してプロファイルを割り当て
-
-#### プロファイルの選択
-
-| | 内容 | 向き |
+| | 内容 | 判断 |
 |---|---|---|
-| A | 既存 `DefaultProfile(URP)` を使う | 作ってあるプロファイルが活きるが、**ゲームの見た目が変わる**。グラフィック方針の判断が必要 |
-| B | 新規プロファイルに Radial Blur のオーバーライドだけ入れる | 見た目を維持できる。**ポストプロセスのコストが混ざらないので自作 Feature の GPU 時間が素直に読める** |
+| A | 既存 `DefaultProfile(URP)` を有効化して使う | **不採用**。Bloom / Tonemapping が一気に効いてゲームの見た目が変わる。グラフィック方針の判断が別途必要になる |
+| B | ポストプロセスは OFF のまま据え置き、新規プロファイルに Radial Blur のオーバーライドだけ入れる | **採用** |
 
-計測の一貫性を重視するなら B。いずれにせよ Step 5 のブースト駆動に Global Volume は必要になる。
+#### 採用方針: B（ポストプロセスは無効のまま）
 
-**この判断は次の §1-5 ベースライン記録より前に済ませること。**
-Bloom / Tonemapping は無視できない GPU コストなので、後から有効化すると Before の数値が使えなくなる。
+**`OWMech_Renderer.asset` も Camera も変更しない。** 理由:
+
+- ポストプロセスを有効にすると、オーバーライドが空でも **UberPost が常時1パス走る**。
+  見た目は変わらないのにコストだけ乗るため、「自作 Feature の GPU 時間を素直に読む」という B の狙いと逆行する
+- 中間カラーテクスチャは `requiresIntermediateTexture = true` で確保できるので、ポストプロセスに依存する必要がない
+- カメラは `Battle.unity` 側にあり（`FollowCamera` が `Camera.main` で動的取得）、
+  フィールドシーンには存在しない。カメラ設定を触ると影響範囲が読みにくい
+
+**自作 Volume は `VolumeManager` から直接読むため、ポストプロセス OFF でも動作する。**
+
+なお HDR が ON のまま Tonemapping が無い状態は残るが、これはプロジェクトの既存条件であり
+本課題のスコープ外とする。将来 A に切り替える場合は、その時点でベースラインを取り直すこと。
+
+この方針では §1-4 で変更する設定は無いので、そのまま §1-5 へ進む。
 
 ### 1-5. 現状のベースライン記録
 
@@ -174,6 +180,32 @@ public class RadialBlurVolumeComponent : VolumeComponent, IPostProcessComponent
 - `SupportedOnRenderPipeline` は Unity 6 の属性。旧 `[VolumeComponentMenuForRenderPipeline]` は非推奨なので使わない
 - `IPostProcessComponent` から `IsTileCompatible()` は URP 14 以降削除済み。実装するとコンパイルエラー
 - `IsActive()` が false のときに Pass 側で即 return することで、**強度0のときパスごと消える** → Render Graph Viewer 上でパスが消えるのが確認できる。これ自体が良いデモになる
+
+#### Step 1 の後: プロファイルと Global Volume を作る
+
+`RadialBlurVolumeComponent` クラスが存在しないと Add Override のメニューに出てこないため、
+**プロファイル作成は必ず Step 1 のコンパイルが通ってから行う。** 順序を間違えると「メニューに出ない」で詰まる。
+
+1. `Assets/Scenes/Profiles/` で右クリック → `Create > Rendering > Volume Profile` → `RadialBlurProfile`
+2. `Battle.unity` の Hierarchy で右クリック → `Volume > Global Volume` → 名前を `RadialBlurVolume` に
+   - **Layer は Default のままにする**（後述）
+   - Transform の Scale が (1,1,1) であることを確認（UnityMCP 経由で作ると 0 になることがある）
+3. Volume コンポーネント: Mode = Global / Weight = 1 / Priority = 0 / Profile = RadialBlurProfile
+4. `Add Override > OWMech > Radial Blur`
+5. **各パラメータ左のチェックボックスを ON にする**
+6. `intensity` を手で 1.0 にして動作確認 → 問題なければ Step 5 でブースト駆動に差し替え
+
+**5 が最大の落とし穴。** `VolumeComponent` のパラメータは左のチェックを入れないと
+「オーバーライドしない」扱いになり、クラス定義側のデフォルト値が使われる。
+`intensity` のデフォルトは `0f` なので、チェックを入れ忘れると `IsActive()` が false のまま
+パスが積まれず、**コードは正しいのに何も起きない**。動かないと思ったらまずここを疑う。
+
+**Volume Mask の注意:** `UniversalAdditionalCameraData.volumeLayerMask` のデフォルトは
+**Default レイヤーのみ**（本プロジェクトのシーンにこの値はシリアライズされておらず、デフォルトのまま）。
+`GameLayers.cs` の `MyPlayer` / `Unit` などの独自レイヤーに Volume を置くとカメラに拾われない。
+
+複数のフィールドシーンで使うことになるので、`Assets/Prefabs/Volume/RadialBlurVolume.prefab`
+としてプレハブ化しておくと配置が楽。Step 5 の `RadialBlurDriver` も同じ GameObject に付ける。
 
 ### Step 2 — シェーダーを書く
 
