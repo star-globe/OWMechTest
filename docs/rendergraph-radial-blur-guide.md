@@ -67,7 +67,55 @@ public class BenchmarkSettings : MonoBehaviour
 実機の数値は AGI / Xcode の GPU 時間を読む（§4-3）。targetFrameRate の設定は
 「30fps に張り付いて差が見えなくなる」のを防ぐためのもの。
 
-### 1-4. 現状のベースライン記録
+### 1-4. ポストプロセスを有効化するか決める（ベースライン記録より前に）
+
+本プロジェクトは**ポストプロセス一式が休眠状態**にある。
+
+- `OWMech_Renderer.asset` の `postProcessData` が null（Post-processing > Enabled = false）
+- どのシーンのカメラも `renderPostProcessing` 未設定（Camera 側も OFF）
+- `DefaultProfile(URP).asset`（Bloom / Tonemapping / ColorAdjustments 等を設定済み）はどのシーンからも参照されていない
+
+自作 Feature 自体は OFF のままでも動く（`RenderPassEvent` は並び順の指定でしかなく、Volume も
+`VolumeManager` から直接読むため）。ただし OFF のままだと以下の問題がある。
+
+1. **中間カラーテクスチャが確保されず、エフェクトが何も出ない。**
+   ポストプロセスも他の Renderer Feature も無いと URP はバックバッファへ直接描画するため
+   （`m_IntermediateTextureMode: 1` = Auto）、Step 3 の `isActiveTargetBackBuffer` ガードで毎フレーム即 return する。
+   **コードは正しいのに表示されない**という、原因の分かりにくい詰まり方をする
+2. `BeforeRenderingPostProcessing` を選ぶ理由（ブラー後に Bloom が乗って光が滲む）が成立しない
+3. HDR が ON（`m_SupportsHDR: 1`）なのに Tonemapping が無いため、ハイライトが素直にクリップする。
+   ラジアルブラーは明部を引き伸ばすエフェクトなのでこの影響を受けやすい
+
+**1 への対策は、ポストプロセスの ON/OFF に関わらず必ず入れる。**
+
+```csharp
+public RadialBlurPass(Material material, bool useLegacyGaussian)
+{
+    _material = material;
+    _useLegacyGaussian = useLegacyGaussian;
+    requiresIntermediateTexture = true;   // バックバッファ直接描画を抑止
+}
+```
+
+#### 有効化する場合のゲートは3箇所
+
+1. `OWMech_Renderer.asset` の Post-processing > Enabled
+2. **各シーンのカメラの Post Processing チェックボックス** — Renderer 側だけ ON にしても効かない。忘れやすい
+3. シーンに Global Volume を配置してプロファイルを割り当て
+
+#### プロファイルの選択
+
+| | 内容 | 向き |
+|---|---|---|
+| A | 既存 `DefaultProfile(URP)` を使う | 作ってあるプロファイルが活きるが、**ゲームの見た目が変わる**。グラフィック方針の判断が必要 |
+| B | 新規プロファイルに Radial Blur のオーバーライドだけ入れる | 見た目を維持できる。**ポストプロセスのコストが混ざらないので自作 Feature の GPU 時間が素直に読める** |
+
+計測の一貫性を重視するなら B。いずれにせよ Step 5 のブースト駆動に Global Volume は必要になる。
+
+**この判断は次の §1-5 ベースライン記録より前に済ませること。**
+Bloom / Tonemapping は無視できない GPU コストなので、後から有効化すると Before の数値が使えなくなる。
+
+### 1-5. 現状のベースライン記録
 
 まだ何も実装していない状態で、以下を記録しておく。これが本当の原点になる。
 
