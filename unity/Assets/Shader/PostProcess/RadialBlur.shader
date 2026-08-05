@@ -12,7 +12,7 @@ Shader "PostProcess/RadialBlur"
         float   _Intensity;
         float   _CenterRadius;
         int     _SampleCount;
-        const float2  _BlurCenter = float2(0.5, 0.5);    // 通常は（0.5, 0.5）
+        float2  _BlurCenter ;    // 通常は（0.5, 0.5）
         ENDHLSL
 
         Pass
@@ -28,12 +28,14 @@ Shader "PostProcess/RadialBlur"
             {
                 float2 uv = input.texcoord;
                 float2 dir = (_BlurCenter - uv);
-                float dist = length(dir);
+                float2 d = dir;
+                d.x *= _ScreenParams.x / _ScreenParams.y;
+                float dist = length(d);
                 float falloff = saturate((dist - _CenterRadius) / (1 - _CenterRadius));
-                float2 step = dir * _Intensity * falloff / _SampleCount;
+                float2 delta = dir * _Intensity * falloff / _SampleCount;
                 half4 color = 0;
                 for (int i = 0; i < _SampleCount; i++)
-                    color += SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, uv + step * i);
+                    color += SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, uv + delta * i);
                 color /= _SampleCount;
                 return color;
             }

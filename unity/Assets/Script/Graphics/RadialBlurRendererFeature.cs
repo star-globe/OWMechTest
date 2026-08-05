@@ -106,6 +106,7 @@ public sealed class RadialBlurRendererFeature : ScriptableRendererFeature
             public float intensity;
             public int sampleCount;
             public float centerRadius;
+            public Vector2 blurCenter;
         }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
@@ -146,6 +147,7 @@ public sealed class RadialBlurRendererFeature : ScriptableRendererFeature
                 passData.intensity = volume.intensity.value;
                 passData.sampleCount = volume.sampleCount.value;
                 passData.centerRadius = volume.centerRadius.value;
+                passData.blurCenter = new Vector2(0.5f, 0.5f);
 
                 builder.UseTexture(passData.source);
                 builder.SetRenderAttachment(temp, 0);
@@ -155,6 +157,7 @@ public sealed class RadialBlurRendererFeature : ScriptableRendererFeature
                     data.material.SetFloat("_Intensity", data.intensity);
                     data.material.SetInt("_SampleCount", data.sampleCount);
                     data.material.SetFloat("_CenterRadius", data.centerRadius);
+                    data.material.SetVector("_BlurCenter", data.blurCenter);
                     Blitter.BlitTexture(ctx.cmd, data.source, new Vector4(1, 1, 0, 0), data.material, 0);
                 });
             }
