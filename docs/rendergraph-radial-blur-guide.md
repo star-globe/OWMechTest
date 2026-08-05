@@ -350,7 +350,13 @@ using (var builder = renderGraph.AddRasterRenderPass<PassData>("RadialBlur", out
 ```
 
 - シェーダープロパティ名の文字列は `static readonly int` に `Shader.PropertyToID` でキャッシュする
-- `SetRenderFunc` のラムダには `static` を付ける。付けないとクロージャがヒープ確保され、毎フレーム GC ゴミが出る（既存 Outline 実装は正しく `static` を付けている）
+- **`SetRenderFunc` のラムダには `static` を付ける（C# 9）。** 理由は2つあり、後者が本質:
+  - 何もキャプチャしなければ delegate が static フィールドにキャッシュされ、毎フレームのヒープ確保が消える
+  - **Pass のフィールドを参照すると `this` が暗黙にキャプチャされ、実行時に「記録時の値」ではなく「最新の値」を読んでしまう。**
+    `_pass` は Game ビューと Scene ビューで使い回されるため、Game の記録 → Scene の記録（フィールド上書き）→ 両方を実行、
+    という順序で Game 側が Scene の値を読む。Scene ビューを閉じると再現しなくなる厄介なバグになる。
+    `static` を付けるとこの書き方がコンパイルエラーになり、「渡していいのは `PassData` と `ctx` だけ」を言語機能で強制できる
+  - 既存 `OutlineRendererFeature.cs` も正しく `static` を付けている
 - **`ctx.cmd.SetGlobalXXX` など「グローバル状態」を変更する場合は `builder.AllowGlobalStateModification(true)` が必須。** これを忘れると実行時エラーになる
 
 ### Step 5 — ブースト状態と接続する
