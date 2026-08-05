@@ -270,6 +270,12 @@ uv += step * noise;   // ループ前に開始位置をずらす
 
 - `SAMPLE_TEXTURE2D_X` / `_BlitTexture` を使う（`_MainTex` ではない）
 - `sampler_LinearClamp` を使う。Repeat だと画面端で反対側の色を拾って破綻する
+- **オフセットは必ず `float2` で受ける（実際に踏んだ）。**
+  `float step = dir * ...;` のようにスカラーで宣言すると **`.x` に切り詰められ**、
+  放射状ではなく斜め方向の一様なブラーになる。エラーも警告も出ないので気づきにくい。
+  変数名も `step` は HLSL の組み込み関数と衝突するため `delta` 等にする
+- `_BlurCenter` は C# 側から `(0.5, 0.5)` を渡すか、シェーダー側で定数にする。
+  未設定だと `(0, 0)` になり、画面左下が中心のブラーになる
 - ループ回数を変数にすると展開されない。`[loop]` を明示するか、タップ数を `#pragma multi_compile` でバリアント化する。**後者のほうが速いが、バリアント数が増える。このトレードオフも計測して記録する価値がある**
 
 ### Step 3 — Renderer Feature / Pass を書く
@@ -374,6 +380,24 @@ public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer
     // 6. Pass B: 縮小バッファ → カメラカラー（バイリニア拡大で戻す）
 }
 ```
+
+**Pass B を忘れないこと（実際に踏んだ）。**
+`temp` に書き込むだけで誰も消費しないと、**Render Graph はそのパスを丸ごとカリングする**。
+`IsActive()` が true でもエフェクトは一切出ない。Render Graph Viewer 上ではパスが消えて見える。
+
+```csharp
+using (var builder = renderGraph.AddRasterRenderPass<PassData>("RadialBlurComposite", out var passData))
+{
+    passData.source = temp;
+    builder.UseTexture(passData.source);
+    builder.SetRenderAttachment(source, 0);
+    builder.SetRenderFunc(static (PassData data, RasterGraphContext ctx) =>
+        Blitter.BlitTexture(ctx.cmd, data.source, new Vector4(1, 1, 0, 0), 0, true));
+}
+```
+
+最後の引数 `true` が bilinear 指定。1/4 解像度から拡大して戻すので、
+`false`（point）にするとモザイク状になる。
 
 **パス数について正直に理解しておくこと**
 
@@ -590,7 +614,31 @@ Volume に差し替える。**Play 中に Project ウィンドウで `RadialBlur
 走っているクローンには反映されない。**
 Play 中は Hierarchy の Volume を選択し、そこに表示されるプロファイル（`(Clone)` 付き）を編集する。
 
-### 4. Volume が拾われる条件
+### 4. そもそもシーンに Volume が存在しない（実際に踏んだ）
+
+**既定ボリュームプロファイル（`Assets/DefaultVolumeProfile.asset`）だけでは `IsActive()` は true にならない。**
+
+既定プロファイルはスタックに「値」を供給するが、スタック側の `overrideState` が true になるのは
+**シーンの Volume が実際に上書きしたときだけ**。シーンに Volume が無いと
+`override=False` / `value=`（既定プロファイルの値）となり、intensity の既定値 0 のまま `IsActive()` は false。
+
+さらに `RadialBlurDriver` をシーンに配置していないと `Start()` が一度も走らないため、
+**ドライバ側で `overrideState = true` を書いても実行されない**。
+「コードは正しいのに効かない」ように見えるが、そのコードが動いていないだけ。
+
+確認方法: シーンファイルを GUID で検索する（シーン YAML はコンポーネントを名前ではなく GUID で参照するため、
+クラス名での grep は当てにならない）。
+
+```bash
+DRIVER=$(grep guid Assets/Script/Graphics/RadialBlurDriver.cs.meta | cut -d' ' -f2)
+grep -c "sharedProfile" Assets/Scenes/Battle.unity   # Volume コンポーネントの有無
+grep -c "$DRIVER"       Assets/Scenes/Battle.unity   # Driver の有無
+```
+
+**切り分けの近道:** `Assets/DefaultVolumeProfile.asset` を選択して RadialBlur > Intensity を 0.5 にすれば、
+シーンに Volume を作らずに `IsActive()` を true にできる。パイプラインが通っているかの確認に使う。
+
+### 5. Volume が拾われる条件
 
 `Battle.unity` の Main Camera には `UniversalAdditionalCameraData` が付いていない
 （`m_VolumeLayerMask` 等が一切シリアライズされていない）。この場合 URP は
@@ -617,6 +665,9 @@ Play 中は Hierarchy の Volume を選択し、そこに表示されるプロ�
 - [ ] `sampler_LinearClamp` ではなく Repeat を使い画面端が破綻
 - [ ] 出力が使われずパスごとカリングされて「何も起きない」（Render Graph Viewer で確認できる）
 - [ ] `volume.sharedProfile` を書き換えて .asset に差分が出る
+- [ ] シーンに Volume / Driver を配置しておらず、既定プロファイルの値 0 のまま動かない（§4-5）
+- [ ] 書き戻しパスが無く、出力を誰も消費しないためパスごとカリングされる（§3 Step 3）
+- [ ] シェーダーでオフセットをスカラーで宣言し `.x` に切り詰められる（§3 Step 2）
 - [ ] `overrideState` が false で、`intensity.value` を書き換えても反映されない（§4-5）
 - [ ] ドライバがブースト非入力時に毎フレーム 0 で上書きし、手動テストができない（§4-5）
 - [ ] Play 中に Project ウィンドウのプロファイルアセットを編集し、クローン側に反映されない（§4-5）
