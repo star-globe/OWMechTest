@@ -75,7 +75,7 @@ namespace AdvancedGears
         {
             cam = cam ?? Camera.main;
 
-            targetCount = PhysicsUtils.OverlapShpereOthers(cam.transform.position, lockLength, 1 << (int)side, GameLayers.TargetableLayerMask, string.Empty, targetArray);
+            targetCount = PhysicsUtils.OverlapShpereOthers(cam.transform.position, lockLength, 1 << (int)side, GameLayers.TargetableLayerMask, null, targetArray);
 
             var center = 0.5f * new Vector3(Screen.width, Screen.height);
             var widthSqrMax = center.x * center.x;
@@ -84,8 +84,17 @@ namespace AdvancedGears
             for (int i = 0; i < targetCount; i++)
             {
                 var tgt = targetArray[i];
-                var index = lockMarkPool.activeList.FindIndex(m => m.ID == tgt.ID);
-                if (index >= 0)
+
+                bool alreadyActive = false;
+                for (int j = 0; j < lockMarkPool.ActiveCount; j++)
+                {
+                    if (lockMarkPool.activeList[j].ID == tgt.ID)
+                    {
+                        alreadyActive = true;
+                        break;
+                    }
+                }
+                if (alreadyActive)
                     continue;
 
                 var pos = cam.WorldToScreenPoint(tgt.transform.position) - center;

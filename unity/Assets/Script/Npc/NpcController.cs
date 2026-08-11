@@ -77,7 +77,7 @@ namespace AdvancedGears
                 EffectiveRadius,
                 this.UnitSide.ToNpcExcludeMask(),
                 GameLayers.EnemyLayerMask,
-                string.Empty,
+                PhysicsUtils.PlayerTag,
                 out target);
 
             if (found && Role == SquadRole.Scout)

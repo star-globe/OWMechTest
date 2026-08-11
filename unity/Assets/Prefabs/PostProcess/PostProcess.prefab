@@ -90,7 +90,7 @@ MonoBehaviour:
   boostIns: 0.3
   _riseSpeed: 1
   _fallSpeed: 0.4
-  reflectBoost: 0
+  reflectBoost: 1
   _volume: {fileID: 5858575226171370376}
 --- !u!1 &7760184466751555199
 GameObject:

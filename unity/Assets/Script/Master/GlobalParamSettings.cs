@@ -13,10 +13,13 @@ namespace AdvancedGears
         {
             get
             {
-                Assert.IsTrue(worldSizeRate > 1.0f);
-
                 return worldSizeRate;
             }
+        }
+
+        private void OnValidate()
+        {
+            Assert.IsTrue(worldSizeRate > 1.0f);
         }
     }
 

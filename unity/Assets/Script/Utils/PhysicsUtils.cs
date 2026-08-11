@@ -19,13 +19,27 @@ public static class PhysicsUtils
         }
     }
 
+    private static TagHandle? _playerTag = null;
+    public static TagHandle PlayerTag
+    {
+        get
+        {
+            if (_playerTag == null)
+            {
+                _playerTag = TagHandle.GetExistingTag("Player");
+            }
+
+            return _playerTag.Value;
+        }
+    }
+
     private readonly static Collider[] colliders = new Collider[256];
 
     /// <summary>
     /// 指定した除外マスク（UnitSide ビットマスク）に一致しない最近傍の BaseObject の座標を返す。
     /// excludeSideMask は UnitSideExtensions.ToExcludeMask() で生成する。
     /// </summary>
-    public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, string tag, out Vector3 targetPos)
+    public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, TagHandle tag, out Vector3 targetPos)
     {
         targetPos = Vector3.zero;
         float length = float.MaxValue;
@@ -33,7 +47,7 @@ public static class PhysicsUtils
         for (int i = 0; i < count; i++)
         {
             var col = colliders[i];
-            if (string.Equals(col.gameObject.tag, tag) == false)
+            if (col.CompareTag(tag) == false)
                 continue;
 
             var baseObject = col.gameObject.GetComponent<BaseObject>();
@@ -60,14 +74,14 @@ public static class PhysicsUtils
     /// 指定した除外マスク（UnitSide ビットマスク）に一致しない BaseObject を results に格納し、件数を返す。
     /// excludeSideMask は UnitSideExtensions.ToExcludeMask() で生成する。
     /// </summary>
-    public static int OverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, string tag, BaseObject[] results)
+    public static int OverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, TagHandle? tag, BaseObject[] results)
     {
         int objectCount = 0;
         var count = Physics.OverlapSphereNonAlloc(pos, radius, colliders, layerMask);
         for (int i = 0; i < count; i++)
         {
             var col = colliders[i];
-            if (!string.IsNullOrEmpty(tag) && string.Equals(col.gameObject.tag, tag) == false)
+            if (tag != null && col.CompareTag(tag.Value) == false)
                 continue;
 
             var baseObject = col.gameObject.GetComponent<BaseObject>();
@@ -88,7 +102,7 @@ public static class PhysicsUtils
     }
 
 
-    public static bool CheckOverlapScorn(Vector3 start, Vector3 forward, float angleRad, UnitSide selfSide, int layerMask, string tag, out Vector3 targetPos)
+    public static bool CheckOverlapScorn(Vector3 start, Vector3 forward, float angleRad, UnitSide selfSide, int layerMask, TagHandle tag, out Vector3 targetPos)
     {
         targetPos = Vector3.zero;
         float length = float.MaxValue;
@@ -101,7 +115,7 @@ public static class PhysicsUtils
         for (int i = 0; i < count; i++)
         {
             var col = colliders[i];
-            if (string.Equals(col.gameObject.tag, tag) == false)
+            if (col.CompareTag(tag) == false)
                 continue;
 
             if (selfSide != UnitSide.None)

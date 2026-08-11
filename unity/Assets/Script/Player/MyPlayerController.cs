@@ -43,10 +43,11 @@ namespace AdvancedGears
             return base.CheckHyperBoost() && InputUtils.CheckHyperBoost();
         }
 
+
         private void SetTarget(out Vector3 target)
         {
             var trans = this.gameObject.transform;
-            if (PhysicsUtils.CheckOverlapScorn(trans.position, trans.forward * defaultTargetLength, defaultTargetAngle * Mathf.Deg2Rad, this.UnitSide, -1, "Player", out target) == false)
+            if (PhysicsUtils.CheckOverlapScorn(trans.position, trans.forward * defaultTargetLength, defaultTargetAngle * Mathf.Deg2Rad, this.UnitSide, -1, PhysicsUtils.PlayerTag, out target) == false)
             {
                 target = trans.position + trans.forward * defaultTargetLength + Vector3.up * this.PlayerHeight;
             }

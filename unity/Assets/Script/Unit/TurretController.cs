@@ -49,7 +49,7 @@ namespace AdvancedGears
                 param.SearchRadius / GlobalParamMaster.Instance.WorldSizeRate,
                 turretUnit.Side.ToNpcExcludeMask(),         // NPCは自陣営とNoneをチェックしない
                 GameLayers.EnemyLayerMask,
-                string.Empty,
+                null,
                 searchBuffer);
 
             float minSqrDist = float.MaxValue;
