@@ -8,7 +8,7 @@ WarGameProject
 
 | 項目 | バージョン / 詳細 |
 |------|-----------------|
-| Unity | **6000.4.6f1**（Unity 6 LTS） |
+| Unity | **6000.5.4f1**（Unity 6.5） |
 | レンダーパイプライン | **URP**（Universal Render Pipeline） |
 | スクリプティングバックエンド | Mono / .NET Standard 2.1（apiCompatibilityLevel: 6） |
 | 言語 | C# |
@@ -31,9 +31,24 @@ wikiを参照するコマンドを実行する際は`unity/docs/wiki/`で`git pu
 - プレイヤー操作: docs/wiki/プレイヤー操作.md
 - レイヤー管理: docs/wiki/レイヤー管理.md
 
+## Unity Editor の操作（Unity CLI）
+
+Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバー名 `unity-mcp`）を使用する。旧 UnityMCP プラグイン（`com.coplaydev.unity-mcp`）は使用しない。
+
+- Editor 操作はプロジェクトの Pipeline パッケージ（`com.unity.pipeline`）経由で行う
+- MCP ツールが使えない場合は、ターミナルから `unity command <コマンド名> --caller plugin --skill unity-cli` で同等の操作を行う
+- 作業前に `unity status` で Editor が `ready` であることを確認する。Editor が起動していなければ `unity open .`（`unity/` で実行）で起動する
+- 利用できるコマンドは `unity command`（一覧）で確認し、名前を推測しない
+- よく使うコマンド
+  - コンパイル・コンソール確認: `console_status` / `console`
+  - シーン構成の確認: `get_scene_hierarchy`
+  - Play モード: `editor_play` / `editor_stop` / `editor_status`
+- Editor に接続できる間は `.unity` / `.prefab` / `.asset` の YAML を直接編集しない
+- 接続できない場合はコンパイルエラーによる Safe Mode を疑い、`unity pipeline list` で確認する
+
 ## 作業上のルール
 
-- **スクリーンショットは明示的に指示された場合のみ撮影すること**（`manage_camera` の `screenshot` アクション等）。確認目的での自動撮影は行わない。
+- **スクリーンショットは明示的に指示された場合のみ撮影すること**（`capture_game_view` / `capture_scene_view` 等）。確認目的での自動撮影は行わない。
 
 ## UI 実装ポリシー
 
@@ -43,12 +58,12 @@ UI を実装・編集する際は以下のルールに従うこと。
   例: `Assets/Prefabs/UI/Briefing/BriefingPanel.prefab`
 - シーン上の Canvas は `Assets/Prefabs/UI/UICanvas.prefab` をベースとして配置し、その子に各 UI パーツを置く
 - **各 UI パネルはプレハブとしてシーンに配置すること**。シーン上のオブジェクトはプレハブインスタンスとして参照を持った状態にし、プレハブ参照が切れた（Unpacked / Missing Prefab）状態で放置しない
-  - 正しい手順: プレハブファイルを `Assets/Prefabs/UI/` に作成 → シーンへはそのプレハブをドラッグまたは `manage_prefabs` でインスタンスとして配置
+  - 正しい手順: プレハブファイルを `Assets/Prefabs/UI/` に作成（`create_prefab`）→ シーンへはそのプレハブをドラッグまたは Unity CLI でインスタンスとして配置
   - プレハブへの変更は「プレハブを編集してシーンに反映」で行い、シーン上のインスタンスを直接 Unpack してから編集する方法は避ける
 - テキストには `TextMeshProUGUI` を使用する
 - `TextMeshProUGUI` のフォントは **`Assets/Fonts/NotoSansJP/NotoSansJP-VariableFont_wght SDF.asset`**（GUID: `255d0acb36bcebb44a76ca265a789374`）をデフォルトとして指定すること
-- UnityMCP で GameObject を作成した場合、Scale が 0 になることがある。**特に指定がない限り Scale は (1, 1, 1) に設定すること**
-- 実際の UI 編集作業はローカルクライアントから **UnityMCP** を使用して実施する（Claude Code からは Unity シーン・プレハブを直接編集しない）
+- GameObject を作成した際は Scale を確認し、**特に指定がない限り Scale は (1, 1, 1) に設定すること**
+- 実際の UI 編集作業は **Unity CLI の MCP**（または `unity command`）で Editor を操作して実施する（シーン・プレハブのファイルを直接編集しない）
 
 ---
 
