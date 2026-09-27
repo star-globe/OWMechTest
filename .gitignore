@@ -6,6 +6,8 @@ unity/Recordings
 unity/obj
 unity/Temp
 unity/.vs
+unity/ProfileAnalyzer
+unity/ProfilerCaptures
 *.csproj
 
 # Font source files

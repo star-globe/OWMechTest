@@ -18,10 +18,10 @@ MonoBehaviour:
     m_Value: 1
   sampleCount:
     m_OverrideState: 1
-    m_Value: 8
+    m_Value: 24
   downsample:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 0
   centerRadius:
     m_OverrideState: 1
     m_Value: 0.2
