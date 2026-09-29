@@ -1,5 +1,8 @@
 {
-  "enabledMcpjsonServers": ["unity-mcp"],
+  "enabledMcpjsonServers": [
+    "unity-mcp",
+    "blender"
+  ],
   "hooks": {
     "SessionStart": [
       {
@@ -9,6 +12,11 @@
             "type": "command",
             "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-unity-editor.ps1\"",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-blender-mcp.ps1\"",
+            "timeout": 15
           }
         ]
       }
