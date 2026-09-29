@@ -8,7 +8,7 @@ WarGameProject
 
 | 項目 | バージョン / 詳細 |
 |------|-----------------|
-| Unity | **6000.5.4f1**（Unity 6.5） |
+| Unity | **6000.6.3f1**（Unity 6.6） |
 | レンダーパイプライン | **URP**（Universal Render Pipeline） |
 | スクリプティングバックエンド | Mono / .NET Standard 2.1（apiCompatibilityLevel: 6） |
 | 言語 | C# |
