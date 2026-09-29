@@ -42,9 +42,18 @@ Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバ
 - よく使うコマンド
   - コンパイル・コンソール確認: `console_status` / `console`
   - シーン構成の確認: `get_scene_hierarchy`
-  - Play モード: `editor_play` / `editor_stop` / `editor_status`
+  - Play モード: `editor_stop` / `editor_status`（開始は下記「デバッグ実行」に従う）
 - Editor に接続できる間は `.unity` / `.prefab` / `.asset` の YAML を直接編集しない
 - 接続できない場合はコンパイルエラーによる Safe Mode を疑い、`unity pipeline list` で確認する
+
+### デバッグ実行
+
+- AI エージェントがデバッグで Play する際は、必ず `PlayMainSceneMenu.PlayMainScene()`（`unity/Assets/Script/Editor/PlayMainSceneMenu.cs`、メニュー `WarGame/Play Main Scene`）から実行する
+  - Unity CLI のメニュー実行コマンドで `WarGame/Play Main Scene` を呼ぶ（コマンド名は `unity command` の一覧で確認し、推測しない）
+  - `editor_play` で任意のシーンから直接 Play を開始しない（MainScene からの初期化経路を通らず、正しく再現できないため）
+- 実行前に変更中のシーンを保存しておく（未保存のシーンがあると `SaveCurrentModifiedScenesIfUserWantsTo` の確認ダイアログで処理が止まる）
+- 実行後は `editor_status` で Play 中であることを確認し、ログは `console` で確認する。停止は `editor_stop` で行う
+- 例外: 特定シーン単体の検証を人間が明示的に指示した場合のみ、直接 Play してよい
 
 ## 作業上のルール
 
