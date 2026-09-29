@@ -35,6 +35,7 @@ wikiを参照するコマンドを実行する際は`unity/docs/wiki/`で`git pu
 
 Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバー名 `unity-mcp`）を使用する。旧 UnityMCP プラグイン（`com.coplaydev.unity-mcp`）は使用しない。
 
+- MCP 接続は自動化済み: `unity/.mcp.json` で `unity mcp --project-path .` を登録し、`unity/.claude/settings.json` の SessionStart フック（`.claude/hooks/ensure-unity-editor.ps1`）が Editor 未起動時に自動で `unity open` する。Editor が ready になるとツールが有効になる（Claude Code は `unity/` で起動すること）
 - Editor 操作はプロジェクトの Pipeline パッケージ（`com.unity.pipeline`）経由で行う
 - MCP ツールが使えない場合は、ターミナルから `unity command <コマンド名> --caller plugin --skill unity-cli` で同等の操作を行う
 - 作業前に `unity status` で Editor が `ready` であることを確認する。Editor が起動していなければ `unity open .`（`unity/` で実行）で起動する

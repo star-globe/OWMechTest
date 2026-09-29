@@ -1,0 +1,17 @@
+{
+  "enabledMcpjsonServers": ["unity-mcp"],
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-unity-editor.ps1\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
