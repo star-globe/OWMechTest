@@ -1,4 +1,4 @@
-# SessionStart hook: このプロジェクトの Unity Editor が起動していなければバックグラウンドで起動する。
+﻿# SessionStart hook: このプロジェクトの Unity Editor が起動していなければバックグラウンドで起動する。
 # unity-mcp（.mcp.json）は Editor 未起動でも待機し、Editor が ready になるとツールが有効化される。
 $ErrorActionPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8

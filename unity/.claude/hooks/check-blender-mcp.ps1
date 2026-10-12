@@ -1,4 +1,4 @@
-# SessionStart hook: Blender MCP アドオン（ブリッジサーバー）への接続可否を確認して通知する。
+﻿# SessionStart hook: Blender MCP アドオン（ブリッジサーバー）への接続可否を確認して通知する。
 # blender MCP サーバー（.mcp.json）はツール呼び出し時に接続するため、Blender を後から起動しても再接続は不要。
 $ErrorActionPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8

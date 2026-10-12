@@ -1,0 +1,2 @@
+# シェルスクリプトは CRLF だと bash で実行できないため、常に LF で checkout する
+*.sh text eol=lf
