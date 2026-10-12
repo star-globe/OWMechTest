@@ -3,60 +3,63 @@ using System.Collections.Generic;
 using UnityEngine;
 using AdvancedGears;
 
-public static class ActionUtils
+namespace AdvancedGears
 {
-    public const int TimeDenominator = 100;
-    public static int ReloadInterLimit
+    public static class ActionUtils
     {
-        get
+        public const int TimeDenominator = 100;
+        public static int ReloadInterLimit
         {
-            //20FPS
-            return TimeDenominator / 20;
-        }
-    }
-
-    public static int ConvertBit(Vector3 v)
-    {
-        if (v.y > 0)
-        {
-            return -1;
+            get
+            {
+                //20FPS
+                return TimeDenominator / 20;
+            }
         }
 
-        return ConvertBitXZ(v.x, v.z);
-    }
-    public static int ConvertBitXZ(float x, float z)
-    {
-        int bit = 0;
-        if (x > 0)
+        public static int ConvertBit(Vector3 v)
         {
-            bit |= 1 << (byte) BoostVector.Right;
-        }
-        else if (x < 0)
-        {
-            bit |= 1 << (byte) BoostVector.Left;
-        }
+            if (v.y > 0)
+            {
+                return -1;
+            }
 
-        if (z > 0)
-        {
-            bit |= 1 << (byte) BoostVector.Forward;
+            return ConvertBitXZ(v.x, v.z);
         }
-        else if (z < 0)
-        {
-            bit |= 1 << (byte) BoostVector.Back;
-        }
-
-        return bit;
-    }
-
-    public static int FloatingBit
-    {
-        get
+        public static int ConvertBitXZ(float x, float z)
         {
             int bit = 0;
-            bit |= 1 << (byte) BoostVector.Forward;
-            bit |= 1 << (byte) BoostVector.Back;
+            if (x > 0)
+            {
+                bit |= 1 << (byte) BoostVector.Right;
+            }
+            else if (x < 0)
+            {
+                bit |= 1 << (byte) BoostVector.Left;
+            }
+
+            if (z > 0)
+            {
+                bit |= 1 << (byte) BoostVector.Forward;
+            }
+            else if (z < 0)
+            {
+                bit |= 1 << (byte) BoostVector.Back;
+            }
 
             return bit;
+        }
+
+        public static int FloatingBit
+        {
+            get
+            {
+                int bit = 0;
+                bit |= 1 << (byte) BoostVector.Forward;
+                bit |= 1 << (byte) BoostVector.Back;
+
+                return bit;
+            }
         }
     }
 }

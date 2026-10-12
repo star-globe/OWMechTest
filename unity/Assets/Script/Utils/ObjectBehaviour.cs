@@ -1,14 +1,17 @@
 using UnityEngine;
 
-public class ObjectBehaviour : MonoBehaviour
+namespace AdvancedGears
 {
-    Transform selfTrans = null;
-    protected Transform SelfTrans
+    public class ObjectBehaviour : MonoBehaviour
     {
-        get
+        Transform selfTrans = null;
+        protected Transform SelfTrans
         {
-            selfTrans = selfTrans ?? this.transform;
-            return selfTrans;
+            get
+            {
+                selfTrans = selfTrans ?? this.transform;
+                return selfTrans;
+            }
         }
     }
 }

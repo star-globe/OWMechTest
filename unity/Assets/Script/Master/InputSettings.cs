@@ -3,48 +3,51 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[CreateAssetMenu(menuName = "TestProject/Input/InputSettings", order = 0)]
-public class InputSettings : ScriptableObject
+namespace AdvancedGears
 {
-    [SerializeField]
-    float inputXMin = 0.2f;
-
-    [SerializeField]
-    float inputYMin = 0.2f;
-
-    [SerializeField]
-    float rotLim = 60.0f;
-
-    public bool CanRotateY(float mY, float rotDeg, out float val)
+    [CreateAssetMenu(menuName = "TestProject/Input/InputSettings", order = 0)]
+    public class InputSettings : ScriptableObject
     {
-        bool canRotate = mY * mY >= inputYMin * inputYMin;
+        [SerializeField]
+        float inputXMin = 0.2f;
 
-        if (mY > 0)
+        [SerializeField]
+        float inputYMin = 0.2f;
+
+        [SerializeField]
+        float rotLim = 60.0f;
+
+        public bool CanRotateY(float mY, float rotDeg, out float val)
         {
-            canRotate &= rotDeg < rotLim;
-            val = mY - inputYMin;
-        }
-        else
-        {
-            canRotate &= rotDeg > -rotLim;
-            val = mY + inputYMin;
+            bool canRotate = mY * mY >= inputYMin * inputYMin;
+
+            if (mY > 0)
+            {
+                canRotate &= rotDeg < rotLim;
+                val = mY - inputYMin;
+            }
+            else
+            {
+                canRotate &= rotDeg > -rotLim;
+                val = mY + inputYMin;
+            }
+
+            return canRotate;
         }
 
-        return canRotate;
-    }
-
-    public bool CanRotateX(float mX, out float val)
-    {
-        bool canRotate = mX * mX >= inputXMin * inputXMin;
-        if (mX > 0)
+        public bool CanRotateX(float mX, out float val)
         {
-            val = mX - inputXMin;
-        }
-        else
-        {
-            val = mX + inputXMin;
-        }
+            bool canRotate = mX * mX >= inputXMin * inputXMin;
+            if (mX > 0)
+            {
+                val = mX - inputXMin;
+            }
+            else
+            {
+                val = mX + inputXMin;
+            }
 
-        return canRotate;
+            return canRotate;
+        }
     }
 }

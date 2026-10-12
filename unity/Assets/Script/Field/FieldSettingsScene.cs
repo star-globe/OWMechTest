@@ -2,71 +2,74 @@ using System.Collections.Generic;
 using UnityEngine;
 using AdvancedGears;
 
-public class FieldSettingsScene : MonoBehaviour
+namespace AdvancedGears
 {
-    [SerializeField]
-    string resourcesFolder = null;
-
-    [SerializeField]
-    List<FieldSettings> settingsList = null;
-
-
-    public void GatherFieldSettings()
+    public class FieldSettingsScene : MonoBehaviour
     {
-        var res = Resources.LoadAll<FieldSettings>(resourcesFolder);
-        settingsList = new List<FieldSettings>();
-        settingsList.AddRange(res);
-    }
+        [SerializeField]
+        string resourcesFolder = null;
 
-#if UNITY_EDITOR
-    public void SearchFieldScenes()
-    {
-        foreach (var settings in settingsList)
-            settings.SearchFieldScenes();
+        [SerializeField]
+        List<FieldSettings> settingsList = null;
 
-        var scenes = new List<UnityEditor.EditorBuildSettingsScene>(UnityEditor.EditorBuildSettings.scenes);
-        var count = scenes.Count;
 
-        foreach (var settings in settingsList)
+        public void GatherFieldSettings()
         {
-            foreach (var name in settings.FieldSceneNames)
+            var res = Resources.LoadAll<FieldSettings>(resourcesFolder);
+            settingsList = new List<FieldSettings>();
+            settingsList.AddRange(res);
+        }
+
+
+        public void SearchFieldScenes()
+        {
+            foreach (var settings in settingsList)
+                settings.SearchFieldScenes();
+
+            var scenes = new List<UnityEditor.EditorBuildSettingsScene>(UnityEditor.EditorBuildSettings.scenes);
+            var count = scenes.Count;
+
+            foreach (var settings in settingsList)
             {
-                var index = scenes.FindIndex(scene => string.Equals(scene.path, name));
-                if (index < 0)
+                foreach (var name in settings.FieldSceneNames)
                 {
-                    scenes.Add(new UnityEditor.EditorBuildSettingsScene(name, true));
+                    var index = scenes.FindIndex(scene => string.Equals(scene.path, name));
+                    if (index < 0)
+                    {
+                        scenes.Add(new UnityEditor.EditorBuildSettingsScene(name, true));
+                    }
                 }
+            }
+
+            if (count != scenes.Count)
+            {
+                UnityEditor.EditorBuildSettings.scenes = scenes.ToArray();
             }
         }
 
-        if (count != scenes.Count)
+    }
+
+
+    [UnityEditor.CustomEditor(typeof(FieldSettingsScene))]
+    public class FieldSettingsSceneEditor : UnityEditor.Editor
+    {
+        FieldSettingsScene scene = null;
+
+        private void OnEnable()
         {
-            UnityEditor.EditorBuildSettings.scenes = scenes.ToArray();
+            scene = target as FieldSettingsScene;
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            if (GUILayout.Button("GatherFieldSettings"))
+                scene?.GatherFieldSettings();
+
+            if (GUILayout.Button("SearchFieldScenes"))
+                scene?.SearchFieldScenes();
         }
     }
-#endif
+
 }
-
-#if UNITY_EDITOR
-[UnityEditor.CustomEditor(typeof(FieldSettingsScene))]
-public class FieldSettingsSceneEditor : UnityEditor.Editor
-{
-    FieldSettingsScene scene = null;
-
-    private void OnEnable()
-    {
-        scene = target as FieldSettingsScene;
-    }
-
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-
-        if (GUILayout.Button("GatherFieldSettings"))
-            scene?.GatherFieldSettings();
-
-        if (GUILayout.Button("SearchFieldScenes"))
-            scene?.SearchFieldScenes();
-    }
-}
-#endif
