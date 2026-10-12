@@ -3,6 +3,68 @@
     "unity-mcp",
     "blender"
   ],
+  "permissions": {
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git ls-files *)",
+      "Bash(git rev-parse *)",
+      "Bash(git submodule status *)",
+      "Bash(gh issue list *)",
+      "Bash(gh issue view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr checks *)",
+      "Bash(unity status *)",
+      "PowerShell(git status *)",
+      "PowerShell(git log *)",
+      "PowerShell(git diff *)",
+      "PowerShell(git show *)",
+      "PowerShell(git branch *)",
+      "PowerShell(gh issue list *)",
+      "PowerShell(gh issue view *)",
+      "PowerShell(gh pr list *)",
+      "PowerShell(gh pr view *)",
+      "PowerShell(gh pr diff *)",
+      "PowerShell(unity status *)",
+      "mcp__unity-mcp__console",
+      "mcp__unity-mcp__console_status",
+      "mcp__unity-mcp__editor_status",
+      "mcp__unity-mcp__recompile_status",
+      "mcp__unity-mcp__codereload_status",
+      "mcp__unity-mcp__runtime_status",
+      "mcp__unity-mcp__test_status",
+      "mcp__unity-mcp__list_tests",
+      "mcp__unity-mcp__list_open_scenes",
+      "mcp__unity-mcp__get_scene_hierarchy",
+      "mcp__unity-mcp__find_gameobjects",
+      "mcp__unity-mcp__find_assets",
+      "mcp__unity-mcp__search",
+      "mcp__unity-mcp__get_selection",
+      "mcp__unity-mcp__get_component_properties",
+      "mcp__unity-mcp__get_serialized_fields",
+      "mcp__unity-mcp__get_material_properties",
+      "mcp__unity-mcp__get_shader_properties",
+      "mcp__unity-mcp__get_import_settings",
+      "mcp__unity-mcp__get_animator_controller",
+      "mcp__unity-mcp__get_animation_clip",
+      "mcp__unity-mcp__get_build_settings",
+      "mcp__unity-mcp__get_tags_layers",
+      "mcp__unity-mcp__get_player_settings",
+      "mcp__unity-mcp__get_physics_settings",
+      "mcp__unity-mcp__get_quality_settings",
+      "mcp__unity-mcp__get_graphics_settings",
+      "mcp__unity-mcp__get_input_settings",
+      "mcp__unity-mcp__get_time_settings",
+      "mcp__unity-mcp__get_performance_stats",
+      "mcp__unity-mcp__package_list",
+      "mcp__unity-mcp__read_text_file"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -10,12 +72,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-unity-editor.ps1\"",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-wiki.sh\"",
+            "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-unity-editor.ps1\"",
             "timeout": 30
           },
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-blender-mcp.ps1\"",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-blender-mcp.ps1\"",
             "timeout": 15
           }
         ]
