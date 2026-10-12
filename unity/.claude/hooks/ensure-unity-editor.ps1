@@ -14,6 +14,9 @@ $instance = $status.data.instances | Where-Object { $_.project -eq $projectPath 
 
 if ($instance) {
     Write-Output "[unity-mcp] Unity Editor 接続先: port $($instance.port) / state=$($instance.state)"
+} elseif (Get-Process blender -ErrorAction SilentlyContinue) {
+    # メモリ節約のため Unity と Blender は同時に起動しない（CLAUDE.md「Unity と Blender の切り替え」）
+    Write-Output '[unity-mcp] Blender が起動中のため Unity Editor は自動起動しません。Unity が必要になったら /switch-app unity で切り替えてください。'
 } else {
     Start-Process -FilePath unity -ArgumentList @('open', "`"$projectPath`"") -WindowStyle Hidden
     Write-Output '[unity-mcp] Unity Editor が未起動のため起動しました。ready になると unity-mcp のツールが使えるようになります（unity status で確認）。'
