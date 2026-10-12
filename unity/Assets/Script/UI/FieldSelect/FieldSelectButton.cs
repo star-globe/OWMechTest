@@ -3,29 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class FieldSelectButton : MonoBehaviour
+namespace AdvancedGears
 {
-    [SerializeField]
-    TextMeshProUGUI fieldNameText = null;
-
-    int fieldId = 0;
-    Action<int> callBack = null;
-
-    public void SetData(int fieldId, string fieldName)
+    public class FieldSelectButton : MonoBehaviour
     {
-        if (fieldNameText != null)
-            fieldNameText.SetText(fieldName);
+        [SerializeField]
+        TextMeshProUGUI fieldNameText = null;
 
-        this.fieldId = fieldId;
-    }
+        int fieldId = 0;
+        Action<int> callBack = null;
 
-    public void SetOnClick(Action<int> callback)
-    {
-        this.callBack = callback;
-    }
+        public void SetData(int fieldId, string fieldName)
+        {
+            if (fieldNameText != null)
+                fieldNameText.SetText(fieldName);
 
-    public void OnSelect()
-    {
-        this.callBack?.Invoke(fieldId);
+            this.fieldId = fieldId;
+        }
+
+        public void SetOnClick(Action<int> callback)
+        {
+            this.callBack = callback;
+        }
+
+        public void OnSelect()
+        {
+            this.callBack?.Invoke(fieldId);
+        }
     }
 }

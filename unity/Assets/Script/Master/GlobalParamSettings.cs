@@ -1,6 +1,6 @@
-using NUnit.Framework;
 using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace AdvancedGears
 {

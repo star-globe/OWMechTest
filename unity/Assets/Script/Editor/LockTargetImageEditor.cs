@@ -1,21 +1,24 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(LockTargetImage))]
-public class LockTargetImageEditor : Editor
+namespace AdvancedGears
 {
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(LockTargetImage))]
+    public class LockTargetImageEditor : UnityEditor.Editor
     {
-        base.OnInspectorGUI();
-
-        EditorGUILayout.Space();
-
-        if (GUILayout.Button("Apply Color"))
+        public override void OnInspectorGUI()
         {
-            var lockTargetImage = (LockTargetImage)target;
-            lockTargetImage.ApplyColor();
-            lockTargetImage.ApplyTextBackGroundColor();
-            EditorUtility.SetDirty(target);
+            base.OnInspectorGUI();
+
+            EditorGUILayout.Space();
+
+            if (GUILayout.Button("Apply Color"))
+            {
+                var lockTargetImage = (LockTargetImage)target;
+                lockTargetImage.ApplyColor();
+                lockTargetImage.ApplyTextBackGroundColor();
+                EditorUtility.SetDirty(target);
+            }
         }
     }
 }

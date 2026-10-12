@@ -2,31 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SingletonMonoBehaviour<T> : MonoBehaviour where T :MonoBehaviour
+namespace AdvancedGears
 {
-    private static T instance = null;
-    public static T Instance
+    public class SingletonMonoBehaviour<T> : MonoBehaviour where T :MonoBehaviour
     {
-        get
+        private static T instance = null;
+        public static T Instance
         {
-            if (instance == null)
+            get
             {
-                var comp = SingletonMonoObject.Instance;
-                if (comp != null && comp.gameObject != null)
+                if (instance == null)
                 {
-                    instance = comp.gameObject.AddComponent<T>();
+                    var comp = SingletonMonoObject.Instance;
+                    if (comp != null && comp.gameObject != null)
+                    {
+                        instance = comp.gameObject.AddComponent<T>();
+                    }
                 }
+
+                return instance;
             }
-
-            return instance;
         }
-    }
 
-    private void Awake()
-    {
-        //if (Instance == null)
-        //    Instance = this as T;
+        private void Awake()
+        {
+            //if (Instance == null)
+            //    Instance = this as T;
 
-        DontDestroyOnLoad(this.gameObject);
+            DontDestroyOnLoad(this.gameObject);
+        }
     }
 }

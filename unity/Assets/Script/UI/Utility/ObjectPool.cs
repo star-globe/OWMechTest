@@ -2,79 +2,82 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class ObjectPool<T> where T : Component
+namespace AdvancedGears
 {
-    [SerializeField]
-    RectTransform content = null;
-
-    [SerializeField]
-    T baseObject = null;
-
-    private readonly Queue<T> sleepQueue = new Queue<T>();
-    public readonly List<T> activeList = new List<T>();
-
-    public int ActiveCount => activeList.Count;
-
-    public void Initialize()
+    [Serializable]
+    public class ObjectPool<T> where T : Component
     {
-        if (baseObject.gameObject.activeSelf)
-            baseObject.gameObject.SetActive(false);
-    }
+        [SerializeField]
+        RectTransform content = null;
 
-    public T Borrow()
-    {
-        if (baseObject == null)
+        [SerializeField]
+        T baseObject = null;
+
+        private readonly Queue<T> sleepQueue = new Queue<T>();
+        public readonly List<T> activeList = new List<T>();
+
+        public int ActiveCount => activeList.Count;
+
+        public void Initialize()
+        {
+            if (baseObject.gameObject.activeSelf)
+                baseObject.gameObject.SetActive(false);
+        }
+
+        public T Borrow()
+        {
+            if (baseObject == null)
+                return null;
+
+            T comp = null;
+            if (sleepQueue.Count > 0)
+            {
+                comp = sleepQueue.Dequeue();
+            }
+            else
+            {
+                var go = UnityEngine.Object.Instantiate(baseObject.gameObject, content);
+                comp = go.GetComponent<T>();
+            }
+
+            if (comp != null)
+            {
+                comp.gameObject.SetActive(true);
+                activeList.Add(comp);
+            }
+
+            return comp;
+        }
+
+        public T Get(int index)
+        {
+            if (index >= 0 && index < activeList.Count)
+            {
+                return activeList[index];
+            }
+
             return null;
-
-        T comp = null;
-        if (sleepQueue.Count > 0)
-        {
-            comp = sleepQueue.Dequeue();
         }
-        else
+        public void Return(T comp)
         {
-            var go = UnityEngine.Object.Instantiate(baseObject.gameObject, content);
-            comp = go.GetComponent<T>();
-        }
+            if (comp == null)
+                return;
 
-        if (comp != null)
-        {
-            comp.gameObject.SetActive(true);
-            activeList.Add(comp);
-        }
-
-        return comp;
-    }
-
-    public T Get(int index)
-    {
-        if (index >= 0 && index < activeList.Count)
-        {
-            return activeList[index];
-        }
-
-        return null;
-    }
-    public void Return(T comp)
-    {
-        if (comp == null)
-            return;
-
-        comp.gameObject.SetActive(false);
-
-        activeList.Remove(comp);
-        sleepQueue.Enqueue(comp);
-    }
-
-    public void ReturnAll()
-    {
-        foreach (var comp in activeList)
-        {
             comp.gameObject.SetActive(false);
+
+            activeList.Remove(comp);
             sleepQueue.Enqueue(comp);
         }
 
-        activeList.Clear();
+        public void ReturnAll()
+        {
+            foreach (var comp in activeList)
+            {
+                comp.gameObject.SetActive(false);
+                sleepQueue.Enqueue(comp);
+            }
+
+            activeList.Clear();
+        }
     }
 }

@@ -1,30 +1,33 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 
-public static class PlayMainSceneMenu
+namespace AdvancedGears
 {
-    private const string MainScenePath = "Assets/Scenes/MainScene.unity";
-    private const string MenuPath = "WarGame/Play Main Scene";
-
-    [MenuItem(MenuPath, priority = 1)]
-    public static void PlayMainScene()
+    public static class PlayMainSceneMenu
     {
-        if (EditorApplication.isPlaying)
-            EditorApplication.isPlaying = false;
+        private const string MainScenePath = "Assets/Scenes/MainScene.unity";
+        private const string MenuPath = "WarGame/Play Main Scene";
 
-        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-            return;
+        [MenuItem(MenuPath, priority = 1)]
+        public static void PlayMainScene()
+        {
+            if (EditorApplication.isPlaying)
+                EditorApplication.isPlaying = false;
 
-        var activeScene = EditorSceneManager.GetActiveScene();
-        if (activeScene.path != MainScenePath)
-            EditorSceneManager.OpenScene(MainScenePath);
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                return;
 
-        EditorApplication.isPlaying = true;
-    }
+            var activeScene = EditorSceneManager.GetActiveScene();
+            if (activeScene.path != MainScenePath)
+                EditorSceneManager.OpenScene(MainScenePath);
 
-    [MenuItem(MenuPath, validate = true)]
-    public static bool ValidatePlayMainScene()
-    {
-        return !EditorApplication.isCompiling;
+            EditorApplication.isPlaying = true;
+        }
+
+        [MenuItem(MenuPath, validate = true)]
+        public static bool ValidatePlayMainScene()
+        {
+            return !EditorApplication.isCompiling;
+        }
     }
 }
