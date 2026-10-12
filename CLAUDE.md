@@ -135,7 +135,13 @@ Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバ
 - AI エージェントがデバッグで Play する際は、必ず `PlayMainSceneMenu.PlayMainScene()`（`unity/Assets/Script/Editor/PlayMainSceneMenu.cs`、メニュー `WarGame/Play Main Scene`）から実行する
   - Unity CLI のメニュー実行コマンドで `WarGame/Play Main Scene` を呼ぶ（コマンド名は `unity command` の一覧で確認し、推測しない）
   - `editor_play` で任意のシーンから直接 Play を開始しない（MainScene からの初期化経路を通らず、正しく再現できないため）
-- 実行前に変更中のシーンを保存しておく（未保存のシーンがあると `SaveCurrentModifiedScenesIfUserWantsTo` の確認ダイアログで処理が止まる）
+- **Play の直前に、毎回シーンの保存状態を確認する**（未保存のシーンがあると `SaveCurrentModifiedScenesIfUserWantsTo` の「Scene(s) Have Been Modified」ダイアログで Editor が止まり、以降の MCP コマンドがすべてタイムアウトする）
+  1. `list_open_scenes` で `isDirty` を確認する。再コンパイルやシーン操作の後は、触っていないシーンも dirty になることがある（Unity のバージョンアップに伴う自動再シリアライズなど）
+  2. dirty なシーンがあれば、変更内容が作業で意図したものかを判断する。判断できないときは `EditorSceneManager.SaveScene(scene, "Temp/<名前>.unity", true)` でコピーを保存し、元ファイルと diff を取る
+     - 意図した変更 → `save_scene` で保存する
+     - 意図しない変更（自動再シリアライズなど） → 保存せず、`EditorSceneManager.OpenScene(path)` で開き直して破棄する。作業と無関係なシーン差分をコミットに混ぜない
+  3. `isDirty` がすべて false になってから `WarGame/Play Main Scene` を実行する
+- Play 開始後に MCP コマンドがタイムアウトし続ける場合は、モーダルダイアログで止まっていることを疑う。人間に Editor の画面確認を依頼する
 - 実行後は `editor_status` で Play 中であることを確認し、ログは `console` で確認する。停止は `editor_stop` で行う
 - 例外: 特定シーン単体の検証を人間が明示的に指示した場合のみ、直接 Play してよい
 
