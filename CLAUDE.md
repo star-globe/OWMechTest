@@ -53,14 +53,14 @@ git submodule update --init --remote unity/docs/wiki
 | フォルダ | 内容 |
 |---|---|
 | `Script/` | 自作 C# コード（下表） |
-| `Editor/` | `SetupChecker.cs`（必須外部アセットの有無を確認するエディタ拡張） |
+| `Editor/` | `SetupChecker.cs`（必須外部アセットの有無を確認するエディタ拡張）。asmref で `AdvancedGears.Editor` に含まれる |
 | `Resources/` | マスタ ScriptableObject（`EffectSettings/`, `MissionSettings/`, `PlayerSettings/`, `UnitSettings/`, `GlobalParamSettings`, `PlayerControllerConstSettings`） |
 | `Prefabs/` | プレハブ。`Prefabs/UI/` は画面ごとのフォルダ（UI 実装ポリシー参照）。`Bullets/Resources/`, `Effect/Resources/`, `Parts/Resources/` にもマスタがある |
-| `Scenes/` | ビルド対象は `MainScene`（起動シーン）, `SelectMenu`, `Briefing`, `Battle`, `Result`, `License` と `Fields/Field_XXX/*.unity`（`FieldSettings` は `Scenes/Fields/Resources/`）。`SceneManager` が読み込む `Customize` シーンは現状存在しない |
+| `Scenes/` | ビルド対象は `MainScene`（起動シーン）, `SelectMenu`, `Briefing`, `Customize`, `Battle`, `Result`, `License` と `Fields/Field_XXX/*.unity`（`FieldSettings` は `Scenes/Fields/Resources/`） |
 | `Models/`, `Textures/`, `Shader/`, `Fonts/`, `Terrain/`, `ProBuilder Data/` | アセット |
 | `Plugins/UniRx/` | UniRx（サードパーティ。編集しない） |
 | `UnityTechnologies/ParticlePack/`, `CleanFlatIcon/` | Asset Store の外部アセット（git 管理外。下記「注意事項」参照） |
-| `MainControls.cs` / `.inputactions` | Input System のアクション定義と自動生成コード |
+| `MainControls.inputactions` | Input System のアクション定義。生成コードは `Script/Input/Generated/MainControls.cs` |
 
 ### `unity/Assets/Script/`
 | フォルダ | 責務 |
@@ -76,15 +76,15 @@ git submodule update --init --remote unity/docs/wiki
 | `Bullet/`, `HitReceiver/`, `Target/` | 弾、被弾・撃破処理、目標オブジェクト |
 | `Effect/` | エフェクトのプール管理と再生 |
 | `Graphics/` | URP の Renderer Feature（アウトライン、ラジアルブラー）とグラフィック設定 |
-| `Input/` | 入力管理（`PlayerInputManager`） |
+| `Input/` | 入力管理（`PlayerInputManager`）。`Input/Generated/MainControls.cs` は自動生成コード |
 | `UI/` | 画面ごとの UI（`Battle/`, `Briefing/`, `Customize/`, `MissionSelect/`, `FieldSelect/`, `License/`） |
 | `Utils/` | シングルトン基底クラス、物理・入力ユーティリティ、`GameLayers` |
 | `Editor/` | エディタ拡張（マスタデータビューア、CSV 入出力、`PlayMainSceneMenu`） |
 
 ## アーキテクチャ要約
 
-- **namespace**: 原則 `AdvancedGears`。ただし `Utils/`・`Graphics/`・`UI/` の一部など約25ファイルは namespace なし（Issue #33 で統一予定）。新規ファイルは `AdvancedGears` に置く
-- **アセンブリ**: 自作コードはすべて `Assembly-CSharp`（asmdef は UniRx のみ。Issue #33 で導入予定）
+- **namespace**: `AdvancedGears`（エディタ拡張の一部は `AdvancedGears.Editor`）。新規ファイルも `AdvancedGears` に置く。`AdvancedGears.Editor` namespace があるため、namespace 内で UnityEditor の `Editor` クラスを継承するときは `UnityEditor.Editor` と完全修飾する。例外は自動生成の `MainControls`（グローバル namespace）
+- **アセンブリ**: `AdvancedGears.Runtime`（`Script/`）と `AdvancedGears.Editor`（`Script/Editor/` と、asmref 経由の `Assets/Editor/`、Editor 専用）。Runtime の参照先は UniRx、Unity.InputSystem、Unity.TextMeshPro、UnityEngine.UI、URP Core/Universal、Unity.Animation.Rigging。新しいパッケージを使うときは asmdef の references に追加する。NUnit はテスト専用なので Runtime では使わない（アサーションは `UnityEngine.Assertions`）
 - **シングルトン**
   - `SingletonMonoBehaviour<T>`（`Utils/`）: Manager 系。`Instance` に初めてアクセスした時点で、`SingletonMonoObject` の GameObject に `AddComponent` して生成し、`DontDestroyOnLoad` で常駐させる。そのため参照するだけで生成されるので、初期化順に注意する
   - 対象: `StateManager`, `SceneManager`, `MasterManager`, `FieldManager`, `PlayerManager`, `NpcManager`, `SquadManager`, `BulletManager`, `EffectManager`, `BattleUIManager`, `TimerManager`, `PlayerInputManager`
@@ -102,7 +102,7 @@ git submodule update --init --remote unity/docs/wiki
 
 ## 禁止・注意事項
 
-- `unity/Assets/MainControls.cs` は `MainControls.inputactions` から自動生成されるため、手で編集しない（アクションの変更は `.inputactions` 側で行う）
+- `unity/Assets/Script/Input/Generated/MainControls.cs` は `MainControls.inputactions` から自動生成されるため、手で編集しない（アクションの変更は `.inputactions` 側で行う。生成先は `.inputactions` のインポート設定 `wrapperCodePath` で指定済み）
 - 新規アセット・スクリプトの `.meta` は Unity に生成させ、必ずコミットに含める。手で `.meta` を作ったり GUID を書き換えたりしない（参照切れの原因になる）
 - `UnityTechnologies/ParticlePack` と `CleanFlatIcon` は Asset Store のアセットで git に含まれていない。新規環境では Asset Store から導入し、`SetupChecker` で有無を確認する。クラウド環境ではこれらが無いため、コンパイルが通らない可能性がある
 - `Plugins/UniRx/` は編集しない
@@ -183,6 +183,7 @@ UI を実装・編集する際は以下のルールに従うこと。
 Issueに着手する際は必ず以下のフローに従うこと。
 
 ### 1. 着手前の確認
+- `/issue-start <番号>` スキルでこの手順を実行できる
 - Issueの内容を読み、実装方針を提示する
 - 他のオープンなIssueとの競合・依存関係を予測して報告する
 - 人間の承認を得てから実装に進む
@@ -192,7 +193,8 @@ Issueに着手する際は必ず以下のフローに従うこと。
 
 ### 2. 実装後の自己チェック
 - Issueの完了条件をすべて満たしているか確認する
-- 意図しないファイルへの変更がないか確認する
+- C# やアセットを変更した場合は `/unity-verify`（動作確認が必要なら `/unity-verify play`）でコンパイルと実行時エラーを確認する
+- 意図しないファイルへの変更がないか確認する（Unity が自動で変更した `unity/ProjectSettings/` や、自動再シリアライズだけの差分を混ぜない）
 
 ### 3. コミット・PR作成
 - 問題がなければコミットしてPRを作成する
