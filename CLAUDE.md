@@ -113,12 +113,24 @@ git submodule update --init --remote unity/docs/wiki
 - パイプラインの手順は `docs/blender-unity-pipeline.md`、エクスポート用スクリプトは `tools/blender/export_to_unity.py`
 - Blender MCP の導入手順は `README.md` の「開発環境セットアップ > Blender MCP」
 
+### Unity と Blender の切り替え
+
+- **メモリ節約のため、Unity Editor と Blender は同時に起動しない**（Unity だけで約 3.5 GB 使う）
+- 切り替えは `/switch-app <blender|unity>` で行う（スクリプト: `unity/.claude/scripts/switch-to-blender.ps1` / `switch-to-unity.ps1`）
+  - Unity → Blender: 未保存シーンを片付け（「デバッグ実行」の手順）→ Unity を quit → Blender を起動 → MCP アドオン（`localhost:9876`）の応答を待つ
+  - Blender → Unity: （必要なら FBX をエクスポート）→ スクリプトが MCP アドオン経由で `.blend` を保存 → Blender を閉じる → Unity を起動 → `ready` を待つ
+  - Unity の未保存シーン、Blender の無題シーンがあるとスクリプトは中断する。**強制終了（`Stop-Process` など）はしない**
+- **Blender 作業は開始時に名前付きの `.blend` として保存しておく**。MCP（Python）で行った変更は `bpy.data.is_dirty` に反映されず、閉じても保存確認が出ないまま失われるため、`is_dirty` で保存の要否を判断しない
+- Unity の終了に `quit` コマンドは使わない（`com.unity.pipeline` の不具合で Editor モードでは失敗し、Editor の登録だけが外れる）。スクリプトはウィンドウを閉じる方法で終了する
+- SessionStart フックは、Blender が起動中なら Unity を自動起動しない
+- Blender 作業中は unity-mcp のツールが使えない（Editor 未起動のため）。逆に Unity 作業中は Blender MCP のツールが使えない
+
 ## Unity Editor の操作（Unity CLI）
 
 Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバー名 `unity-mcp`）を使用する。旧 UnityMCP プラグイン（`com.coplaydev.unity-mcp`）は使用しない。
 
 - MCP 接続は自動化済み: `unity/.mcp.json` で `unity mcp --project-path .` を登録し、`unity/.claude/settings.json` の SessionStart フック（`.claude/hooks/ensure-unity-editor.ps1`）が Editor 未起動時に自動で `unity open` する。Editor が ready になるとツールが有効になる（Claude Code は `unity/` で起動すること）
-- Blender MCP も `unity/.mcp.json` に `blender` として登録済み（`uv --directory C:/blender_mcp/mcp run blender-mcp`、環境変数 `BLENDER_MCP_DIR` / `BLENDER_MCP_PORT` で変更可）。ツール呼び出し時に `localhost:9876` のアドオンへ接続するため、Blender を後から起動しても再接続は不要。SessionStart フック（`check-blender-mcp.ps1`）が接続可否を通知する。Blender 側は MCP アドオンの Auto Start を有効にしておく
+- Blender MCP も `unity/.mcp.json` に `blender` として登録済み（`uv --directory C:/blender_mcp/mcp run blender-mcp`、環境変数 `BLENDER_MCP_DIR` / `BLENDER_MCP_PORT` で変更可）。ツール呼び出し時に `localhost:9876` のアドオンへ接続するため、Blender を後から起動しても再接続は不要（ただしセッション開始時に MCP サーバー自体の起動に失敗していた場合は、`/mcp` から再接続が必要）。Unity と同時に起動しないこと（「Unity と Blender の切り替え」参照）。SessionStart フック（`check-blender-mcp.ps1`）が接続可否を通知する。Blender 側は MCP アドオンの Auto Start を有効にしておく
 - Editor 操作はプロジェクトの Pipeline パッケージ（`com.unity.pipeline`）経由で行う
 - MCP ツールが使えない場合は、ターミナルから `unity command <コマンド名> --caller plugin --skill unity-cli` で同等の操作を行う
 - 作業前に `unity status` で Editor が `ready` であることを確認する。Editor が起動していなければ `unity open .`（`unity/` で実行）で起動する

@@ -62,7 +62,11 @@
       "mcp__unity-mcp__get_time_settings",
       "mcp__unity-mcp__get_performance_stats",
       "mcp__unity-mcp__package_list",
-      "mcp__unity-mcp__read_text_file"
+      "mcp__unity-mcp__read_text_file",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File *switch-to-blender.ps1*)",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File *switch-to-unity.ps1*)",
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File *switch-to-blender.ps1*)",
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File *switch-to-unity.ps1*)"
     ]
   },
   "hooks": {
