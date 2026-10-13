@@ -10,10 +10,11 @@ namespace AdvancedGears
         {
             FieldMaster.Instance.Load();
             PlayerMaster.Instance.Load();
-            PartMaster.Instance.Load();
             GunMaster.Instance.Load();
             BulletMaster.Instance.Load();
             BoosterMaster.Instance.Load();
+            // PartMaster は GunMaster / BoosterMaster の内容を取り込むため、それらの後に読み込む
+            PartMaster.Instance.Load();
             EffectMaster.Instance.Load();
 
             PlayerControllerConst.Instance.Load();

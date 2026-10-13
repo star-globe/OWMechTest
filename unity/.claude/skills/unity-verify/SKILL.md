@@ -22,7 +22,7 @@ Unity CLI MCP（`unity-mcp`）のツールで検証する。MCP ツールが使�
    - 今回の変更に起因するエラーは修正して手順 2 からやり直す。変更前からある警告は報告だけでよい
 
 4. **（引数に `play` がある場合）実行時エラーを確認する**
-   - 変更中のシーンを `save_scene` で保存する（未保存だと確認ダイアログで止まる）
+   - **Play 直前にシーンの保存状態を確認する**（CLAUDE.md「デバッグ実行」の手順）。`list_open_scenes` で `isDirty` を見て、意図した変更なら `save_scene`、意図しない変更（自動再シリアライズなど）なら `EditorSceneManager.OpenScene(path)` で開き直して破棄する。すべて false になるまで Play しない（未保存だと確認ダイアログで Editor が止まる）
    - `menu` で `WarGame/Play Main Scene` を実行する（`editor_play` で任意のシーンから直接 Play しない）
    - `editor_status` で Play 中であることを確認し、操作が必要な検証が無ければ数秒待ってから `console` で例外・エラーを確認する
    - `editor_stop` で停止する
