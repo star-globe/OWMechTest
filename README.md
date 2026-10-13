@@ -23,7 +23,7 @@ NPC部隊が連携して動くオープンフィールドで戦うアクショ�
 
 | 項目 | 詳細 |
 |------|------|
-| エンジン | Unity 6 LTS (6000.4.6f1) |
+| エンジン | Unity 6.6 (6000.6.3f1) |
 | レンダーパイプライン | URP（Universal Render Pipeline） |
 | 言語 | C# (.NET Standard 2.1) |
 | 主要ライブラリ | UniRx / ProBuilder / NavMesh |
