@@ -1208,7 +1208,7 @@ MonoBehaviour:
   rightGunAttach: {fileID: 3081360461234624602}
   leftGunAttach: {fileID: 5522040938239828618}
   subGunAttach: {fileID: 0}
-  assembleDataAsset: {fileID: 11400000, guid: 148528af726d2c04887206388178c008, type: 2}
+  assembleDataAsset: {fileID: 11400000, guid: 62c3a6dc6bc77f5408dea55d1550caa7, type: 2}
 --- !u!1 &8234829977464033972
 GameObject:
   m_ObjectHideFlags: 0

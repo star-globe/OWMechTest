@@ -45,6 +45,10 @@ namespace AdvancedGears
     {
         public static GunPart InstantiateGunPart(int gunId)
         {
+            // 負の ID は未装備
+            if (gunId < 0)
+                return null;
+
             return Instance.GetSettings(gunId)?.InstantiatePart<GunPart>();
         }
     }

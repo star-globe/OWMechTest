@@ -22,6 +22,10 @@ namespace AdvancedGears
     {
         public static BoosterPart InstantiateBoosterPart(int boosterId)
         {
+            // 負の ID は未装備（RemoveBoosters も -1 を渡す）
+            if (boosterId < 0)
+                return null;
+
             return Instance.GetSettings(boosterId)?.InstantiatePart<BoosterPart>();
         }
     }

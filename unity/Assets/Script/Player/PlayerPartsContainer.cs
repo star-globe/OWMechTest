@@ -30,6 +30,10 @@ namespace AdvancedGears
 
         private void Start()
         {
+            // プレイヤー機体はカスタマイズ画面で保存した組み合わせを反映する（保存データが無ければアセットの初期値）
+            if (assembleDataAsset is PlayerPartsAssembleDataAsset playerAsset)
+                playerAsset.Load();
+
             Load();
         }
 

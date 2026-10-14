@@ -8,38 +8,33 @@ namespace AdvancedGears
     [CreateAssetMenu(menuName = "TestProject/Assemble/PartsAssembleDataAsset", order = 0)]
     public class PartsAssembleDataAsset : ScriptableObject
     {
+        // アセットに保存された初期値。実行時に書き換えない（Editor では git 管理下のアセットに書き戻されるため）
         [SerializeField]
         PartsAssembleData data;
 
-        protected void SetData(PartsAssembleData assembleData)
-        {
-            this.data = assembleData;
-        }
+        /// <summary>現在有効な組み合わせ。派生クラスで実行時のデータに差し替える。</summary>
+        protected virtual PartsAssembleData CurrentData => data;
 
+        /// <summary>スロットのパーツIDを返す。未装備（データに無い）スロットは -1。</summary>
         public int GetPartId(PartsAttachType type)
         {
-            if (data == null)
+            var current = CurrentData;
+            if (current == null)
             {
                 Debug.LogError("PartsAssembleData is not Attached");
                 return -1;
             }
 
-            var dic = this.data.GetDictionary();
+            var dic = current.GetDictionary();
             if (dic == null)
                 return -1;
 
-            if (dic.TryGetValue(type, out int partId) == false)
-            {
-                Debug.LogErrorFormat("There is no PartId. PartsAttachType:{0}", type);
-                return -1;
-            }
-
-            return partId;
+            return dic.TryGetValue(type, out int partId) ? partId : -1;
         }
 
         public Dictionary<PartsAttachType, int> GetPartId_All()
         {
-            return data?.GetDictionary();
+            return CurrentData?.GetDictionary();
         }
     }
 
@@ -56,7 +51,12 @@ namespace AdvancedGears
             var data = new PartsAssembleData();
             var list = new List<PartsTuple>();
             foreach (var kvp in dic)
+            {
+                // 負の ID は未装備。データには含めない
+                if (kvp.Value < 0)
+                    continue;
                 list.Add(new PartsTuple { attachType = kvp.Key, partId = kvp.Value });
+            }
             data.tuples = list.ToArray();
             return data;
         }
