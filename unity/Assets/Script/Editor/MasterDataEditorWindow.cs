@@ -27,12 +27,9 @@ namespace AdvancedGears.Editor
         }
 
         // IDBasedMasterSettings を実装した ScriptableObject サブクラスを自動検索
-        private static Type[] FindMasterTypes() => AppDomain.CurrentDomain
-            .GetAssemblies()
-            .SelectMany(a => { try { return a.GetTypes(); } catch { return Array.Empty<Type>(); } })
-            .Where(t => !t.IsAbstract
-                     && typeof(ScriptableObject).IsAssignableFrom(t)
-                     && typeof(IDBasedMasterSettings).IsAssignableFrom(t))
+        private static Type[] FindMasterTypes() => TypeCache
+            .GetTypesDerivedFrom<IDBasedMasterSettings>()
+            .Where(t => !t.IsAbstract && typeof(ScriptableObject).IsAssignableFrom(t))
             .OrderBy(t => t.Name)
             .ToArray();
 
