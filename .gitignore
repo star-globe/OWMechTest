@@ -24,3 +24,6 @@ unity/.idea/
 # Font source files
 *.ttf
 *.otf
+
+# Python bytecode (tools/blender を import したときに生成される)
+__pycache__/
