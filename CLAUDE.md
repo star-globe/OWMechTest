@@ -54,6 +54,7 @@ git submodule update --init --remote unity/docs/wiki
 |---|---|
 | `Script/` | 自作 C# コード（下表） |
 | `Editor/` | `SetupChecker.cs`（必須外部アセットの有無を確認するエディタ拡張）。asmref で `AdvancedGears.Editor` に含まれる |
+| `Tests/EditMode/` | EditMode テスト（asmdef: `AdvancedGears.Tests.EditMode`） |
 | `Resources/` | マスタ ScriptableObject（`EffectSettings/`, `MissionSettings/`, `PlayerSettings/`, `UnitSettings/`, `GlobalParamSettings`, `PlayerControllerConstSettings`） |
 | `Prefabs/` | プレハブ。`Prefabs/UI/` は画面ごとのフォルダ（UI 実装ポリシー参照）。`Bullets/Resources/`, `Effect/Resources/`, `Parts/Resources/` にもマスタがある |
 | `Scenes/` | ビルド対象は `MainScene`（起動シーン）, `SelectMenu`, `Briefing`, `Customize`, `Battle`, `Result`, `License` と `Fields/Field_XXX/*.unity`（`FieldSettings` は `Scenes/Fields/Resources/`） |
@@ -97,7 +98,10 @@ git submodule update --init --remote unity/docs/wiki
 
 - **コンパイル確認**: コードを変更したら、Unity CLI MCP の `console_status` / `console` でコンパイルエラーが 0 件であることを確認する。反映されていなければ `recompile` を実行する
 - **動作確認**: 「デバッグ実行」の手順で `WarGame/Play Main Scene` から Play し、`console` でエラーと例外を確認する
-- **テスト**: 現時点ではテストは 0 件（テスト用 asmdef なし）
+- **テスト**: EditMode テストを Unity CLI MCP の `run_tests`（`mode: editor`、`filter_type: assembly`、`filter: AdvancedGears.Tests.EditMode`）で実行し、全件 green であることを確認する
+  - テストは `unity/Assets/Tests/EditMode/`（asmdef: `AdvancedGears.Tests.EditMode`、Editor 専用、`UNITY_INCLUDE_TESTS` 定義時のみコンパイル）。Runtime と Editor の両アセンブリを参照できる
+  - Unity に依存しない純粋なロジック（データクラス、パラメーター計算、マスタのコンテナなど）を変更・追加したらテストも追加する
+  - PlayerPrefs など Editor の外部状態に触れるテストは、`SetUp` で退避して `TearDown` で元に戻す（例: `PartsAssembleDataTests`）
 - **クラウド環境**: Unity が無いためコンパイルも動作も検証できない。その場合は PR 本文に「未検証（クラウド環境のため）」と明記する
 
 ## 禁止・注意事項

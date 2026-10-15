@@ -38,6 +38,7 @@
       "mcp__unity-mcp__codereload_status",
       "mcp__unity-mcp__runtime_status",
       "mcp__unity-mcp__test_status",
+      "mcp__unity-mcp__run_tests",
       "mcp__unity-mcp__list_tests",
       "mcp__unity-mcp__list_open_scenes",
       "mcp__unity-mcp__get_scene_hierarchy",
