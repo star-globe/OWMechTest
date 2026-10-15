@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace AdvancedGears
@@ -48,9 +49,9 @@ namespace AdvancedGears
             if (points == null)
                 points = new List<SpawnPoint>();
 
+            // FindObjectsByType は順序を保証しないので、シリアライズ結果が毎回同じになるよう ID 順に並べる
             points.Clear();
-            foreach (var p in FindObjectsOfType<SpawnPoint>())
-                points.Add(p);
+            points.AddRange(FindObjectsByType<SpawnPoint>().OrderBy(p => p.ID));
 
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
