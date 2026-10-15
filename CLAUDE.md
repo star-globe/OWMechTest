@@ -102,13 +102,16 @@ git submodule update --init --remote unity/docs/wiki
   - テストは `unity/Assets/Tests/EditMode/`（asmdef: `AdvancedGears.Tests.EditMode`、Editor 専用、`UNITY_INCLUDE_TESTS` 定義時のみコンパイル）。Runtime と Editor の両アセンブリを参照できる
   - Unity に依存しない純粋なロジック（データクラス、パラメーター計算、マスタのコンテナなど）を変更・追加したらテストも追加する
   - PlayerPrefs など Editor の外部状態に触れるテストは、`SetUp` で退避して `TearDown` で元に戻す（例: `PartsAssembleDataTests`）
-- **クラウド環境**: Unity が無いためコンパイルも動作も検証できない。その場合は PR 本文に「未検証（クラウド環境のため）」と明記する
+- **Editor を起動していないとき**（Blender 作業中など）: リポジトリルートで `bash tools/unity/compile-check.sh`（コンパイル）と `bash tools/unity/run-tests.sh [フィルタ]`（EditMode テスト）を実行する。Unity をバッチモードで起動するため、Editor がプロジェクトを開いている間は使えない（案内を出して終了する）。ログは `unity/Logs/compile-check.log` / `run-tests.log`
+  - スクリプトに変更がないと Unity は再コンパイルしないため、`compile-check.sh` の警告一覧は変更があったときだけ表示される
+- **CI**: PR で GitHub Actions（`.github/workflows/unity-tests.yml`、GameCI）がコンパイルと EditMode テストを実行する。結果は `gh pr checks <番号>` で確認し、失敗していれば修正する。Unity ライセンスの Secret が未登録の間はスキップされる（README「CI」参照）
+- **クラウド環境**: Unity が無いためローカルでは検証できない。PR の CI 結果で確認し、CI がスキップされた場合は PR 本文に「未検証（クラウド環境のため）」と明記する
 
 ## 禁止・注意事項
 
 - `unity/Assets/Script/Input/Generated/MainControls.cs` は `MainControls.inputactions` から自動生成されるため、手で編集しない（アクションの変更は `.inputactions` 側で行う。生成先は `.inputactions` のインポート設定 `wrapperCodePath` で指定済み）
 - 新規アセット・スクリプトの `.meta` は Unity に生成させ、必ずコミットに含める。手で `.meta` を作ったり GUID を書き換えたりしない（参照切れの原因になる）
-- `UnityTechnologies/ParticlePack` と `CleanFlatIcon` は Asset Store のアセットで git に含まれていない。新規環境では Asset Store から導入し、`SetupChecker` で有無を確認する。クラウド環境ではこれらが無いため、コンパイルが通らない可能性がある
+- `UnityTechnologies/ParticlePack` と `CleanFlatIcon` は Asset Store のアセットで git に含まれていない。新規環境では Asset Store から導入し、`SetupChecker` で有無を確認する。自作コードはこれらのスクリプトに依存していないので、無くてもコンパイルとテストは通る（CI はこの状態で実行する）。依存を増やさないこと
 - `Plugins/UniRx/` は編集しない
 - Unity が自動で変更した `unity/ProjectSettings/` のファイルは、作業内容と無関係ならコミットに含めない
 
@@ -127,7 +130,7 @@ git submodule update --init --remote unity/docs/wiki
 - **Blender 作業は開始時に名前付きの `.blend` として保存しておく**。MCP（Python）で行った変更は `bpy.data.is_dirty` に反映されず、閉じても保存確認が出ないまま失われるため、`is_dirty` で保存の要否を判断しない
 - Unity の終了に `quit` コマンドは使わない（`com.unity.pipeline` の不具合で Editor モードでは失敗し、Editor の登録だけが外れる）。スクリプトはウィンドウを閉じる方法で終了する
 - SessionStart フックは、Blender が起動中なら Unity を自動起動しない
-- Blender 作業中は unity-mcp のツールが使えない（Editor 未起動のため）。逆に Unity 作業中は Blender MCP のツールが使えない
+- Blender 作業中は unity-mcp のツールが使えない（Editor 未起動のため。コンパイルとテストは `tools/unity/*.sh` で確認できる）。逆に Unity 作業中は Blender MCP のツールが使えない
 
 ## Unity Editor の操作（Unity CLI）
 

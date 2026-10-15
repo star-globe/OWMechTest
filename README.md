@@ -82,6 +82,27 @@ uv --directory C:/blender_mcp/mcp run python -c "import blmcp; print('OK')"
 | ツール呼び出しで接続エラー | Blender が未起動か、アドオンのサーバーが停止している。アドオン設定から Start するか、Auto Start を有効にする |
 | ポートを変えたい | アドオン設定のポートと環境変数 `BLENDER_MCP_PORT` を同じ値にする |
 
+### CI（GitHub Actions）
+
+`.github/workflows/unity-tests.yml` が、`unity/` の Assets・Packages・ProjectSettings を変更した PR と main への push で、コンパイルと EditMode テストを実行します（[GameCI](https://game.ci/) の `unity-test-runner`）。結果は PR のチェック「EditMode Test Results」に表示されます。
+
+Unity のライセンスが必要なため、リポジトリの **Settings > Secrets and variables > Actions** に次の3つを登録してください。未登録の間は、ワークフローは失敗せずにスキップされます（警告が表示されます）。
+
+| Secret | 内容 |
+|---|---|
+| `UNITY_LICENSE` | ライセンスファイルの中身。Unity Hub でサインインしてライセンスを有効化した PC の `C:\ProgramData\Unity\Unity_lic.ulf`（隠しフォルダ） |
+| `UNITY_EMAIL` | Unity アカウントのメールアドレス |
+| `UNITY_PASSWORD` | Unity アカウントのパスワード |
+
+有料アセット（ParticlePack / CleanFlatIcon）は CI 環境にありませんが、自作コードはこれらに依存していないため、コンパイルとテストには影響しません。
+
+ローカルで Editor を開いていないときは、同じ確認を次のスクリプトで行えます（Git Bash）。
+
+```bash
+tools/unity/compile-check.sh            # コンパイルエラーの確認
+tools/unity/run-tests.sh                # EditMode テスト（引数でテスト名を絞り込める）
+```
+
 ## 開発状況
 
 このリポジトリは個人開発のプロトタイプです。
