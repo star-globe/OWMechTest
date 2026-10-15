@@ -104,14 +104,13 @@ git submodule update --init --remote unity/docs/wiki
   - PlayerPrefs など Editor の外部状態に触れるテストは、`SetUp` で退避して `TearDown` で元に戻す（例: `PartsAssembleDataTests`）
 - **Editor を起動していないとき**（Blender 作業中など）: リポジトリルートで `bash tools/unity/compile-check.sh`（コンパイル）と `bash tools/unity/run-tests.sh [フィルタ]`（EditMode テスト）を実行する。Unity をバッチモードで起動するため、Editor がプロジェクトを開いている間は使えない（案内を出して終了する）。ログは `unity/Logs/compile-check.log` / `run-tests.log`
   - スクリプトに変更がないと Unity は再コンパイルしないため、`compile-check.sh` の警告一覧は変更があったときだけ表示される
-- **CI**: PR で GitHub Actions（`.github/workflows/unity-tests.yml`、GameCI）がコンパイルと EditMode テストを実行する。結果は `gh pr checks <番号>` で確認し、失敗していれば修正する。Unity ライセンスの Secret が未登録の間はスキップされる（README「CI」参照）
-- **クラウド環境**: Unity が無いためローカルでは検証できない。PR の CI 結果で確認し、CI がスキップされた場合は PR 本文に「未検証（クラウド環境のため）」と明記する
+- **クラウド環境**: Unity が無いためコンパイルも動作も検証できない。その場合は PR 本文に「未検証（クラウド環境のため）」と明記する（GameCI による CI は保留中: #54）
 
 ## 禁止・注意事項
 
 - `unity/Assets/Script/Input/Generated/MainControls.cs` は `MainControls.inputactions` から自動生成されるため、手で編集しない（アクションの変更は `.inputactions` 側で行う。生成先は `.inputactions` のインポート設定 `wrapperCodePath` で指定済み）
 - 新規アセット・スクリプトの `.meta` は Unity に生成させ、必ずコミットに含める。手で `.meta` を作ったり GUID を書き換えたりしない（参照切れの原因になる）
-- `UnityTechnologies/ParticlePack` と `CleanFlatIcon` は Asset Store のアセットで git に含まれていない。新規環境では Asset Store から導入し、`SetupChecker` で有無を確認する。自作コードはこれらのスクリプトに依存していないので、無くてもコンパイルとテストは通る（CI はこの状態で実行する）。依存を増やさないこと
+- `UnityTechnologies/ParticlePack` と `CleanFlatIcon` は Asset Store のアセットで git に含まれていない。新規環境では Asset Store から導入し、`SetupChecker` で有無を確認する。自作コードはこれらのスクリプトに依存していない（`SetupChecker` が文字列でパスを見ているだけ）。依存を増やさないこと
 - `Plugins/UniRx/` は編集しない
 - Unity が自動で変更した `unity/ProjectSettings/` のファイルは、作業内容と無関係ならコミットに含めない
 
