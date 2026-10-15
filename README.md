@@ -82,6 +82,17 @@ uv --directory C:/blender_mcp/mcp run python -c "import blmcp; print('OK')"
 | ツール呼び出しで接続エラー | Blender が未起動か、アドオンのサーバーが停止している。アドオン設定から Start するか、Auto Start を有効にする |
 | ポートを変えたい | アドオン設定のポートと環境変数 `BLENDER_MCP_PORT` を同じ値にする |
 
+### Editor を開かずにコンパイル・テストする
+
+Unity Editor を起動していないときは、Unity をバッチモードで起動するスクリプトで、コンパイルと EditMode テストを確認できます（Git Bash でリポジトリルートから実行）。Editor がプロジェクトを開いている間は使えません。
+
+```bash
+tools/unity/compile-check.sh            # コンパイルエラーの確認
+tools/unity/run-tests.sh                # EditMode テスト（引数でテスト名を絞り込める）
+```
+
+Unity は Unity Hub の既定のインストール先から探します。別の場所にある場合は、環境変数 `UNITY_EXE` に実行ファイルのパスを指定してください。
+
 ## 開発状況
 
 このリポジトリは個人開発のプロトタイプです。
