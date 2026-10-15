@@ -11,7 +11,7 @@
 | P4 CLI / CI でのコンパイル・テスト自動化 | 未着手 | - |
 | P5 `.claude/` 設定の整備 | 完了 | #32 / #35 |
 | P6 責務分割のリファクタ | 未着手（`MainControls.cs` の移動のみ P2 で実施） | - |
-| P7 Blender パイプラインの MCP 対応 | 一部（MCP 導入・Unity との切り替えは完了、`export_to_unity.py` の改修は未着手） | #41 / #42 |
+| P7 Blender パイプラインの MCP 対応 | 完了（MCP 導入・Unity との切り替え、`export_to_unity.py` の API 化と命名規約の検証） | #41 / #42、#55 |
 | P8 軽微な整理 | 一部（`docs/logs/` 作成済み） | - |
 
 以下の「調査で分かった事実」は調査日時点の内容。

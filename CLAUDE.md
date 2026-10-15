@@ -115,6 +115,9 @@ git submodule update --init --remote unity/docs/wiki
 ## Blender 連携
 
 - パイプラインの手順は `docs/blender-unity-pipeline.md`、エクスポート用スクリプトは `tools/blender/export_to_unity.py`
+- Blender MCP からエクスポートするときは、`tools/blender` を `sys.path` に追加して `export_to_unity` を import し、`validate_objects()` で命名規約を確認してから `export_objects([...])` / `export_selected()` を呼ぶ（`dry_run=True` で出力先だけ確認できる）。使い方はパイプラインの手順書の「エクスポート用スクリプト」
+  - MCP のコードには UI のコンテキストが無い（`bpy.context.object` は使えず、`bpy.ops.mesh.primitive_*` の後に作ったオブジェクトを取れない）。オブジェクトの作成や参照は `bpy.data` を使う
+  - 試しにエクスポートするときは `base_path` に scratchpad などを指定し、`unity/Assets/Models` に不要な FBX を作らない（Unity が取り込んで `.meta` ができる）
 - Blender MCP の導入手順は `README.md` の「開発環境セットアップ > Blender MCP」
 
 ### Unity と Blender の切り替え
