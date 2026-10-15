@@ -61,9 +61,6 @@ namespace AdvancedGears
         [SerializeField]
         BoosterParticleSystem hyper;
 
-        int boostBit = 0;
-        bool isOn = false;
-
         public void SetBoostVector(BoostVector vec)
         {
             normal.SetBoostVector(vec);
