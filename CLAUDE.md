@@ -70,7 +70,7 @@ git submodule update --init --remote unity/docs/wiki
 | `State/`, `Scene/` | ゲーム状態の管理とシーン遷移 |
 | `Master/` | マスタデータの ScriptableObject 定義と読み込み（`MasterManager`） |
 | `Mission/`, `Field/` | ミッション定義、フィールド読み込み、スポーン地点 |
-| `Player/` | プレイヤー機体の入力・移動・カメラ・脚 IK（`Player/Animation/`） |
+| `Player/` | プレイヤー機体の入力・移動・カメラ・脚 IK（`Player/Animation/`）。移動の計算は `Player/Movement/`（`PlayerMoveCalculator` など。Unity に依存せずテストできる） |
 | `Parts/` | 機体パーツ（ブースター、武器）の組み立て |
 | `Npc/` | NPC と部隊 AI（`Npc/Squad/`） |
 | `Unit/` | 戦車・ドローン・砲台などのユニット |

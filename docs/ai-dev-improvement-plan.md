@@ -10,7 +10,7 @@
 | P3 テスト基盤とロジックの切り出し | 完了（EditMode テスト 34 件。`PlayerController` の移動計算の切り出しは P6 に移動） | #45 |
 | P4 CLI / CI でのコンパイル・テスト自動化 | 一部（ローカルのバッチモード用スクリプトは完了。GameCI による CI は有料アセットの扱いに課題があるため保留） | #52 / #54（保留） |
 | P5 `.claude/` 設定の整備 | 完了 | #32 / #35 |
-| P6 責務分割のリファクタ | 未着手（`MainControls.cs` の移動のみ P2 で実施） | - |
+| P6 責務分割のリファクタ | 一部（`PlayerController` の分割と移動計算のテストは完了。`MainControls.cs` の移動は P2 で実施。シングルトンの初期化順の明示は未着手） | #64 |
 | P7 Blender パイプラインの MCP 対応 | 完了（MCP 導入・Unity との切り替え、`export_to_unity.py` の API 化と命名規約の検証、コマンドラインからの検証・エクスポート） | #41 / #42、#55、#57 |
 | P8 軽微な整理 | 完了（`docs/logs/` の作成、`issues-draft.md` の削除、`.claudeignore` を `.ignore` に置き換え） | #60 |
 
