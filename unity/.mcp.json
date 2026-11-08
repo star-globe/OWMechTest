@@ -9,7 +9,8 @@
       "args": ["--directory", "${BLENDER_MCP_DIR:-C:/blender_mcp/mcp}", "run", "blender-mcp"],
       "env": {
         "BLENDER_MCP_HOST": "${BLENDER_MCP_HOST:-localhost}",
-        "BLENDER_MCP_PORT": "${BLENDER_MCP_PORT:-9876}"
+        "BLENDER_MCP_PORT": "${BLENDER_MCP_PORT:-9876}",
+        "BLENDER_PATH": "${BLENDER_PATH:-C:/Program Files/Blender Foundation/Blender 5.2/blender.exe}"
       }
     }
   }

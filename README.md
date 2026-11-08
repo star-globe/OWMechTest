@@ -93,6 +93,17 @@ tools/unity/run-tests.sh                # EditMode テスト（引数でテス�
 
 Unity は Unity Hub の既定のインストール先から探します。別の場所にある場合は、環境変数 `UNITY_EXE` に実行ファイルのパスを指定してください。
 
+### Blender を開かずにモデルを検証・エクスポートする
+
+保存済みの `.blend` を、Blender の GUI を開かずに命名規約で検証し、FBX を `unity/Assets/Models` にエクスポートできます（詳しくは `docs/blender-unity-pipeline.md` の「コマンドラインから使う」）。
+
+```bash
+tools/blender/export.sh model.blend --all --validate-only   # 検証だけ
+tools/blender/export.sh model.blend --all                   # エクスポート
+```
+
+Blender は既定のインストール先から探します。別の場所にある場合は、環境変数 `BLENDER_EXE` を指定してください。
+
 ## 開発状況
 
 このリポジトリは個人開発のプロトタイプです。

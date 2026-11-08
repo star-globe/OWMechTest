@@ -120,6 +120,9 @@ git submodule update --init --remote unity/docs/wiki
 - Blender MCP からエクスポートするときは、`tools/blender` を `sys.path` に追加して `export_to_unity` を import し、`validate_objects()` で命名規約を確認してから `export_objects([...])` / `export_selected()` を呼ぶ（`dry_run=True` で出力先だけ確認できる）。使い方はパイプラインの手順書の「エクスポート用スクリプト」
   - MCP のコードには UI のコンテキストが無い（`bpy.context.object` は使えず、`bpy.ops.mesh.primitive_*` の後に作ったオブジェクトを取れない）。オブジェクトの作成や参照は `bpy.data` を使う
   - 試しにエクスポートするときは `base_path` に scratchpad などを指定し、`unity/Assets/Models` に不要な FBX を作らない（Unity が取り込んで `.meta` ができる）
+- **保存済みの `.blend` の検証・エクスポートは、GUI を開かずに `bash tools/blender/export.sh <file.blend> [--objects <名前...> | --all] [--validate-only | --dry-run] [--base-path <path>]` で行える**。標準出力に結果の JSON、終了コードは 0 = 成功 / 2 = 規約違反 / 1 = その他のエラー。GUI で編集中の内容は保存してから実行する
+  - 使い分け: モデリングなど状態を見ながら進める作業は MCP、エクスポート・検証は `export.sh`、GUI を開かずに `.blend` を調べるのは MCP の `_for_cli` ツール（パイプラインの手順書の「MCP・コマンドラインの使い分け」）
+  - **Unity Editor の起動中は実行しない**（メモリ不足になるため。`export.sh` は Editor が起動中なら実行せずに終了する）。Unity を閉じてから使う
 - Blender MCP の導入手順は `README.md` の「開発環境セットアップ > Blender MCP」
 
 ### Unity と Blender の切り替え

@@ -66,6 +66,7 @@
       "mcp__unity-mcp__read_text_file",
       "Bash(bash *tools/unity/compile-check.sh*)",
       "Bash(bash *tools/unity/run-tests.sh*)",
+      "Bash(bash *tools/blender/export.sh*)",
       "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File *switch-to-blender.ps1*)",
       "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File *switch-to-unity.ps1*)",
       "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File *switch-to-blender.ps1*)",

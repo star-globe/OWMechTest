@@ -135,6 +135,48 @@ ex.export_objects(["body_standard"], base_path=r"C:\temp\Models")   # 別の場�
 - エクスポート後は、選択状態とアクティブなオブジェクトを元に戻します
 - MCP のコードは `bpy.context.object` などの UI のコンテキストが無い状態で動くため、オブジェクトは名前か `bpy.data.objects` で渡します
 
+#### コマンドラインから使う（`tools/blender/export.sh`）
+
+Blender の GUI を開かずに（`blender --background`）、保存済みの `.blend` を検証・エクスポートします。Blender の起動や MCP の接続が不要で、1 回あたり数秒で終わります。Git Bash でリポジトリルートから実行します。
+
+```bash
+tools/blender/export.sh model.blend --all --validate-only          # 検証だけ
+tools/blender/export.sh model.blend --all --dry-run                # 出力先だけ確認
+tools/blender/export.sh model.blend --objects body_standard        # 名前を指定してエクスポート
+tools/blender/export.sh model.blend --all --base-path /c/temp/Models   # 別の場所へ（試し出しなど）
+```
+
+| オプション | 内容 |
+|---|---|
+| `--objects <名前...>` | 対象のオブジェクト。`--objects` も `--all` も無いときは、`.blend` に保存された選択状態が対象 |
+| `--all` | 名前がカテゴリ（`body` / `arm` / `leg` / `head` / `weapon`）で始まるオブジェクトをすべて対象にする |
+| `--validate-only` / `--dry-run` | 検証だけ / 出力先の確認だけ（どちらも FBX を書き出さない） |
+| `--base-path <path>` | エクスポート先の Models フォルダ |
+| `--json-out <path>` | 結果の JSON をファイルにも書く |
+
+- 標準出力は結果の JSON 1 行です（`{"mode", "ok", "issues", "exports", "error", "blend_file"}`。`issues` と `exports` の要素は Python の `validate_objects()` / `export_objects()` の戻り値と同じ）
+- 終了コード: `0` = 成功、`2` = 規約違反（error）があり何もしなかった、`1` = その他のエラー（オブジェクトが無い、引数の誤りなど）
+- Blender のログは `unity/Logs/blender-export.log` に保存します
+- **Unity Editor の起動中は実行できません**（メモリ不足を避けるため。Editor が起動中なら案内を出して終了コード 1 で終わります）。Unity を閉じてから実行してください
+- `.blend` は読むだけで保存しません。**GUI の Blender で編集中の内容は、保存してから実行してください**
+- `--factory-startup` で起動するため、ユーザーのアドオン（MCP アドオンの Auto Start など）は読み込みません
+- Blender は既定のインストール先（Windows は `C:\Program Files\Blender Foundation\Blender X.Y` の最新版）から探します。別の場所にある場合は環境変数 `BLENDER_EXE` を指定してください
+- 直接呼ぶ場合: `blender --background --factory-startup model.blend --python tools/blender/export_to_unity.py -- [オプション]`。JSON は `OWMECH_RESULT:` で始まる行に出ます
+
+#### MCP・コマンドラインの使い分け
+
+| 方法 | 向いている作業 |
+|---|---|
+| Blender MCP（`execute_blender_code` など。GUI の Blender が必要） | モデリングなど、状態を確認しながら少しずつ進める作業。保存前の変更も扱える |
+| `tools/blender/export.sh` | エクスポートと検証。手順が決まっていて、終了コードで成否が分かる |
+| Blender MCP の `_for_cli` ツール（`execute_blender_code_for_cli` など） | GUI を開かずに `.blend` の中身を調べる、決まった手順に無い処理を試す |
+
+`_for_cli` ツールは MCP サーバーが `blender --background <file> --python-expr <code>` を実行し、`result` に入れた dict を返します。
+
+- Blender の場所は環境変数 `BLENDER_PATH`（`unity/.mcp.json` で既定値を指定済み。変えたら `/mcp` から `blender` を再接続する）
+- GUI の Blender が同じ `.blend` を未保存のまま開いていると、その内容のコピー（`<名前>_mcp_0001.blend`）を保存して使い、終わったら削除します。GUI が起動していなければファイルをそのまま使います
+- タイムアウトは 120 秒で、ユーザーのアドオンも読み込みます。終了コードは返りません
+
 ---
 
 ## Unityインポート設定
