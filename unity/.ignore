@@ -1,0 +1,10 @@
+# Grep（ripgrep）でリポジトリ全体や unity/ 以下を検索するときに除外するファイル（.gitignore で除外済みのものは書かない）
+# Claude Code は unity/ で起動し、Grep の既定の検索範囲が unity/ になるため、リポジトリルートではなくここに置く
+# 除外したものを検索したいときは、UniRx はフォルダ、SDF はファイルを検索の path に直接指定する
+# .meta とシーンは GUID や参照を探すのに使うので除外しない。バイナリ（Terrain の .asset など）は ripgrep が自動で飛ばす
+
+# サードパーティのコード（編集しない）
+Assets/Plugins/UniRx/
+
+# フォントの SDF アセット（約 35 MB の YAML）
+Assets/Fonts/**/*SDF.asset
