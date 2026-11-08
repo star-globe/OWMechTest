@@ -8,7 +8,7 @@
 | P1 CLAUDE.md の修正・拡充 | 完了 | #31 / #34 |
 | P2 Assembly Definition の導入 | 完了 | #33 / #36 |
 | P3 テスト基盤とロジックの切り出し | 完了（EditMode テスト 34 件。`PlayerController` の移動計算の切り出しは P6 に移動） | #45 |
-| P4 CLI / CI でのコンパイル・テスト自動化 | 一部（ローカルのバッチモード用スクリプトは完了。GameCI による CI は有料アセットの扱いに課題があるため保留） | #52 / #54（保留） |
+| P4 CLI / CI でのコンパイル・テスト自動化 | 実装済み（ローカルのバッチモード用スクリプトと GameCI による CI。有料アセットは CI に置かずに実行する。CI の実行には Unity ライセンスの Secret 登録が必要） | #52、#54 |
 | P5 `.claude/` 設定の整備 | 完了 | #32 / #35 |
 | P6 責務分割のリファクタ | 未着手（`MainControls.cs` の移動のみ P2 で実施） | - |
 | P7 Blender パイプラインの MCP 対応 | 完了（MCP 導入・Unity との切り替え、`export_to_unity.py` の API 化と命名規約の検証、コマンドラインからの検証・エクスポート） | #41 / #42、#55、#57 |
@@ -62,6 +62,7 @@ AI（Claude Code）での開発速度を上げるため、CLAUDE.md・CLI検証�
 ### P4. CLI / CI でのコンパイル・テスト自動化 ― 効果: 大 / 作業量: 中〜大（1日、ライセンス次第）
 - **ローカル**: `tools/unity/run-tests.sh`（`Unity -batchmode -projectPath unity -runTests -testPlatform EditMode -testResults ...`）と `compile-check.sh`（`-quit -logFile -` で Error を grep）を用意し、CLAUDE.md に記載する。
 - **GitHub Actions**: GameCI（`game-ci/unity-test-runner`）で PR ごとにコンパイルとテストを回す。Unity ライセンスの Secret が必要（Personal でも可）。問題になるのは有料アセット（ParticlePack/CleanFlatIcon）で、git に無いとコンパイルが通らない。対策は、これらへのコード依存を無くすか、別 asmdef/define で切り離すこと。
+  - 実施時の補足（#54）: 自作コードは有料アセットに依存していなかったため、有料アセットの無い clone でコンパイルとテストが通ることを確認し、CI もその状態で実行する。外部アクションはコミット SHA で固定した。
 - これでクラウドの Claude セッションでも CI 結果をもとに自己修正できるようになる。
 
 ### P5. `.claude/` 設定の整備 ― 効果: 中 / 作業量: 小（1〜2時間）

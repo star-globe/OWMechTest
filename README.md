@@ -93,6 +93,24 @@ tools/unity/run-tests.sh                # EditMode テスト（引数でテス�
 
 Unity は Unity Hub の既定のインストール先から探します。別の場所にある場合は、環境変数 `UNITY_EXE` に実行ファイルのパスを指定してください。
 
+### CI（GitHub Actions）
+
+`.github/workflows/unity-tests.yml` が、`unity/` の Assets・Packages・ProjectSettings を変更した PR と main への push で、コンパイルと EditMode テストを実行します（[GameCI](https://game.ci/) の `unity-test-runner`）。結果は PR のチェック「EditMode Test Results」に表示されます。
+
+Unity のライセンスが必要なため、リポジトリの **Settings > Secrets and variables > Actions** に次の 3 つを登録してください。未登録の間は、ワークフローは失敗せずにスキップされます（警告が表示されます）。
+
+| Secret | 内容 |
+|---|---|
+| `UNITY_LICENSE` | ライセンスファイルの中身。Unity Hub でサインインしてライセンスを有効化した PC の `C:\ProgramData\Unity\Unity_lic.ulf`（隠しフォルダ） |
+| `UNITY_EMAIL` | Unity アカウントのメールアドレス |
+| `UNITY_PASSWORD` | Unity アカウントのパスワード |
+
+- 公開リポジトリでも、Secret の値は他人から見えず、ログでも伏せ字になります。さらに次の対策をしています
+  - 外部アクションをコミット SHA で固定（タグを差し替えられても、確認済みのコード以外は動かない）
+  - フォークからの PR では実行しない（GitHub の既定で Secret も渡らない）。`pull_request_target` は使わない
+- 心配な場合は、CI 専用の Unity アカウント（Personal ライセンス）を作り、その情報を登録してください。普段のアカウントのパスワードを GitHub に置かずに済みます
+- 有料アセット（ParticlePack / CleanFlatIcon）は CI 環境にありませんが、自作コードはこれらに依存していないため、コンパイルとテストには影響しません。ライセンス上、CI に有料アセットを置いたり、キャッシュや成果物に含めたりしないでください
+
 ### Blender を開かずにモデルを検証・エクスポートする
 
 保存済みの `.blend` を、Blender の GUI を開かずに命名規約で検証し、FBX を `unity/Assets/Models` にエクスポートできます（詳しくは `docs/blender-unity-pipeline.md` の「コマンドラインから使う」）。
