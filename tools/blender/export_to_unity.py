@@ -21,14 +21,28 @@ unity/Assets/Models/ 以下のカテゴリ別フォルダへ FBX をエクスポ
   ex.export_selected()                      # エクスポート
   ex.export_objects(["body_standard"])      # 名前を指定してエクスポート
 
+使い方 C: コマンドライン（GUI を開かずに実行。ラッパーは tools/blender/export.sh）
+  blender --background --factory-startup <file.blend> --python export_to_unity.py -- [オプション]
+    --objects <名前...>   対象のオブジェクト（省略時は .blend に保存された選択状態）
+    --all                 カテゴリ（body / arm / ...）で始まる名前のオブジェクトをすべて対象にする
+    --validate-only       検証だけ行う
+    --dry-run             出力先だけ確認する
+    --base-path <path>    エクスポート先の Models フォルダ
+    --json-out <path>     結果の JSON をファイルにも書く
+  結果は "OWMECH_RESULT:" で始まる 1 行の JSON で標準出力に出す。
+  終了コード: 0 = 成功、2 = 規約違反（error）があり何もしなかった、1 = その他のエラー
+
 エクスポート先（Models フォルダ）は次の順で決まる:
   1. 関数の引数 base_path
   2. 環境変数 OWMECH_UNITY_MODELS
   3. このスクリプトの場所から求めたリポジトリの unity/Assets/Models
 """
 
+import argparse
+import json
 import os
 import re
+import sys
 
 import bpy
 
@@ -283,7 +297,78 @@ def export_selected(base_path=None, validate=True, dry_run=False):
     return export_objects(None, base_path=base_path, validate=validate, dry_run=dry_run)
 
 
-if __name__ == "__main__":
+# ── コマンドライン ─────────────────────────────────
+
+RESULT_PREFIX = "OWMECH_RESULT:"
+EXIT_OK = 0
+EXIT_ERROR = 1
+EXIT_VIOLATION = 2
+
+
+def get_all_targets():
+    """名前がカテゴリで始まるオブジェクトをすべて返す（カメラやライトなどは含めない）"""
+    return [o for o in bpy.data.objects if get_category(o.name) is not None]
+
+
+def _parse_cli_args(argv):
+    parser = argparse.ArgumentParser(
+        prog="export_to_unity.py",
+        description="命名規約を検証して FBX を unity/Assets/Models にエクスポートする")
+    target = parser.add_mutually_exclusive_group()
+    target.add_argument("--objects", nargs="+", metavar="NAME", help="対象のオブジェクト名（省略時は選択中のオブジェクト）")
+    target.add_argument("--all", action="store_true", help="カテゴリで始まる名前のオブジェクトをすべて対象にする")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--validate-only", action="store_true", help="検証だけ行う")
+    mode.add_argument("--dry-run", action="store_true", help="エクスポートせず出力先だけ確認する")
+    parser.add_argument("--base-path", help="エクスポート先の Models フォルダ")
+    parser.add_argument("--json-out", help="結果の JSON を書き出すファイル")
+    return parser.parse_args(argv)
+
+
+def run_cli(argv):
+    """コマンドラインの処理。結果の dict と終了コードを返す"""
+    args = _parse_cli_args(argv)
+    mode = "validate" if args.validate_only else "dry_run" if args.dry_run else "export"
+    result = {"blend_file": bpy.data.filepath, "mode": mode, "ok": False,
+              "issues": [], "exports": [], "error": None}
+    try:
+        objects = args.objects if args.objects else get_all_targets() if args.all else None
+        roots = get_export_roots(objects)
+        if not roots:
+            raise ValueError("対象のオブジェクトがありません（--objects か --all で指定するか、選択して保存してください）")
+        result["issues"] = validate_objects(roots)
+        if any(i["level"] == "error" for i in result["issues"]):
+            result["error"] = "命名規約の違反があるため処理しません"
+            return result, EXIT_VIOLATION
+        if mode != "validate":
+            result["exports"] = export_objects(roots, base_path=args.base_path,
+                                               validate=False, dry_run=(mode == "dry_run"))
+        result["ok"] = True
+        return result, EXIT_OK
+    except Exception as e:
+        result["error"] = f"{type(e).__name__}: {e}"
+        return result, EXIT_ERROR
+    finally:
+        if args.json_out:
+            with open(args.json_out, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False, indent=2)
+
+
+def _main_cli():
+    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    try:
+        result, code = run_cli(argv)
+    except SystemExit as e:
+        # argparse の --help や引数の誤り
+        code = e.code if isinstance(e.code, int) else EXIT_ERROR
+        sys.stdout.flush()
+        sys.exit(code if code == 0 else EXIT_ERROR)
+    print(RESULT_PREFIX + json.dumps(result, ensure_ascii=False))
+    sys.stdout.flush()
+    sys.exit(code)
+
+
+def _main_text_editor():
     # Text Editor の Run Script から実行したとき
     try:
         for issue in validate_objects():
@@ -292,3 +377,10 @@ if __name__ == "__main__":
         export_selected()
     except ValueError as e:
         print(f"[export_to_unity] {e}")
+
+
+if __name__ == "__main__":
+    if bpy.app.background:
+        _main_cli()
+    else:
+        _main_text_editor()
