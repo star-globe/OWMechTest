@@ -1,70 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AdvancedGears
 {
-    public struct JumpInfo
-    {
-        public bool isJump { get; private set; }
-        public float jumpSumTime { get; private set; }
-        public Vector3 jumpVector { get; private set; }
-        public Vector3 localNor { get; private set; }
-        public float interval { get; private set; }
-
-        public void SetJump(Vector3 jumpVec, Vector3 local, float interval)
-        {
-            isJump = true;
-            jumpSumTime = 0.0f;
-            jumpVector = jumpVec;
-            this.localNor = local;
-            this.interval = interval;
-        }
-
-        public void UpdateJumpSumTime(float sum)
-        {
-            jumpSumTime = sum;
-        }
-
-        public void ReduceIntervalTime(float cool)
-        {
-            interval -= cool;
-        }
-
-        public void ResetJump()
-        {
-            isJump = false;
-            jumpSumTime = 0.0f;
-            jumpVector = Vector3.zero;
-        }
-    }
-
-    public struct HyperBoostInfo
-    {
-        public bool isOn { get; private set; }
-        public Vector2 inputVector { get; private set; }
-        public Vector3 localBoostVector { get; private set; }
-
-        public void SetBoost(Vector2 input, float boostVal)
-        {
-            inputVector = input;
-            localBoostVector = new Vector3(input.x, 0, input.y) * boostVal;
-            isOn = true;
-        }
-
-        public void ResetBoost()
-        {
-            localBoostVector = Vector3.zero;
-            isOn = false;
-        }
-
-        public bool CheckInputVector(Vector2 input)
-        {
-            return Vector2.Dot(input, inputVector) >= 0;
-        }
-    }
-
+    /// <summary>
+    /// 機体の操作。入力（virtual メソッド。MyPlayerController / NpcController が差し替える）・Rigidbody・TouchChecker と、
+    /// 移動の計算（PlayerMoveCalculator）・エフェクト（PlayerEffectPresenter）をつなぐ
+    /// </summary>
     public class PlayerController : MonoBehaviour
     {
         [SerializeField]
@@ -76,36 +18,15 @@ namespace AdvancedGears
         [SerializeField]
         TouchChecker touchChecker = null;
 
-        #region Paramter
         [SerializeField]
         PlayerControllerSettings controllerSettings;
 
-        float vecSpeed => controllerSettings.VecSpeed;
-        float accelerateTime => controllerSettings.AccelerateTime;
-        float jumpSpeed => controllerSettings.JumpSpeed;
-        float horizontalBoostRate => controllerSettings.HorizontalBoostRate;
-        float floatRate => controllerSettings.FloatRate;
-        float rotSpeed => controllerSettings.RotSpeed;
-
-        float rotXMin => PlayerControllerConst.Instance.RotXMin;
-        float wallJumpRate => PlayerControllerConst.Instance.WallJumpRate;
-        float jumpTime => PlayerControllerConst.Instance.JumpTime;
-        float touchTime => PlayerControllerConst.Instance.TouchTime;
-        float jumpInterval => PlayerControllerConst.Instance.JumpInterval;
-        float airBrakeRate => PlayerControllerConst.Instance.AirBrakeRate;
-        float touchBrakeRateAdd => PlayerControllerConst.Instance.TouchBrakeRateAdd;
-        float quickYDelta => PlayerControllerConst.Instance.QuickYDelta;
-
-        float quickSpeed => controllerSettings.QuickSpeed;
-        float touchQuickRate => controllerSettings.TouchQuickRate;
-        float quickTime => controllerSettings.QuickTime;
-        float quickInterval => controllerSettings.QuickInterval;
-
-        float hyperBoostSpeed => controllerSettings.HyperBoostSpeed;
-        #endregion
-
         [SerializeField]
         PlayerPartsContainer partsContainer = null;
+
+        PlayerEffectPresenter effectPresenter;
+
+        PlayerMoveParams MoveParams => PlayerMoveParams.From(controllerSettings, PlayerControllerConst.Instance);
 
         bool IsBoost
         {
@@ -118,47 +39,10 @@ namespace AdvancedGears
                 playerCharacter.IsBoost = value;
             }
         }
+
         JumpInfo jumpInfo = new JumpInfo();
-
-        bool isJump { get { return jumpInfo.isJump; } }
-        float jumpSumTime
-        {
-            get
-            {
-                return jumpInfo.jumpSumTime;
-            }
-            set
-            {
-                jumpInfo.UpdateJumpSumTime(value);
-            }
-        }
-        Vector3 jumpVector
-        {
-            get { return jumpInfo.jumpVector; }
-        }
-
         JumpInfo quickInfo = new JumpInfo();
-
-        bool isQuick { get { return quickInfo.isJump; } }
-        float quickSumTime
-        {
-            get
-            {
-                return quickInfo.jumpSumTime;
-            }
-            set
-            {
-                quickInfo.UpdateJumpSumTime(value);
-            }
-        }
-        Vector3 quickVector
-        {
-            get { return quickInfo.jumpVector; }
-        }
-
         HyperBoostInfo hypBstInfo = new HyperBoostInfo();
-
-        bool isHyperBoost { get { return hypBstInfo.isOn; } }
 
         public UnitSide UnitSide
         {
@@ -183,6 +67,7 @@ namespace AdvancedGears
         {
             Assert.IsNotNull(controllerSettings);
             Assert.IsNotNull(partsContainer);
+            effectPresenter = new PlayerEffectPresenter(partsContainer);
         }
 
         private void Start()
@@ -208,21 +93,7 @@ namespace AdvancedGears
             UpdateRotae();
         }
 
-        private float LimitSpeed
-        {
-            get
-            {
-                if (this.IsBoost)
-                {
-                    if (this.isHyperBoost)
-                        return hyperBoostSpeed;
-                    else
-                        return vecSpeed * horizontalBoostRate;
-                }
-                else
-                    return vecSpeed;
-            }
-        }
+        #region 入力（派生クラスで差し替える）
 
         protected virtual void UpdateXZ(out float inputX, out float inputZ)
         {
@@ -266,36 +137,23 @@ namespace AdvancedGears
             return false;
         }
 
+        #endregion
+
         protected virtual void UpdateInput()
         {
             UpdateXZ(out inputX, out inputZ);
 
+            var p = MoveParams;
+
             if (CheckJump())
             {
-                if (isJump == false && jumpInfo.interval <= 0 && isTouched)
+                if (jumpInfo.isJump == false && jumpInfo.interval <= 0 && isTouched)
                 {
-                    Vector3 holNor;
-                    Vector3 local;
-                    if (inputX == 0 && inputZ == 0)
-                    {
-                        holNor = Vector3.zero;
-                        local = Vector3.up;
-                    }
-                    else
-                    {
-                        holNor = new Vector3(inputX, 0, inputZ);
-                        holNor.Normalize();
-                        local = holNor;
-                        holNor = rigid.transform.TransformDirection(holNor);
-                    }
-
-                    jumpInfo.SetJump(KickAndJump(holNor), local, jumpInterval);
-                    playerCharacter.IgnitJumpBoost();
-                    //rigid.velocity = Vector3.zero;
+                    StartJump(p);
                 }
                 else
                 {
-                    Debug.LogFormat("IsJump:{0} IsTouched:{1}", isJump, isTouched);
+                    Debug.LogFormat("IsJump:{0} IsTouched:{1}", jumpInfo.isJump, isTouched);
                 }
             }
             if (CheckBoost())
@@ -304,56 +162,18 @@ namespace AdvancedGears
             }
             if (CheckQuick())
             {
-                if (isQuick == false && quickInfo.interval <= 0)
+                if (quickInfo.isJump == false && quickInfo.interval <= 0)
                 {
-                    Vector3 localVec;
-                    if (inputX == 0 && inputZ == 0)
-                    {
-                        localVec = Vector3.forward;
-                    }
-                    else
-                    {
-                        localVec = new Vector3(inputX, 0, inputZ);
-                        localVec.Normalize();
-                    }
-
-                    if (!isFloating)
-                    {
-                        localVec += Vector3.up * quickYDelta;
-                    }
-
-                    var quickVec = rigid.transform.TransformDirection(localVec);
-
-                    var speed = quickSpeed;
-                    if (isTouched)
-                        speed *= touchQuickRate;
-
-                    quickInfo.SetJump(quickVec * quickSpeed, localVec, quickInterval);
-                    playerCharacter.IgnitQuickBoost();
-                    //rigid.velocity = Vector3.zero;
+                    StartQuick(p);
                 }
                 else
                 {
-                    Debug.LogFormat("IsQuick:{0} IsTouched:{1}", isQuick, isTouched);
+                    Debug.LogFormat("IsQuick:{0} IsTouched:{1}", quickInfo.isJump, isTouched);
                 }
             }
-            if (isHyperBoost)
+            if (hypBstInfo.isOn)
             {
-                bool checkInverse()
-                {
-                    if (inputX != 0 || inputZ != 0)
-                    {
-                        var local = new Vector2(inputX, inputZ);
-                        local.Normalize();
-                        return Vector2.Dot(hypBstInfo.inputVector, local) < 0;
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
-
-                if (isJump || checkInverse())
+                if (PlayerMoveCalculator.ShouldCancelHyperBoost(jumpInfo.isJump, inputX, inputZ, hypBstInfo.inputVector))
                 {
                     hypBstInfo.ResetBoost();
                     playerCharacter.IsHyperBoost = false;
@@ -361,18 +181,7 @@ namespace AdvancedGears
             }
             else if (CheckHyperBoost() && IsBoost)
             {
-                Vector2 localVec;
-                if (inputX == 0 && inputZ == 0)
-                {
-                    localVec = Vector2.up;
-                }
-                else
-                {
-                    localVec = new Vector2(inputX, inputZ);
-                    localVec.Normalize();
-                }
-
-                hypBstInfo.SetBoost(localVec, hyperBoostSpeed);
+                hypBstInfo.SetBoost(PlayerMoveCalculator.CalcHyperBoostInput(inputX, inputZ), p.HyperBoostSpeed);
                 playerCharacter.IsHyperBoost = true;
             }
             Vector3 tgt;
@@ -390,6 +199,29 @@ namespace AdvancedGears
             {
                 SubFire(tgt);
             }
+        }
+
+        private void StartJump(in PlayerMoveParams p)
+        {
+            PlayerMoveCalculator.CalcJumpDirection(inputX, inputZ, out var horizontal, out var local);
+            if (PlayerMoveCalculator.HasInput(inputX, inputZ))
+                horizontal = rigid.transform.TransformDirection(horizontal);
+
+            var jumpVec = touchChecker == null ? Vector3.zero :
+                PlayerMoveCalculator.KickAndJump(p, touchChecker.CurrentTouchState, touchChecker.CurrentNormal, horizontal);
+
+            jumpInfo.SetJump(jumpVec, local, p.JumpInterval);
+            playerCharacter.IgnitJumpBoost();
+        }
+
+        private void StartQuick(in PlayerMoveParams p)
+        {
+            var localVec = PlayerMoveCalculator.CalcQuickLocalVector(p, inputX, inputZ, isFloating);
+            var quickVec = rigid.transform.TransformDirection(localVec);
+
+            // 接触中に TouchQuickRate を掛ける処理は、分割前のコードでも計算結果が使われていなかった（#64）
+            quickInfo.SetJump(quickVec * p.QuickSpeed, localVec, p.QuickInterval);
+            playerCharacter.IgnitQuickBoost();
         }
 
         void UpdateParam()
@@ -417,116 +249,40 @@ namespace AdvancedGears
 
         private void UpdateMove()
         {
-            bool isInput = inputX != 0 || inputZ != 0;
-            Vector3 hVec = Vector3.zero;
-
-            if (isInput)
-            {
-                hVec = new Vector3(inputX, 0, inputZ);
-                hVec.Normalize();
-                hVec = rigid.transform.TransformDirection(hVec);
-            }
-
-            bool canAccel = isInput;
-
-            var vel = rigid.linearVelocity;
-            var dotVec = vel.x * hVec.x + vel.z * hVec.z;
-
-            canAccel &= dotVec < LimitSpeed;
-            canAccel &= !isJump || !isWallTouched;
-            canAccel &= !isFloating || this.IsBoost;
-
-            Vector3 vec = Vector3.zero;
+            var p = MoveParams;
+            var state = CurrentMoveState;
             var delta = Time.deltaTime;
 
-            if (canAccel)
+            bool hasInput = PlayerMoveCalculator.HasInput(inputX, inputZ);
+            Vector3 inputDir = Vector3.zero;
+            if (hasInput)
             {
-                var accelTime = accelerateTime;
-                if (this.isFloating)
-                    accelTime *= 2;
-
-                if (this.isHyperBoost)
-                {
-                    var bstVec = rigid.transform.TransformDirection(hypBstInfo.localBoostVector);
-                    hVec += bstVec * (delta / accelTime);
-                }
-                else
-                {
-                    hVec *= vecSpeed * delta / accelTime;
-
-                    if (this.IsBoost)
-                        hVec *= horizontalBoostRate;
-                }
-
-                vec += hVec;
-
-                if (this.isWallTouched)
-                {
-                    var dot = Vector3.Dot(touchChecker.CurrentNormal, vec.normalized);
-                    if (dot < 0)
-                    {
-                        var normal = -vec.magnitude * touchChecker.CurrentNormal * dot;
-                        vec += new Vector3(normal.x, 0, normal.z);
-                    }
-                }
+                inputDir = new Vector3(inputX, 0, inputZ);
+                inputDir.Normalize();
+                inputDir = rigid.transform.TransformDirection(inputDir);
             }
 
-            if (isJump)
-            {
-                bool forceReset = false;
-                if (jumpSumTime < touchTime)
-                    vec += jumpVector * delta / touchTime;
-                else
-                    forceReset = isTouched;
+            var hyperBoostVec = state.IsHyperBoost ? rigid.transform.TransformDirection(hypBstInfo.localBoostVector) : Vector3.zero;
+            var vel = rigid.linearVelocity;
 
-                jumpSumTime += delta;
-                if (jumpSumTime >= jumpTime || forceReset)
-                {
-                    jumpInfo.ResetJump();
-                    playerCharacter.QuitJumpBoost();
-                }
-            }
-            else
+            var vec = PlayerMoveCalculator.CalcAccel(p, state, hasInput, inputDir, vel, jumpInfo.isJump, hyperBoostVec, delta);
+
+            vec += PlayerMoveCalculator.StepImpulse(ref jumpInfo, p.TouchTime, p.JumpTime, state.IsTouched, delta, out var jumpEnded);
+            if (jumpEnded)
+                playerCharacter.QuitJumpBoost();
+
+            vec += PlayerMoveCalculator.StepImpulse(ref quickInfo, p.QuickTime, p.QuickTime, state.IsTouched, delta, out var quickEnded);
+            if (quickEnded)
+                playerCharacter.QuitQuickBoost();
+
+            if (PlayerMoveCalculator.ShouldBrake(state.IsBoost, hasInput, jumpInfo.isJump, quickInfo.isJump))
             {
-                jumpInfo.ReduceIntervalTime(delta);
+                vec = PlayerMoveCalculator.CalcBrake(p, vel, state.IsTouched, delta);
             }
 
-            if (isQuick)
+            if (PlayerMoveCalculator.ShouldFloat(state.IsFloating, state.IsBoost, vel.y))
             {
-                bool forceReset = false;
-                if (quickSumTime < quickTime)
-                    vec += quickVector * delta / quickTime;
-                else
-                    forceReset = isTouched;
-
-                quickSumTime += delta;
-                if (quickSumTime >= quickTime || forceReset)
-                {
-                    quickInfo.ResetJump();
-                    playerCharacter.QuitQuickBoost();
-                }
-            }
-            else
-            {
-                quickInfo.ReduceIntervalTime(delta);
-            }
-
-            if (this.IsBoost && !isInput && !isJump && !isQuick)
-            {
-                vec = new Vector3(-vel.x, 0, -vel.z);
-                var brake = this.airBrakeRate;
-
-                if (this.isTouched)
-                {
-                    brake += this.touchBrakeRateAdd;
-                }
-
-                vec *= brake * delta;
-            }
-
-            if (isFloating && this.IsBoost && vel.y < 0)
-            {
-                vec += -1.0f * Vector3.up * Physics.gravity.y * delta * floatRate;
+                vec += PlayerMoveCalculator.CalcFloatForce(p, Physics.gravity.y, delta);
             }
 
             rigid.AddForce(vec, ForceMode.VelocityChange);
@@ -536,38 +292,23 @@ namespace AdvancedGears
 
         private void UpdateEffect()
         {
-            int bit = 0;
-            if (IsBoost)
+            effectPresenter.Apply(IsBoost, isFloating, inputX, inputZ, jumpInfo, quickInfo, hypBstInfo);
+        }
+
+        private PlayerMoveState CurrentMoveState
+        {
+            get
             {
-                if (isFloating)
+                return new PlayerMoveState
                 {
-                    bit = ActionUtils.FloatingBit;
-                }
-                else
-                {
-                    bit = ActionUtils.ConvertBitXZ(inputX, inputZ);
-                }
+                    IsBoost = this.IsBoost,
+                    IsHyperBoost = hypBstInfo.isOn,
+                    IsFloating = isFloating,
+                    IsTouched = isTouched,
+                    IsWallTouched = isWallTouched,
+                    TouchNormal = touchChecker != null ? touchChecker.CurrentNormal : Vector3.zero,
+                };
             }
-
-            partsContainer.Boost(bit);
-
-            if (isQuick && quickInfo.jumpSumTime == 0)
-            {
-                partsContainer.Quick(ActionUtils.ConvertBit(quickInfo.localNor));
-            }
-
-            if (isJump && jumpInfo.jumpSumTime == 0)
-            {
-                partsContainer.Quick(ActionUtils.ConvertBit(jumpInfo.localNor));
-            }
-
-            int hyperBoostBit = 0;
-            if (isHyperBoost)
-            {
-                hyperBoostBit = ActionUtils.ConvertBit(hypBstInfo.localBoostVector);
-            }
-
-            partsContainer.HyperBoost(hyperBoostBit);
         }
 
         private bool isFloating
@@ -600,38 +341,9 @@ namespace AdvancedGears
         private void UpdateRotae()
         {
             var cameraVec2 = GetCameraPos();
-            var mX = cameraVec2.x;//InputUtils.GetCenterMouse().x;
-            if (mX * mX < rotXMin * rotXMin)
-                return;
-
-            var rotDeg = mX * rotSpeed * Time.deltaTime;
-
-            rigid.transform.Rotate(Vector3.up * rotDeg);
-        }
-
-        private Vector3 KickAndJump(Vector3 holNor)
-        {
-            if (touchChecker == null)
-                return Vector3.zero;
-
-            var touch = touchChecker.CurrentTouchState;
-            var normal = touchChecker.CurrentNormal;
-            switch (touch)
+            if (PlayerMoveCalculator.TryCalcRotateDegree(MoveParams, cameraVec2.x, Time.deltaTime, out var rotDeg))
             {
-                case TouchState.Wall:
-                    if (holNor == Vector3.zero ||
-                        Vector3.Dot(holNor, normal) < 0) {
-                        return Vector3.up * jumpSpeed * wallJumpRate;
-                    }
-                    else {
-                        return holNor * jumpSpeed;
-                    }
-
-                case TouchState.Ground:
-                    return Vector3.up * jumpSpeed;
-
-                default:
-                    return Vector3.zero;
+                rigid.transform.Rotate(Vector3.up * rotDeg);
             }
         }
     }
