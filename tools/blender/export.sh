@@ -43,6 +43,22 @@ if [ -z "${BLENDER_EXE:-}" ] || [ ! -x "$BLENDER_EXE" ]; then
     exit 1
 fi
 
+# メモリ不足を避けるため、Unity Editor の起動中は実行しない（CLAUDE.md「Unity と Blender の切り替え」）
+# Unity CLI（AppData\Local\Unity\bin\unity.exe、MCP サーバー）は対象外なので、Editor の実行ファイルのパスで判定する
+unity_editor_running() {
+    if command -v powershell >/dev/null 2>&1; then
+        powershell -NoProfile -Command "@(Get-Process Unity -ErrorAction SilentlyContinue | Where-Object { \$_.Path -like '*\\Editor\\Unity.exe' }).Count" 2>/dev/null \
+            | tr -d '\r' | grep -qv '^0$'
+    else
+        pgrep -f "Unity.app/Contents/MacOS/Unity|/Editor/Unity( |$)" >/dev/null 2>&1
+    fi
+}
+if unity_editor_running; then
+    echo "Unity Editor が起動中のため実行しません（メモリ不足を避けるため、Unity と Blender は同時に起動しない）。" >&2
+    echo "Unity を終了してから再実行してください（/switch-app blender の手順 1 を参照）。" >&2
+    exit 1
+fi
+
 LOG_DIR="$REPO_ROOT/unity/Logs"
 mkdir -p "$LOG_DIR"
 LOG="$LOG_DIR/blender-export.log"

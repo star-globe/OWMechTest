@@ -122,7 +122,7 @@ git submodule update --init --remote unity/docs/wiki
   - 試しにエクスポートするときは `base_path` に scratchpad などを指定し、`unity/Assets/Models` に不要な FBX を作らない（Unity が取り込んで `.meta` ができる）
 - **保存済みの `.blend` の検証・エクスポートは、GUI を開かずに `bash tools/blender/export.sh <file.blend> [--objects <名前...> | --all] [--validate-only | --dry-run] [--base-path <path>]` で行える**。標準出力に結果の JSON、終了コードは 0 = 成功 / 2 = 規約違反 / 1 = その他のエラー。GUI で編集中の内容は保存してから実行する
   - 使い分け: モデリングなど状態を見ながら進める作業は MCP、エクスポート・検証は `export.sh`、GUI を開かずに `.blend` を調べるのは MCP の `_for_cli` ツール（パイプラインの手順書の「MCP・コマンドラインの使い分け」）
-  - `export.sh` もバックグラウンドの Blender を起動するので、「Unity と Blender は同時に起動しない」ルールの対象（約 200 MB、数秒で終わる）
+  - **Unity Editor の起動中は実行しない**（メモリ不足になるため。`export.sh` は Editor が起動中なら実行せずに終了する）。Unity を閉じてから使う
 - Blender MCP の導入手順は `README.md` の「開発環境セットアップ > Blender MCP」
 
 ### Unity と Blender の切り替え

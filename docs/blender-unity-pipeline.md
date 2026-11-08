@@ -157,6 +157,7 @@ tools/blender/export.sh model.blend --all --base-path /c/temp/Models   # 別の�
 - 標準出力は結果の JSON 1 行です（`{"mode", "ok", "issues", "exports", "error", "blend_file"}`。`issues` と `exports` の要素は Python の `validate_objects()` / `export_objects()` の戻り値と同じ）
 - 終了コード: `0` = 成功、`2` = 規約違反（error）があり何もしなかった、`1` = その他のエラー（オブジェクトが無い、引数の誤りなど）
 - Blender のログは `unity/Logs/blender-export.log` に保存します
+- **Unity Editor の起動中は実行できません**（メモリ不足を避けるため。Editor が起動中なら案内を出して終了コード 1 で終わります）。Unity を閉じてから実行してください
 - `.blend` は読むだけで保存しません。**GUI の Blender で編集中の内容は、保存してから実行してください**
 - `--factory-startup` で起動するため、ユーザーのアドオン（MCP アドオンの Auto Start など）は読み込みません
 - Blender は既定のインストール先（Windows は `C:\Program Files\Blender Foundation\Blender X.Y` の最新版）から探します。別の場所にある場合は環境変数 `BLENDER_EXE` を指定してください
