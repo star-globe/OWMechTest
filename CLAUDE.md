@@ -112,6 +112,7 @@ git submodule update --init --remote unity/docs/wiki
 - 新規アセット・スクリプトの `.meta` は Unity に生成させ、必ずコミットに含める。手で `.meta` を作ったり GUID を書き換えたりしない（参照切れの原因になる）
 - `UnityTechnologies/ParticlePack` と `CleanFlatIcon` は Asset Store のアセットで git に含まれていない。新規環境では Asset Store から導入し、`SetupChecker` で有無を確認する。自作コードはこれらのスクリプトに依存していない（`SetupChecker` が文字列でパスを見ているだけ）。依存を増やさないこと
 - `Plugins/UniRx/` は編集しない
+- `unity/.ignore` で、UniRx とフォントの SDF アセット（約 35 MB）を Grep の全体検索から除外している。検索するときは Grep の `path` に UniRx のフォルダ、または SDF のファイルを直接指定する（Glob は `.ignore` の影響を受けない）
 - Unity が自動で変更した `unity/ProjectSettings/` のファイルは、作業内容と無関係ならコミットに含めない
 
 ## Blender 連携

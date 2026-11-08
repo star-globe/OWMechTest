@@ -12,7 +12,7 @@
 | P5 `.claude/` 設定の整備 | 完了 | #32 / #35 |
 | P6 責務分割のリファクタ | 未着手（`MainControls.cs` の移動のみ P2 で実施） | - |
 | P7 Blender パイプラインの MCP 対応 | 完了（MCP 導入・Unity との切り替え、`export_to_unity.py` の API 化と命名規約の検証、コマンドラインからの検証・エクスポート） | #41 / #42、#55、#57 |
-| P8 軽微な整理 | 一部（`docs/logs/` 作成済み） | - |
+| P8 軽微な整理 | 完了（`docs/logs/` の作成、`issues-draft.md` の削除、`.claudeignore` を `.ignore` に置き換え） | #60 |
 
 以下の「調査で分かった事実」は調査日時点の内容。
 
@@ -84,6 +84,7 @@ AI（Claude Code）での開発速度を上げるため、CLAUDE.md・CLI検証�
 ### P8. 軽微な整理 ― 効果: 小 / 作業量: 小
 - `docs/logs/` を作成する。`.github/issues-draft.md` が Issue 化済みなら削除またはアーカイブする。
 - `.claudeignore` に `unity/Assets/Plugins/UniRx`、`*.meta`、`Terrain`/`ProBuilder Data` 等の巨大な YAML を追加し、検索ノイズを減らす。
+  - 実施時の補足（#60）: Claude Code は `.claudeignore` を読まないため、Grep（ripgrep）が読む `.ignore` で除外した（Grep の既定の検索範囲が `unity/` なので `unity/.ignore` に置く）。`.meta` とシーンは GUID や参照の検索に使うので除外せず、`Terrain` の `.asset` はバイナリで ripgrep が自動で飛ばし、`ProBuilder Data` は小さい（5 KB）ので対象外にした。
 
 ## 推奨する着手順
 P1 → P5 → P2 → P3 → P4 → P7 → P6（P1/P5 はすぐ効果が出る。P2 以降は依存順）。
