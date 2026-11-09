@@ -1556,7 +1556,6 @@ GameObject:
   - component: {fileID: 5940345344510896108}
   - component: {fileID: 1969270925747620592}
   - component: {fileID: 8887031089818129393}
-  - component: {fileID: 3334824440956096721}
   - component: {fileID: 8871830659860910109}
   - component: {fileID: 6779917017821725060}
   - component: {fileID: 1782852313489705339}
@@ -1648,30 +1647,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3334824440956096721
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8069397516925169022}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5b77d5acdd3f7542b8d550b16a505a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rigid: {fileID: 8627606612195392983}
-  touchChecker: {fileID: 8871830659860910109}
-  vecSpeed: 7
-  accelerateTime: 0.1
-  jumpSpeed: 30
-  rotXMin: 0.1
-  wallJumpRate: 1
-  jumpTime: 2
-  touchTimeRate: 0.2
-  horizontalBoostRate: 1.5
-  floatRate: 0.8
-  controllerSettings: {fileID: 11400000, guid: 73710241aa44cc749ad9db7dcca12955, type: 2}
 --- !u!114 &8871830659860910109
 MonoBehaviour:
   m_ObjectHideFlags: 0
