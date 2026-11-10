@@ -217,6 +217,65 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void CalcAccel_Turning_DoesNotExceedLimitSpeed()
+        {
+            // 上限の速さ（10）で前進中に 45 度旋回した → 入力方向への射影は約 7.07 なので加速の判定は通るが、
+            // 加速後の水平方向の速さは上限を超えない
+            var state = new PlayerMoveState { IsTouched = true };
+            var velocity = Vector3.forward * 10f;
+            var dir = new Vector3(1, 0, 1).normalized;
+
+            var vec = PlayerMoveCalculator.CalcAccel(CreateParams(), state, true, dir, velocity, false, Vector3.zero, Delta);
+
+            var next = velocity + vec;
+            Assert.LessOrEqual(new Vector3(next.x, 0, next.z).magnitude, 10f + 1e-4f);
+            // 向きは入力方向へ曲がる
+            Assert.Greater(vec.x, 0f);
+        }
+
+        [Test]
+        public void CalcAccel_KeepTurning_SpeedStaysAtLimit()
+        {
+            // 上限の速さで走りながら毎ステップ入力方向を回し続けても、水平方向の速さは上限に留まる
+            var p = CreateParams();
+            var state = new PlayerMoveState { IsTouched = true };
+            var velocity = Vector3.forward * 10f;
+
+            for (int i = 1; i <= 200; i++)
+            {
+                var dir = Quaternion.Euler(0, i * 3f, 0) * Vector3.forward;
+                velocity += PlayerMoveCalculator.CalcAccel(p, state, true, dir, velocity, false, Vector3.zero, Delta);
+            }
+
+            Assert.LessOrEqual(new Vector3(velocity.x, 0, velocity.z).magnitude, 10f + 1e-3f);
+        }
+
+        [Test]
+        public void ClampHorizontalSpeed_BelowLimit_Unchanged()
+        {
+            var accel = new Vector3(0.4f, 0.1f, 0);
+
+            var vec = PlayerMoveCalculator.ClampHorizontalSpeed(accel, Vector3.forward * 5f, 10f);
+
+            AssertVector(accel, vec);
+        }
+
+        [Test]
+        public void ClampHorizontalSpeed_AlreadyOverLimit_KeepsCurrentSpeedAndYComponent()
+        {
+            // クイック直後などで上限（10）を超えている（15）ときは、速さを増やさずに向きだけ変える
+            var velocity = Vector3.forward * 15f;
+            var accel = new Vector3(1f, 0.5f, 0);
+
+            var vec = PlayerMoveCalculator.ClampHorizontalSpeed(accel, velocity, 10f);
+
+            var next = velocity + vec;
+            Assert.AreEqual(15f, new Vector3(next.x, 0, next.z).magnitude, 1e-4f);
+            Assert.AreEqual(0.5f, vec.y, 1e-5f);
+            Assert.Greater(vec.x, 0f);
+        }
+
+        [Test]
         public void StepImpulse_NotActive_ReducesInterval()
         {
             var info = new JumpInfo();
