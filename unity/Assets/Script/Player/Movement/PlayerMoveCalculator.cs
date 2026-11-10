@@ -158,8 +158,9 @@ namespace AdvancedGears
             bool canAccel = hasInput;
 
             var dotVec = velocity.x * hVec.x + velocity.z * hVec.z;
+            var limitSpeed = LimitSpeed(p, state.IsBoost, state.IsHyperBoost);
 
-            canAccel &= dotVec < LimitSpeed(p, state.IsBoost, state.IsHyperBoost);
+            canAccel &= dotVec < limitSpeed;
             canAccel &= !isJump || !state.IsWallTouched;
             canAccel &= !state.IsFloating || state.IsBoost;
 
@@ -196,7 +197,26 @@ namespace AdvancedGears
                 }
             }
 
-            return vec;
+            return ClampHorizontalSpeed(vec, velocity, limitSpeed);
+        }
+
+        /// <summary>
+        /// 加速後の水平方向の速さが上限を超えないよう、加速の XZ 成分を抑える（Y 成分はそのまま）。
+        /// 加速するかどうかは入力方向への速度の射影で判定しているため、旋回中は射影が上限より小さくなり、
+        /// 入力方向と垂直な速度成分を残したまま加速し続けて上限を超えてしまう。それを防ぐ。
+        /// すでに上限を超えている（ジャンプ・クイックの直後など）ときは、今の速さを上限として向きの変更だけ許す。
+        /// </summary>
+        public static Vector3 ClampHorizontalSpeed(Vector3 accel, Vector3 velocity, float limitSpeed)
+        {
+            var current = new Vector3(velocity.x, 0, velocity.z);
+            var next = current + new Vector3(accel.x, 0, accel.z);
+
+            var cap = Mathf.Max(limitSpeed, current.magnitude);
+            if (next.sqrMagnitude <= cap * cap)
+                return accel;
+
+            next = next.normalized * cap;
+            return new Vector3(next.x - current.x, accel.y, next.z - current.z);
         }
 
         /// <summary>
