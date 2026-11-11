@@ -62,11 +62,9 @@ namespace AdvancedGears
             assembleDataAsset.Load();
             editingDic.Clear();
 
-            var dic = assembleDataAsset.GetPartId_All();
+            // 機体本体のスロットは、保存データに無ければ初期値のパーツを表示する（Battle と同じ組み合わせになる）
             foreach (var slot in AllSlots)
-            {
-                editingDic[slot] = dic != null && dic.TryGetValue(slot, out var id) ? id : -1;
-            }
+                editingDic[slot] = assembleDataAsset.GetEquippedPartId(slot);
         }
 
         private void ShowSlots()
