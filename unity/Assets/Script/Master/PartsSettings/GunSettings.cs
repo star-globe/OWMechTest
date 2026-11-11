@@ -34,6 +34,11 @@ namespace AdvancedGears
                 return limit;
             }
         }
+
+        [SerializeField]
+        [Tooltip("一次ロックから二次ロック（偏差射撃）になるまでの時間（秒）")]
+        float secondaryLockTime = 1.0f;
+        public float SecondaryLockTime => secondaryLockTime;
     }
 
     public class GunMasterContainer : IDBasedMasterContainer<GunSettings>

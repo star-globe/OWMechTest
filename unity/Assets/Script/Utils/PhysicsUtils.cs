@@ -43,7 +43,18 @@ namespace AdvancedGears
         /// </summary>
         public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, TagHandle tag, out Vector3 targetPos)
         {
-            targetPos = Vector3.zero;
+            var found = CheckOverlapShpereOthers(pos, radius, excludeSideMask, layerMask, tag, out BaseObject target);
+            targetPos = found ? target.transform.position : Vector3.zero;
+            return found;
+        }
+
+        /// <summary>
+        /// 指定した除外マスク（UnitSide ビットマスク）に一致しない最近傍の BaseObject を返す。
+        /// excludeSideMask は UnitSideExtensions.ToNpcExcludeMask() などで生成する。
+        /// </summary>
+        public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, TagHandle tag, out BaseObject target)
+        {
+            target = null;
             float length = float.MaxValue;
             var count = Physics.OverlapSphereNonAlloc(pos, radius, colliders, layerMask);
             for (int i = 0; i < count; i++)
@@ -66,10 +77,10 @@ namespace AdvancedGears
                     continue;
 
                 length = len;
-                targetPos = colPos;
+                target = baseObject;
             }
 
-            return length < float.MaxValue;
+            return target != null;
         }
 
         /// <summary>

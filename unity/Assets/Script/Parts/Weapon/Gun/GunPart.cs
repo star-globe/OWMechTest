@@ -23,7 +23,19 @@ namespace AdvancedGears
         public int BulletId => Settings == null ? 0: Settings.BulletID;
         public int ReloadInter => Settings == null ? int.MaxValue : Settings.ReloadInter;
 
-        public void Fire(Vector3 target)
+        /// <summary>二次ロックになるまでの時間（秒）</summary>
+        public float SecondaryLockTime => AdvancedGears.SecondaryLockTime.Calc(Settings);
+
+        float BulletSpeed
+        {
+            get
+            {
+                var bullet = BulletMaster.Instance.GetSettings(BulletId);
+                return bullet == null ? 0f : bullet.Speed;
+            }
+        }
+
+        public void Fire(in AimRequest request)
         {
             if (ReloadInter == int.MaxValue || ReloadInter <= 0)
                 return;
@@ -35,7 +47,9 @@ namespace AdvancedGears
 
             fireDate = now;
 
-            BulletManager.Instance.Fire(BulletId, this.MuzzleTrans);
+            var muzzlePos = muzzleTrans.position;
+            var dir = AimSolver.CalcAimDirection(request, muzzlePos, BulletSpeed, muzzleTrans.forward);
+            BulletManager.Instance.Fire(BulletId, muzzlePos, dir, request.ShooterVelocity);
         }
     }
 }

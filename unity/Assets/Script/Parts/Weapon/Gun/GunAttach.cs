@@ -35,10 +35,13 @@ namespace AdvancedGears
             connector.Exchange(prefabObject);
         }
 
-        public void Fire(Vector3 target)
+        /// <summary>二次ロックになるまでの時間（秒）。銃が無ければ二次ロックにならない</summary>
+        public float SecondaryLockTime => gun != null ? gun.SecondaryLockTime : AdvancedGears.SecondaryLockTime.Never;
+
+        public void Fire(in AimRequest request)
         {
             if (gun != null)
-                gun.Fire(target);
+                gun.Fire(request);
         }
     }
 }
