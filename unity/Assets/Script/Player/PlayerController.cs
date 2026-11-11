@@ -287,7 +287,9 @@ namespace AdvancedGears
 
             rigid.AddForce(vec, ForceMode.VelocityChange);
 
-            playerCharacter.SetSpeed(rigid.linearVelocity.magnitude);
+            var velocity = rigid.linearVelocity;
+            playerCharacter.SetSpeed(velocity.magnitude);
+            partsContainer.SetMove(new Vector2(velocity.x, velocity.z).magnitude, !state.IsFloating);
         }
 
         private void UpdateEffect()

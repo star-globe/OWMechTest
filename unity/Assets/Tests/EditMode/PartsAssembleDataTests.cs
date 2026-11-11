@@ -172,6 +172,18 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void GetDefaultPartId_IgnoresSavedData()
+        {
+            var asset = CreateAsset<PlayerPartsAssembleDataAsset>((PartsAttachType.Head, 101001));
+            asset.Save(PartsAssembleData.CreateFromDictionary(Dic((PartsAttachType.Booster, 201001))));
+
+            // 保存データには頭部が無いが、初期値は読める（機体本体のスロットの補完に使う。#68）
+            Assert.AreEqual(-1, asset.GetPartId(PartsAttachType.Head));
+            Assert.AreEqual(101001, asset.GetDefaultPartId(PartsAttachType.Head));
+            Assert.AreEqual(-1, asset.GetDefaultPartId(PartsAttachType.Booster));
+        }
+
+        [Test]
         public void Load_AfterSaveDataDeleted_FallsBackToAssetDefaults()
         {
             var asset = CreateAsset<PlayerPartsAssembleDataAsset>((PartsAttachType.Weapon_Left, 301001));
