@@ -44,6 +44,7 @@ git submodule update --init --remote unity/docs/wiki
 その他のドキュメント（リポジトリルートの `docs/`）
 - AI 開発の改善プラン: docs/ai-dev-improvement-plan.md
 - Blender ↔ Unity パイプライン: docs/blender-unity-pipeline.md
+- モデリング作業のポリシー（トークン使用量の削減）: docs/modeling-work-policy.md
 - RenderGraph ラジアルブラー: docs/rendergraph-radial-blur-guide.md
 - 管理用セッションのトークン節約ポリシー: docs/management-session-policy.md
 - 作業ログ: docs/logs/issue-{番号}-log.md
@@ -118,6 +119,7 @@ git submodule update --init --remote unity/docs/wiki
 
 ## Blender 連携
 
+- **モデリング（Blender でのモデル作成と Unity への取り込み）を始める前に、`docs/modeling-work-policy.md` を読んで従う**（切り替え回数・ツールの戻り値を最小にする、形は数値で確かめる、モデルはスクリプトで作る、など）
 - パイプラインの手順は `docs/blender-unity-pipeline.md`、エクスポート用スクリプトは `tools/blender/export_to_unity.py`
 - Blender MCP からエクスポートするときは、`tools/blender` を `sys.path` に追加して `export_to_unity` を import し、`validate_objects()` で命名規約を確認してから `export_objects([...])` / `export_selected()` を呼ぶ（`dry_run=True` で出力先だけ確認できる）。使い方はパイプラインの手順書の「エクスポート用スクリプト」
   - MCP のコードには UI のコンテキストが無い（`bpy.context.object` は使えず、`bpy.ops.mesh.primitive_*` の後に作ったオブジェクトを取れない）。オブジェクトの作成や参照は `bpy.data` を使う
