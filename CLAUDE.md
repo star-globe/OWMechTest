@@ -45,6 +45,7 @@ git submodule update --init --remote unity/docs/wiki
 - AI 開発の改善プラン: docs/ai-dev-improvement-plan.md
 - Blender ↔ Unity パイプライン: docs/blender-unity-pipeline.md
 - RenderGraph ラジアルブラー: docs/rendergraph-radial-blur-guide.md
+- 管理用セッションのトークン節約ポリシー: docs/management-session-policy.md
 - 作業ログ: docs/logs/issue-{番号}-log.md
 
 ## ディレクトリマップ
@@ -241,3 +242,13 @@ Issue: #XX タイトル
 - 作業中に範囲外の問題に気づいたら、その場で直さずにここへ追加し、PR 本文にも書く
 - 終わったらチェックを付け、PR で対応したときは PR 番号を添える。調査や作業が大きくなったら別の Issue に分け、この行にはリンクを残す
 - 次の Issue を提案するときは、このチェックリストの未完了の項目も候補に含める
+
+### 管理用セッション
+
+作業用セッションを作って Issue を進めさせる管理用セッションは、`docs/management-session-policy.md` に従ってトークンの使用量を抑える。要点は次のとおり。
+
+- 管理用セッションは指示・状態確認・PR と Issue の管理だけを行い、実装・調査・Unity / Blender の操作は作業用セッションに任せる
+- 作業用セッションの状態は `get_session` の要約で確認する。`list_events` は `kinds` と `limit` で絞り、必要なときだけ使う。定期的な確認はしない
+- 大きな出力（ファイル全体、diff 全体、シーン階層、コンソール）を読み込まない
+- 作業の区切りで、新しいセッションに引き継ぐよう人間に提案する（引き継ぎの形式はポリシーを参照）
+- 作業用セッションと作業フォルダを共有しているときは、ブランチを切り替えない。別の PR は scratchpad に短いフォルダ名（`wt-xx` など）の git worktree を作って行う（長いと Windows のパス長制限で失敗する）
