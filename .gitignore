@@ -25,5 +25,8 @@ unity/.idea/
 *.ttf
 *.otf
 
+# Blender が保存時に作るバックアップ
+*.blend1
+
 # Python bytecode (tools/blender を import したときに生成される)
 __pycache__/

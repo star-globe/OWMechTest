@@ -32,6 +32,16 @@ namespace AdvancedGears
             return dic.TryGetValue(type, out int partId) ? partId : -1;
         }
 
+        /// <summary>アセットに保存された初期値のパーツIDを返す（実行時のデータは見ない）。無ければ -1。</summary>
+        public int GetDefaultPartId(PartsAttachType type)
+        {
+            var dic = data?.GetDictionary();
+            if (dic == null)
+                return -1;
+
+            return dic.TryGetValue(type, out int partId) ? partId : -1;
+        }
+
         public Dictionary<PartsAttachType, int> GetPartId_All()
         {
             return CurrentData?.GetDictionary();

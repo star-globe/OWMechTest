@@ -5,6 +5,8 @@ Blender → Unity FBXエクスポートスクリプト
 unity/Assets/Models/ 以下のカテゴリ別フォルダへ FBX をエクスポートする。
   body_standard → Parts/Body/body_standard.fbx
   arm_left_blade → Parts/Arms/arm_left_blade.fbx
+  rig_mech       → Rig/rig_mech.fbx（アニメーションを含めるのは rig_ だけ）
+スキンメッシュは、Armature モディファイアが参照するアーマチュアも同じ FBX に含める。
 
 使い方 A: Blender の Text Editor
   1. このファイルを開く
@@ -55,7 +57,11 @@ CATEGORY_MAP = {
     "leg":    "Parts/Legs",
     "head":   "Parts/Head",
     "weapon": "Weapons",
+    "rig":    "Rig",
 }
+
+# アニメーションを書き出すカテゴリ（パーツの FBX には入れない。アニメーションは共通リグの FBX にまとめる）
+ANIMATION_CATEGORIES = {"rig"}
 
 # docs/blender-unity-pipeline.md の「FBXファイル名」
 _VARIANT = r"[a-z0-9]+(?:_[a-z0-9]+)*"
@@ -65,6 +71,7 @@ NAME_PATTERNS = {
     "leg":    re.compile(rf"^leg_(?:left|right)_{_VARIANT}$"),
     "head":   re.compile(rf"^head_{_VARIANT}$"),
     "weapon": re.compile(rf"^weapon_{_VARIANT}$"),
+    "rig":    re.compile(rf"^rig_{_VARIANT}$"),
 }
 
 # docs/blender-unity-pipeline.md の「マテリアルスロット名」
@@ -74,7 +81,8 @@ EXPORT_OBJECT_TYPES = {"ARMATURE", "MESH"}
 
 FBX_SETTINGS = dict(
     use_selection=True,
-    global_scale=0.01,
+    # FBX_SCALE_ALL と組み合わせると Blender の 1 m が Unity の 1 になる（0.01 だと 1/100 になる。#68 で確認）
+    global_scale=1.0,
     apply_scale_options='FBX_SCALE_ALL',
     axis_forward='-Z',
     axis_up='Y',
@@ -157,6 +165,34 @@ def _iter_tree(obj):
         yield from _iter_tree(child)
 
 
+def _skinning_armatures(obj):
+    """メッシュの Armature モディファイアが参照するアーマチュアを返す"""
+    if obj.type != "MESH":
+        return []
+    return [m.object for m in obj.modifiers if m.type == 'ARMATURE' and m.object is not None]
+
+
+def get_export_tree(root):
+    """FBX に含めるオブジェクト（root とその子孫、スキニングに使うアーマチュア）を返す
+
+    パーツのメッシュは共通リグのアーマチュアでスキニングするが、アーマチュアはパーツの子ではないので、
+    ここで加えないとボーンの無い FBX になる。
+    """
+    tree = list(_iter_tree(root))
+    for o in list(tree):
+        for arm in _skinning_armatures(o):
+            if arm not in tree:
+                tree.append(arm)
+    return tree
+
+
+def get_fbx_settings(root):
+    """root のカテゴリに合わせた FBX の設定を返す（アニメーションはリグの FBX だけに入れる）"""
+    settings = dict(FBX_SETTINGS)
+    settings["bake_anim"] = get_category(root.name) in ANIMATION_CATEGORIES
+    return settings
+
+
 def _resolve_objects(objects):
     """None → 選択中のオブジェクト。名前の文字列も受け付ける"""
     if objects is None:
@@ -209,7 +245,7 @@ def validate_objects(objects=None):
         if root.name != root.name.lower():
             issues.append(_issue(root, "warning", "名前に大文字が含まれる（ファイル名は小文字になる）"))
 
-        tree = list(_iter_tree(root))
+        tree = get_export_tree(root)
         if not any(o.type in EXPORT_OBJECT_TYPES for o in tree):
             issues.append(_issue(root, "error", "メッシュもアーマチュアも含まれない"))
 
@@ -256,7 +292,7 @@ def export_objects(objects=None, base_path=None, validate=True, dry_run=False):
 
     results = []
     for root in roots:
-        tree = list(_iter_tree(root))
+        tree = get_export_tree(root)
         results.append({
             "object": root.name,
             "path": get_export_path(root.name, base_path),
@@ -276,10 +312,10 @@ def export_objects(objects=None, base_path=None, validate=True, dry_run=False):
         for root, result in zip(roots, results):
             os.makedirs(os.path.dirname(result["path"]), exist_ok=True)
             bpy.ops.object.select_all(action='DESELECT')
-            for o in _iter_tree(root):
+            for o in get_export_tree(root):
                 o.select_set(True)
             view_layer.objects.active = root
-            bpy.ops.export_scene.fbx(filepath=result["path"], **FBX_SETTINGS)
+            bpy.ops.export_scene.fbx(filepath=result["path"], **get_fbx_settings(root))
             result["exported"] = True
             print(f"[export_to_unity] エクスポート完了: {result['path']}")
     finally:

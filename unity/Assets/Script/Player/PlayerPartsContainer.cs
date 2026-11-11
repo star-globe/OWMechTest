@@ -21,6 +21,9 @@ namespace AdvancedGears
         GunAttach subGunAttach = null;
 
         [SerializeField]
+        MechRig mechRig = null;
+
+        [SerializeField]
         PartsAssembleDataAsset assembleDataAsset;
 
         private void Awake()
@@ -39,6 +42,9 @@ namespace AdvancedGears
 
         private void Load()
         {
+            if (mechRig != null)
+                LoadFrame();
+
             if (boosterContainer != null)
                 boosterContainer.SetBoosters(assembleDataAsset.GetPartId(PartsAttachType.Booster));
 
@@ -52,6 +58,27 @@ namespace AdvancedGears
                 subGunAttach.SetGun(assembleDataAsset.GetPartId(PartsAttachType.Weapon_Sub));
         }
 
+        private void LoadFrame()
+        {
+            foreach (var slot in MechFrameSlots.All)
+            {
+                // 機体本体は外せないので、保存データに無ければアセットの初期値を使う（本体のスロットが無い古い保存データ向け）
+                var partId = MechFrameSlots.ResolvePartId(assembleDataAsset.GetPartId(slot), assembleDataAsset.GetDefaultPartId(slot));
+                var part = PartMaster.Instance.GetSettings(partId)?.InstantiatePart<MechFramePart>();
+                if (part == null)
+                    Debug.LogErrorFormat("[PlayerPartsContainer] {0} のパーツ（ID: {1}）を読み込めませんでした", slot, partId);
+
+                mechRig.Attach(slot, part);
+            }
+        }
+
+        /// <summary>移動の状態をアニメーションに反映する</summary>
+        public void SetMove(float horizontalSpeed, bool isGrounded)
+        {
+            if (mechRig != null)
+                mechRig.SetMove(horizontalSpeed, isGrounded);
+        }
+
         public void Boost(int vectorBit)
         {
             if (boosterContainer != null)
@@ -62,12 +89,18 @@ namespace AdvancedGears
         {
             if (rightGunAttach != null)
                 rightGunAttach.Fire(tgt);
+
+            if (mechRig != null)
+                mechRig.NotifyFire(isRight: true);
         }
 
         public void LeftFire(Vector3 tgt)
         {
             if (leftGunAttach != null)
                 leftGunAttach.Fire(tgt);
+
+            if (mechRig != null)
+                mechRig.NotifyFire(isRight: false);
         }
 
         public void SubFire(Vector3 tgt)
