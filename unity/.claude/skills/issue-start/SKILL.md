@@ -13,7 +13,7 @@ argument-hint: <Issue番号>
 1. **Issue を読む**
    - `gh issue view $ARGUMENTS --repo star-globe/OWMechTest --comments`
    - Issue 本文に完了条件があれば控えておく（実装後の自己チェックで使う）
-   - 分野ラベル（`ゲームロジック` / `デザイン` / `管理` / `仕様検討`）を確認する。`デザイン` は Blender / Unity Editor が必要なので、クラウド環境なら手元での作業を勧める
+   - 分野ラベル（`GameLogic` / `Design` / `Management` / `Spec-Discussion`）を確認する。`Design` は Blender / Unity Editor が必要なので、クラウド環境なら手元での作業を勧める
 
 2. **関連する仕様とコードを確認する**
    - 仕様書を使う場合は先に `git submodule update --init --remote unity/docs/wiki` で wiki を最新化する
