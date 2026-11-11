@@ -22,6 +22,7 @@ unity/Assets/
 │   │   ├── Arms/       # 腕パーツ (.fbx)
 │   │   ├── Legs/       # 脚パーツ (.fbx)
 │   │   └── Head/       # 頭部パーツ (.fbx)
+│   ├── Rig/            # 共通リグとアニメーション (.fbx)
 │   └── Weapons/        # 武装 (.fbx)
 └── Textures/
     ├── Parts/          # パーツ用テクスチャ
@@ -41,6 +42,16 @@ unity/Assets/
 | 脚 | `leg_{left/right}_{バリアント名}.fbx` | `leg_left_standard.fbx` |
 | 頭部 | `head_{バリアント名}.fbx` | `head_sensor.fbx` |
 | 武装 | `weapon_{バリアント名}.fbx` | `weapon_rifle.fbx` |
+| 共通リグ・アニメーション | `rig_{名前}.fbx` | `rig_mech.fbx` |
+
+### 機体本体のパーツと共通リグ（#68）
+
+- `.blend` は `blender/mech_frame.blend`。アーマチュア `rig_mech`（ボーン 20 本、機体の高さ約 8 m、正面は -Y、機体の左は +X）を全パーツで共有する
+- パーツのメッシュは `tools/blender/mech_frame_parts.py` で作る。箱ごとに 1 本のボーンへウェイト 100% で割り当てる
+- パーツのメッシュは **アーマチュアの子にせず、Armature モディファイアだけで `rig_mech` を参照する**（子にすると `rig_mech.fbx` にパーツのメッシュが入る）。エクスポートスクリプトは、モディファイアが参照するアーマチュアをパーツの FBX に自動で含める
+- サイズを変えるときもボーンの位置（関節の位置）は変えず、メッシュの形で差をつける
+- アニメーション（アクション `idle` / `walk` / `aim_right` / `aim_left`）は `rig_mech` に作る。FBX に書き出すのは `rig_` の FBX だけで、パーツの FBX には入れない
+- Unity 側では `Prefabs/Mech/MechRig.prefab`（`rig_mech.fbx` のバリアント。Animator と `MechRig` を持つ）が、パーツの `SkinnedMeshRenderer` のボーンを名前で自分のボーンに付け替える
 
 ### マテリアルスロット名（Blender側）
 
@@ -75,7 +86,7 @@ Include
   └── Object Types: Armature, Mesh
 
 Transform
-  └── Scale: 0.01 （Blenderはデフォルトでmをcmとして扱うため）
+  └── Scale: 1.0 （Apply Scalings: FBX All と組み合わせると、Blender の 1 m が Unity の 1 になる。0.01 にすると 1/100 になる）
   └── Apply Scalings: FBX All
   └── Forward: -Z Forward
   └── Up: Y Up
@@ -151,7 +162,7 @@ tools/blender/export.sh model.blend --all --base-path /c/temp/Models   # 別の�
 | オプション | 内容 |
 |---|---|
 | `--objects <名前...>` | 対象のオブジェクト。`--objects` も `--all` も無いときは、`.blend` に保存された選択状態が対象 |
-| `--all` | 名前がカテゴリ（`body` / `arm` / `leg` / `head` / `weapon`）で始まるオブジェクトをすべて対象にする |
+| `--all` | 名前がカテゴリ（`body` / `arm` / `leg` / `head` / `weapon` / `rig`）で始まるオブジェクトをすべて対象にする |
 | `--validate-only` / `--dry-run` | 検証だけ / 出力先の確認だけ（どちらも FBX を書き出さない） |
 | `--base-path <path>` | エクスポート先の Models フォルダ |
 | `--json-out <path>` | 結果の JSON をファイルにも書く |
@@ -187,7 +198,7 @@ tools/blender/export.sh model.blend --all --base-path /c/temp/Models   # 別の�
 
 | 設定項目 | 値 |
 |---------|-----|
-| Scale Factor | 1（FBXエクスポート時にScale 0.01適用済みのため） |
+| Scale Factor | 1（エクスポート時に FBX All で縮尺を適用済みのため） |
 | Import Blendshapes | OFF（使用しない場合） |
 | Generate Colliders | OFF（コライダーは別途設定） |
 | Material Creation | Import via MaterialDescription |
@@ -196,7 +207,7 @@ tools/blender/export.sh model.blend --all --base-path /c/temp/Models   # 別の�
 
 | 設定項目 | 値 |
 |---------|-----|
-| Animation Type | Humanoid |
+| Animation Type | Generic（メカの体型なので Humanoid は使わない） |
 | Avatar Definition | Create From This Model |
 
 ### テクスチャ

@@ -13,6 +13,7 @@ argument-hint: <Issue番号>
 1. **Issue を読む**
    - `gh issue view $ARGUMENTS --repo star-globe/OWMechTest --comments`
    - Issue 本文に完了条件があれば控えておく（実装後の自己チェックで使う）
+   - 分野ラベル（`GameLogic` / `Design` / `Management` / `Spec-Discussion`）を確認する。`Design` は Blender / Unity Editor が必要なので、クラウド環境なら手元での作業を勧める
 
 2. **関連する仕様とコードを確認する**
    - 仕様書は `docs/spec/`（wiki の原本）にある。Issue で仕様が変わる場合は、`docs/spec/` の変更も実装方針に含める
@@ -24,6 +25,7 @@ argument-hint: <Issue番号>
 
 4. **実装方針を提示して承認を得る**
    - 変更するファイル、方針、検証方法（Unity でのコンパイル・Play 確認が要るか）、競合・依存をまとめて提示する
+   - 分野ラベルが付いていなければ、付けるラベルも提案する（CLAUDE.md の「ラベル」参照）
    - AskUserQuestion で承認を取る。承認されるまで実装・ブランチ作成はしない
 
 5. **ブランチを作る**
@@ -31,4 +33,4 @@ argument-hint: <Issue番号>
    - `git switch main && git pull` で最新化してから `git switch -c feature/issue-{番号}-{内容を表す短い英語}`
    - 例: `feature/issue-7-squad-ai`
 
-承認後の実装・検証・PR 作成は CLAUDE.md の「開発フロー」2〜3 に従う。C# を変更したら `/unity-verify` で確認する。
+承認後の実装・検証・PR 作成は CLAUDE.md の「開発フロー」2〜3 に従う。PR には Issue と同じ分野ラベルを付ける。C# を変更したら `/unity-verify` で確認する。
