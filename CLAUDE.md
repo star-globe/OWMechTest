@@ -31,6 +31,14 @@ git submodule update --init --remote unity/docs/wiki
 
 `unity/docs/wiki/` が空の場合（クラウド環境・新規 clone 直後）も同じコマンドで取得できます。
 
+### wiki の更新
+- wiki は本体とは別のリポジトリ（`star-globe/OWMechTest.wiki`）。`unity/docs/wiki/` で変更しても本体のコミットには含まれず、wiki リポジトリへの push が必要になる
+- **クラウド環境では wiki に push できない**（セッションのリポジトリに wiki が含まれていないため）。wiki の変更が必要なときは次のようにする
+  - `unity/docs/wiki/` のファイルは編集しない（編集してしまったら `git -C unity/docs/wiki reset --hard` で戻し、本体の差分にサブモジュールの変更を混ぜない）
+  - PR 本文に「wiki の追記（未反映）」の節を作り、対象のファイル名・追記する位置・追記する内容（Markdown のコードブロック）を書く。反映は人間が行う
+  - Issue の完了条件に wiki の更新が含まれていれば、PR 本文で「未反映」と明記する
+- ローカル環境では、`unity/docs/wiki/` で編集・コミットして wiki リポジトリに push してよい
+
 ## 仕様書の索引
 パスはリポジトリルート基準。
 - 基本仕様: unity/docs/wiki/基本仕様.md
