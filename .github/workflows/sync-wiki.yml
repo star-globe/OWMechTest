@@ -1,0 +1,82 @@
+# docs/spec/ の仕様書を GitHub Wiki（star-globe/OWMechTest.wiki）に反映する。
+# 仕様書の原本は docs/spec/。wiki は表示用の複製なので直接編集しない。
+name: wiki に仕様書を反映
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/spec/**"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "wiki が直接編集されていても上書きする"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-wiki
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: docs/spec
+
+      - name: wiki を clone
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" "$RUNNER_TEMP/wiki"
+
+      - name: 差分の確認と直接編集の検出
+        id: check
+        env:
+          BEFORE: ${{ github.event.before }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          wiki="$RUNNER_TEMP/wiki"
+          if diff -r -q --exclude=.git docs/spec "$wiki" > /dev/null; then
+            echo "wiki は docs/spec と同じ内容のため、反映は不要です。"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+          if [ "$FORCE" = "true" ]; then
+            echo "force が指定されたため、wiki の内容を確認せずに上書きします。"
+            exit 0
+          fi
+
+          # 前回の main の docs/spec と wiki が同じなら、wiki は直接編集されていない
+          prev="$RUNNER_TEMP/prev"
+          mkdir -p "$prev"
+          if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] \
+            && { git cat-file -e "$BEFORE^{commit}" 2>/dev/null || git fetch -q --depth 1 origin "$BEFORE"; } \
+            && git archive "$BEFORE" docs/spec | tar -x -C "$prev" \
+            && diff -r -q --exclude=.git "$prev/docs/spec" "$wiki" > /dev/null; then
+            echo "wiki は直接編集されていません。反映します。"
+            exit 0
+          fi
+
+          echo "::error::wiki が docs/spec 以外から変更されている可能性があります。wiki と docs/spec の差分を確認し、必要な内容を docs/spec に取り込んでから、このワークフローを force 付きで手動実行してください。"
+          diff -r --exclude=.git "$prev/docs/spec" "$wiki" || true
+          exit 1
+
+      - name: wiki に push
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          wiki="$RUNNER_TEMP/wiki"
+          rsync -a --delete --exclude=.git docs/spec/ "$wiki/"
+          cd "$wiki"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "docs/spec を反映（${GITHUB_REPOSITORY}@${GITHUB_SHA::7}）"
+          git push -q origin HEAD
+          git log -1 --stat
