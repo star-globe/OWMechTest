@@ -81,6 +81,18 @@ namespace AdvancedGears
             CharacterParam.Recovery(time);
         }
 
+        public bool IsAscend
+        {
+            get
+            {
+                return CharacterParam.IsAscend;
+            }
+            set
+            {
+                CharacterParam.SetAscend(value);
+            }
+        }
+
         public void UpdateParam(float time, bool isFloat)
         {
             CharacterParam.Recovery(time);
@@ -88,6 +100,11 @@ namespace AdvancedGears
             if (IsBoost && isFloat)
             {
                 CharacterParam.ConsumeBoostEnergy(time);
+            }
+
+            if (IsAscend)
+            {
+                CharacterParam.ConsumeAscendEnergy(time);
             }
 
             if (IsHyperBoost)

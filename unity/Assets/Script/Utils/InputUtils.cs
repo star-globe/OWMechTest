@@ -69,6 +69,18 @@ namespace AdvancedGears
             return action.WasPressedThisFrame();
         }
 
+        /// <summary>ジャンプボタンを押し続けているか（グライド中の上昇に使う）</summary>
+        public static bool CheckJumpHold()
+        {
+            if (_mainControls == null)
+            {
+                return false;
+            }
+
+            var action = _mainControls.Player.Jump;
+            return action.IsPressed();
+        }
+
         public static bool CheckQuick()
         {
             if (_mainControls == null)

@@ -12,11 +12,16 @@ namespace AdvancedGears
             this.partsContainer = partsContainer;
         }
 
-        /// <summary>通常ブーストのビット。空中では前後、地上では入力方向。ブーストしていなければ 0</summary>
-        public static int CalcBoostBit(bool isBoost, bool isFloating, float inputX, float inputZ)
+        /// <summary>
+        /// 通常ブーストのビット。上昇中は全方向（継続的なブースト）、空中では前後、地上では入力方向。ブーストしていなければ 0
+        /// </summary>
+        public static int CalcBoostBit(bool isBoost, bool isFloating, bool isAscend, float inputX, float inputZ)
         {
             if (!isBoost)
                 return 0;
+
+            if (isAscend)
+                return ActionUtils.AscendBit;
 
             if (isFloating)
                 return ActionUtils.FloatingBit;
@@ -35,10 +40,11 @@ namespace AdvancedGears
             return info.isOn ? ActionUtils.ConvertBit(info.localBoostVector) : 0;
         }
 
-        public void Apply(bool isBoost, bool isFloating, float inputX, float inputZ,
+        public void Apply(bool isBoost, bool isFloating, bool isAscend, float inputX, float inputZ,
                           in JumpInfo jumpInfo, in JumpInfo quickInfo, in HyperBoostInfo hyperBoostInfo)
         {
-            partsContainer.Boost(CalcBoostBit(isBoost, isFloating, inputX, inputZ));
+            // 上昇は継続的なブースト（通常ブーストのエフェクト）、ジャンプは瞬発的なブースト（クイックのエフェクト）で描画する
+            partsContainer.Boost(CalcBoostBit(isBoost, isFloating, isAscend, inputX, inputZ));
 
             if (IsImpulseStarted(quickInfo))
             {

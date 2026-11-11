@@ -38,6 +38,11 @@ namespace AdvancedGears
         public int HyperBoostEnergy => hyperBoostEnergy;
 
         [SerializeField]
+        [Tooltip("グライド中の上昇で消費するエネルギー（1 秒あたり。グライドの BoostEnergy に加えて消費する）")]
+        int ascendEnergy = 5000;
+        public int AscendEnergy => ascendEnergy;
+
+        [SerializeField]
         float quickTime = 0.5f;
         public float QuickTime => quickTime;
 

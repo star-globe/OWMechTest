@@ -19,11 +19,13 @@ namespace AdvancedGears
         public int JumpEnergy { get; private set; }
         public int QuickBoostEnergy { get; private set; }
         public int HyperBoostEnergy { get; private set; }
+        public int AscendEnergy { get; private set; }
 
         public bool IsBoost { get; private set; } = false;
         public bool IsJumpBoost { get; private set; } = false;
         public bool IsQuickBoost { get; private set; } = false;
         public bool IsHyperBoost { get; private set; } = false;
+        public bool IsAscend { get; private set; } = false;
 
         public int LockCircleSize { get; private set; }
         public int LockLength { get; private set; }
@@ -43,6 +45,7 @@ namespace AdvancedGears
             JumpEnergy = param.JumpEnergy;
             QuickBoostEnergy = param.QuickBoostEnergy;
             HyperBoostEnergy = param.HyperBoostEnergy;
+            AscendEnergy = param.AscendEnergy;
 
             LockCircleSize = param.LockCircleSize;
             LockLength = param.LockLength;
@@ -84,6 +87,11 @@ namespace AdvancedGears
             ConsumeEnergy((int) (time * HyperBoostEnergy));
         }
 
+        public void ConsumeAscendEnergy(float time)
+        {
+            ConsumeEnergy((int) (time * AscendEnergy));
+        }
+
         public bool CanBoost
         {
             get { return Energy > BoostEnergy; }
@@ -104,6 +112,12 @@ namespace AdvancedGears
             get { return Energy > HyperBoostEnergy; }
         }
 
+        /// <summary>グライド中の上昇は、エネルギーが残っていれば続けられる</summary>
+        public bool CanAscend
+        {
+            get { return Energy > 0; }
+        }
+
         public void SetBoost(bool boost)
         {
             this.IsBoost = boost;
@@ -122,6 +136,11 @@ namespace AdvancedGears
         public void SetHyperBoost(bool hyper)
         {
             this.IsHyperBoost = hyper;
+        }
+
+        public void SetAscend(bool ascend)
+        {
+            this.IsAscend = ascend;
         }
 
         public void SetSpeed(float speed)

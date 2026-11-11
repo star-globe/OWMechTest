@@ -18,6 +18,8 @@ namespace AdvancedGears
         public float QuickTime;
         public float QuickInterval;
         public float HyperBoostSpeed;
+        public float AscendSpeed;
+        public float AscendAccel;
 
         // PlayerControllerConst
         public float RotXMin;
@@ -44,6 +46,8 @@ namespace AdvancedGears
                 QuickTime = settings.QuickTime,
                 QuickInterval = settings.QuickInterval,
                 HyperBoostSpeed = settings.HyperBoostSpeed,
+                AscendSpeed = settings.AscendSpeed,
+                AscendAccel = settings.AscendAccel,
 
                 RotXMin = constants.RotXMin,
                 WallJumpRate = constants.WallJumpRate,

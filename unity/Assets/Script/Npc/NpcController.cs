@@ -21,6 +21,10 @@ namespace AdvancedGears
         [SerializeField]
         NavMeshAgent agent;
 
+        [SerializeField]
+        [Tooltip("目的地がこの高さ以上、上にあるときにグライド中の上昇をする")]
+        float ascendHeight = 5f;
+
         // ─── ISquadMember ────────────────────────────────────
         public SquadRole Role { get; private set; } = SquadRole.None;
         public SquadData Squad { get; private set; }
@@ -95,6 +99,14 @@ namespace AdvancedGears
         protected override bool CheckRightFire(out Vector3 target)
         {
             return FindTarget(out target);
+        }
+
+        // ─── 上昇 ────────────────────────────────────────────
+        // 最低限の判定：経路の目的地が自分より ascendHeight 以上高いときだけ上昇する（空中・ブースト中かどうかは基底で判定）
+        protected override bool CheckAscend()
+        {
+            if (agent == null || !agent.isActiveAndEnabled || !agent.hasPath) return false;
+            return agent.destination.y - transform.position.y >= ascendHeight;
         }
 
         // ─── 移動AI ──────────────────────────────────────────
