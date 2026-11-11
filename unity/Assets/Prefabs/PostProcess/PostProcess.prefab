@@ -85,11 +85,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f4934a3023b23e41affedf5788b6443, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RadialBlurDriver
-  hyperBoostIns: 1
-  quickBoostIns: 0.6
-  boostIns: 0.3
+  hyperBoostIns: 0.3
+  quickBoostIns: 0.1
+  boostIns: 0.08
   _riseSpeed: 1
-  _fallSpeed: 0.4
+  _fallSpeed: 0.8
   reflectBoost: 1
   _volume: {fileID: 5858575226171370376}
 --- !u!1 &7760184466751555199
