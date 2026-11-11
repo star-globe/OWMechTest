@@ -52,6 +52,16 @@ namespace AdvancedGears
         [SerializeField]
         float hyperBoostSpeed = 10.0f;
         public float HyperBoostSpeed => hyperBoostSpeed;
+
+        [SerializeField]
+        [Tooltip("グライド中にジャンプボタンを押し続けたときの上昇の上限速度")]
+        float ascendSpeed = 2.0f;
+        public float AscendSpeed => ascendSpeed;
+
+        [SerializeField]
+        [Tooltip("グライド中の上昇の加速度（上限速度に達するまで）")]
+        float ascendAccel = 8.0f;
+        public float AscendAccel => ascendAccel;
         #endregion
     }
 }

@@ -283,6 +283,31 @@ namespace AdvancedGears
             return -1.0f * Vector3.up * gravityY * delta * p.FloatRate;
         }
 
+        /// <summary>
+        /// グライド中の上昇をするか。空中・ブースト中に上昇の入力があり、エネルギーが残っていれば上昇する。
+        /// ジャンプの推力が残っている間（ジャンプ直後）でも上昇できる
+        /// </summary>
+        public static bool ShouldAscend(bool hasAscendInput, bool isFloating, bool isBoost, bool canAscend)
+        {
+            return hasAscendInput && isFloating && isBoost && canAscend;
+        }
+
+        /// <summary>
+        /// グライド中の上昇で加える値（ForceMode.VelocityChange）。重力を加えた後の上向きの速度が、
+        /// 上限速度（AscendSpeed）まで加速度（AscendAccel）で加速するようにする。
+        /// 下降中は加速度で減速してから上昇に転じる。上限速度を超えている（ジャンプ直後など）ときは何もしない（重力で上限速度まで減速する）
+        /// </summary>
+        public static Vector3 CalcAscendForce(in PlayerMoveParams p, float velocityY, float gravityY, float delta)
+        {
+            var natural = velocityY + gravityY * delta;
+            if (natural >= p.AscendSpeed)
+                return Vector3.zero;
+
+            var next = Mathf.Min(velocityY + p.AscendAccel * delta, p.AscendSpeed);
+            next = Mathf.Max(next, natural);
+            return Vector3.up * (next - natural);
+        }
+
         #endregion
 
         /// <summary>

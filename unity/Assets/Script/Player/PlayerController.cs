@@ -62,6 +62,7 @@ namespace AdvancedGears
 
         float inputX = 0;
         float inputZ = 0;
+        bool hasAscendInput = false;
 
         private void Awake()
         {
@@ -108,6 +109,14 @@ namespace AdvancedGears
         protected virtual bool CheckJump()
         {
             return playerCharacter.CharacterParam.CanJump;
+        }
+        /// <summary>
+        /// グライド中の上昇の入力（押し続けている間 true）。エネルギーや空中かどうかは PlayerController 側で判定する。
+        /// CheckJump と違い、基底では false を返す（エネルギーだけで判定すると NPC が空中で常に上昇し続けるため）
+        /// </summary>
+        protected virtual bool CheckAscend()
+        {
+            return false;
         }
         protected virtual bool CheckBoost()
         {
@@ -156,6 +165,7 @@ namespace AdvancedGears
                     Debug.LogFormat("IsJump:{0} IsTouched:{1}", jumpInfo.isJump, isTouched);
                 }
             }
+            hasAscendInput = CheckAscend();
             if (CheckBoost())
             {
                 this.IsBoost = !this.IsBoost;
@@ -227,6 +237,7 @@ namespace AdvancedGears
         void UpdateParam()
         {
             var time = Time.deltaTime;
+            playerCharacter.IsAscend = isAscend;
             playerCharacter.UpdateParam(time, isFloating);
         }
 
@@ -280,7 +291,11 @@ namespace AdvancedGears
                 vec = PlayerMoveCalculator.CalcBrake(p, vel, state.IsTouched, delta);
             }
 
-            if (PlayerMoveCalculator.ShouldFloat(state.IsFloating, state.IsBoost, vel.y))
+            if (isAscend)
+            {
+                vec += PlayerMoveCalculator.CalcAscendForce(p, vel.y, Physics.gravity.y, delta);
+            }
+            else if (PlayerMoveCalculator.ShouldFloat(state.IsFloating, state.IsBoost, vel.y))
             {
                 vec += PlayerMoveCalculator.CalcFloatForce(p, Physics.gravity.y, delta);
             }
@@ -292,7 +307,7 @@ namespace AdvancedGears
 
         private void UpdateEffect()
         {
-            effectPresenter.Apply(IsBoost, isFloating, inputX, inputZ, jumpInfo, quickInfo, hypBstInfo);
+            effectPresenter.Apply(IsBoost, isFloating, isAscend, inputX, inputZ, jumpInfo, quickInfo, hypBstInfo);
         }
 
         private PlayerMoveState CurrentMoveState
@@ -317,6 +332,16 @@ namespace AdvancedGears
             {
                 return touchChecker != null &&
                        touchChecker.CurrentTouchState != TouchState.Ground;
+            }
+        }
+
+        /// <summary>グライド中の上昇をしているか</summary>
+        private bool isAscend
+        {
+            get
+            {
+                return PlayerMoveCalculator.ShouldAscend(hasAscendInput, isFloating, IsBoost,
+                                                         playerCharacter.CharacterParam.CanAscend);
             }
         }
 

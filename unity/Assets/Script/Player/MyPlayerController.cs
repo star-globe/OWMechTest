@@ -33,6 +33,11 @@ namespace AdvancedGears
             return base.CheckJump() && InputUtils.CheckJump();
         }
 
+        protected override bool CheckAscend()
+        {
+            return InputUtils.CheckJumpHold();
+        }
+
         protected override bool CheckQuick()
         {
             return base.CheckQuick() && InputUtils.CheckQuick();

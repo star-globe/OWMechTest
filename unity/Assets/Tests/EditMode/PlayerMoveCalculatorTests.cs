@@ -22,6 +22,8 @@ namespace AdvancedGears.Tests
                 QuickTime = 0.2f,
                 QuickInterval = 1f,
                 HyperBoostSpeed = 40f,
+                AscendSpeed = 3f,
+                AscendAccel = 10f,
                 RotXMin = 0.1f,
                 WallJumpRate = 1.5f,
                 JumpTime = 0.5f,
@@ -379,6 +381,54 @@ namespace AdvancedGears.Tests
             Assert.AreEqual(expected, PlayerMoveCalculator.ShouldFloat(isFloating, isBoost, velocityY));
         }
 
+        [TestCase(true, true, true, true, true)]
+        [TestCase(false, true, true, true, false)]
+        [TestCase(true, false, true, true, false)]
+        [TestCase(true, true, false, true, false)]
+        [TestCase(true, true, true, false, false)]
+        public void ShouldAscend(bool hasInput, bool isFloating, bool isBoost, bool canAscend, bool expected)
+        {
+            Assert.AreEqual(expected, PlayerMoveCalculator.ShouldAscend(hasInput, isFloating, isBoost, canAscend));
+        }
+
+        [Test]
+        public void CalcAscendForce_BelowLimit_AcceleratesByAscendAccel()
+        {
+            // 重力を加えた後の速度が vy + AscendAccel * delta になる: 0 + 10 * 0.02 = 0.2
+            var vec = PlayerMoveCalculator.CalcAscendForce(CreateParams(), 0f, -9.8f, Delta);
+            Assert.AreEqual(0.2f, 0f + vec.y + (-9.8f * Delta), 1e-5f);
+            Assert.AreEqual(0f, vec.x);
+            Assert.AreEqual(0f, vec.z);
+        }
+
+        [Test]
+        public void CalcAscendForce_Falling_DeceleratesByAscendAccel()
+        {
+            var vec = PlayerMoveCalculator.CalcAscendForce(CreateParams(), -2f, -9.8f, Delta);
+            Assert.AreEqual(-1.8f, -2f + vec.y + (-9.8f * Delta), 1e-5f);
+        }
+
+        [Test]
+        public void CalcAscendForce_NearLimit_ClampsToAscendSpeed()
+        {
+            var vec = PlayerMoveCalculator.CalcAscendForce(CreateParams(), 2.9f, -9.8f, Delta);
+            Assert.AreEqual(3f, 2.9f + vec.y + (-9.8f * Delta), 1e-5f);
+        }
+
+        [Test]
+        public void CalcAscendForce_AtLimit_KeepsAscendSpeed()
+        {
+            var vec = PlayerMoveCalculator.CalcAscendForce(CreateParams(), 3f, -9.8f, Delta);
+            Assert.AreEqual(3f, 3f + vec.y + (-9.8f * Delta), 1e-5f);
+        }
+
+        [Test]
+        public void CalcAscendForce_AboveLimit_NoForce()
+        {
+            // ジャンプ直後など、重力を加えても上限速度を超えているときは何もしない
+            AssertVector(Vector3.zero, PlayerMoveCalculator.CalcAscendForce(CreateParams(), 8f, -9.8f, Delta));
+        }
+
         [Test]
         public void TryCalcRotateDegree_BelowThreshold_NoRotation()
         {
@@ -399,19 +449,25 @@ namespace AdvancedGears.Tests
         [Test]
         public void CalcBoostBit_NotBoost_Zero()
         {
-            Assert.AreEqual(0, PlayerEffectPresenter.CalcBoostBit(false, false, 1, 1));
+            Assert.AreEqual(0, PlayerEffectPresenter.CalcBoostBit(false, false, false, 1, 1));
         }
 
         [Test]
         public void CalcBoostBit_Floating_FloatingBit()
         {
-            Assert.AreEqual(ActionUtils.FloatingBit, PlayerEffectPresenter.CalcBoostBit(true, true, 1, 0));
+            Assert.AreEqual(ActionUtils.FloatingBit, PlayerEffectPresenter.CalcBoostBit(true, true, false, 1, 0));
         }
 
         [Test]
         public void CalcBoostBit_OnGround_InputDirection()
         {
-            Assert.AreEqual(ActionUtils.ConvertBitXZ(1, -1), PlayerEffectPresenter.CalcBoostBit(true, false, 1, -1));
+            Assert.AreEqual(ActionUtils.ConvertBitXZ(1, -1), PlayerEffectPresenter.CalcBoostBit(true, false, false, 1, -1));
+        }
+
+        [Test]
+        public void CalcBoostBit_Ascend_AllDirections()
+        {
+            Assert.AreEqual(ActionUtils.AscendBit, PlayerEffectPresenter.CalcBoostBit(true, true, true, 1, 0));
         }
 
         [Test]

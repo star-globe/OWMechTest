@@ -50,6 +50,9 @@ namespace AdvancedGears
             return bit;
         }
 
+        /// <summary>上昇中は全方向のブースターを点ける（ConvertBit の上向きと同じ）</summary>
+        public static int AscendBit => -1;
+
         public static int FloatingBit
         {
             get

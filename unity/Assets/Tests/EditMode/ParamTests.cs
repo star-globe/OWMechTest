@@ -65,6 +65,23 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void ConsumeAscendEnergy_ReducesEnergyByTime()
+        {
+            param.ConsumeAscendEnergy(0.5f);
+            Assert.AreEqual(settings.MaxEnergy - (int)(0.5f * settings.AscendEnergy), param.Energy);
+        }
+
+        [Test]
+        public void CanAscend_WhileEnergyRemains()
+        {
+            param.ConsumeEnergy(param.MaxEnergy - 1);
+            Assert.IsTrue(param.CanAscend);
+
+            param.ConsumeEnergy(1);
+            Assert.IsFalse(param.CanAscend);
+        }
+
+        [Test]
         public void CanJump_RequiresMoreEnergyThanCost()
         {
             param.ConsumeEnergy(param.MaxEnergy - param.JumpEnergy);   // 残りエネルギー = JumpEnergy
