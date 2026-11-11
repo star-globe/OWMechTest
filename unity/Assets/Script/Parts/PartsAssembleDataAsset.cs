@@ -42,6 +42,19 @@ namespace AdvancedGears
             return dic.TryGetValue(type, out int partId) ? partId : -1;
         }
 
+        /// <summary>
+        /// 装備するパーツIDを返す。機体本体（頭部・胴体・腕・脚）は外せないので、未設定なら初期値を使う
+        /// （本体のスロットが無い古い保存データ向け）。それ以外のスロットは GetPartId と同じ。
+        /// </summary>
+        public int GetEquippedPartId(PartsAttachType type)
+        {
+            var partId = GetPartId(type);
+            if (!MechFrameSlots.IsFrameSlot(type))
+                return partId;
+
+            return MechFrameSlots.ResolvePartId(partId, GetDefaultPartId(type));
+        }
+
         public Dictionary<PartsAttachType, int> GetPartId_All()
         {
             return CurrentData?.GetDictionary();

@@ -184,6 +184,30 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void GetEquippedPartId_FillsOnlyFrameSlotsWithDefaults()
+        {
+            var asset = CreateAsset<PlayerPartsAssembleDataAsset>(
+                (PartsAttachType.Leg, 104001),
+                (PartsAttachType.Weapon_Left, 301001));
+            // 本体のスロットが無い古い保存データ（左腕武装は外した）
+            asset.Save(PartsAssembleData.CreateFromDictionary(Dic((PartsAttachType.Booster, 201001))));
+
+            Assert.AreEqual(104001, asset.GetEquippedPartId(PartsAttachType.Leg));
+            // 武器は外せるので初期値で補わない
+            Assert.AreEqual(-1, asset.GetEquippedPartId(PartsAttachType.Weapon_Left));
+            Assert.AreEqual(201001, asset.GetEquippedPartId(PartsAttachType.Booster));
+        }
+
+        [Test]
+        public void GetEquippedPartId_PrefersSavedFramePart()
+        {
+            var asset = CreateAsset<PlayerPartsAssembleDataAsset>((PartsAttachType.Head, 101001));
+            asset.Save(PartsAssembleData.CreateFromDictionary(Dic((PartsAttachType.Head, 101003))));
+
+            Assert.AreEqual(101003, asset.GetEquippedPartId(PartsAttachType.Head));
+        }
+
+        [Test]
         public void Load_AfterSaveDataDeleted_FallsBackToAssetDefaults()
         {
             var asset = CreateAsset<PlayerPartsAssembleDataAsset>((PartsAttachType.Weapon_Left, 301001));
