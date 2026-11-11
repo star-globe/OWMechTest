@@ -16,7 +16,6 @@
       "Bash(git branch *)",
       "Bash(git ls-files *)",
       "Bash(git rev-parse *)",
-      "Bash(git submodule status *)",
       "Bash(gh issue list *)",
       "Bash(gh issue view *)",
       "Bash(gh pr list *)",
@@ -94,7 +93,6 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git push -u origin feature/*)",
-      "Bash(git submodule update *)",
       "Bash(gh pr create *)",
       "PowerShell(git switch *)",
       "PowerShell(git pull *)",
@@ -102,7 +100,6 @@
       "PowerShell(git add *)",
       "PowerShell(git commit *)",
       "PowerShell(git push -u origin feature/*)",
-      "PowerShell(git submodule update *)",
       "PowerShell(gh pr create *)",
       "mcp__unity-mcp__eval",
       "mcp__unity-mcp__menu",
@@ -134,11 +131,6 @@
       {
         "matcher": "startup",
         "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-wiki.sh\"",
-            "timeout": 60
-          },
           {
             "type": "command",
             "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-unity-editor.ps1\"",

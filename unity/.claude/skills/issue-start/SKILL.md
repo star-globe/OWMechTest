@@ -15,7 +15,7 @@ argument-hint: <Issue番号>
    - Issue 本文に完了条件があれば控えておく（実装後の自己チェックで使う）
 
 2. **関連する仕様とコードを確認する**
-   - 仕様書を使う場合は先に `git submodule update --init --remote unity/docs/wiki` で wiki を最新化する
+   - 仕様書は `docs/spec/`（wiki の原本）にある。Issue で仕様が変わる場合は、`docs/spec/` の変更も実装方針に含める
    - CLAUDE.md の「仕様書の索引」「ディレクトリマップ」「アーキテクチャ要約」から関係する箇所を特定し、既存コードのパターンを読む
 
 3. **他の Issue・PR との競合を調べる**

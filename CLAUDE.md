@@ -22,32 +22,25 @@ WarGameProject
 - 実装前に既存コードのパターンを確認し、プロジェクト内の記述スタイルに合わせること
 
 ## 仕様書
-GitHubWikiをサブモジュールとして `unity/docs/wiki/` に格納しています。
-wikiを参照する前に、リポジトリルートで以下を実行して最新化してください（サブモジュールは detached HEAD のため、`unity/docs/wiki/` での素の `git pull` は失敗します）。
+仕様書の原本は本体リポジトリの `docs/spec/` に置いている。GitHub Wiki（`star-globe/OWMechTest.wiki`）は表示用の複製で、main への push 時に GitHub Actions（`.github/workflows/sync-wiki.yml`）が `docs/spec/` の内容で上書きする。
 
-```
-git submodule update --init --remote unity/docs/wiki
-```
-
-`unity/docs/wiki/` が空の場合（クラウド環境・新規 clone 直後）も同じコマンドで取得できます。
-
-### wiki の更新
-- wiki は本体とは別のリポジトリ（`star-globe/OWMechTest.wiki`）。`unity/docs/wiki/` で変更しても本体のコミットには含まれず、wiki リポジトリへの push が必要になる
-- **クラウド環境では wiki に push できない**（セッションのリポジトリに wiki が含まれていないため）。wiki の変更が必要なときは次のようにする
-  - `unity/docs/wiki/` のファイルは編集しない（編集してしまったら `git -C unity/docs/wiki reset --hard` で戻し、本体の差分にサブモジュールの変更を混ぜない）
-  - PR 本文に「wiki の追記（未反映）」の節を作り、対象のファイル名・追記する位置・追記する内容（Markdown のコードブロック）を書く。反映は人間が行う
-  - Issue の完了条件に wiki の更新が含まれていれば、PR 本文で「未反映」と明記する
-- ローカル環境では、`unity/docs/wiki/` で編集・コミットして wiki リポジトリに push してよい
+### 仕様の変更
+- **wiki を直接編集しない**。仕様の変更は `docs/spec/` を編集し、コードの変更と同じ PR に含める（クラウド環境でも同じ）
+- 会話の中で仕様が変わったら、その場で「`docs/spec/` のどのページをどう変えるか」の差分案を示し、人間の了承を得てから編集する。決まった内容を後からまとめて書き起こさない
+- 相談だけで PR がない場合も、`docs/spec/` の変更だけの PR を作る
+- PR 本文の「仕様変更」欄（`.github/pull_request_template.md`）に、あり / なしと変更したページを書く
+- ページの書式は GitHub Wiki に合わせる（ファイル名がページ名、ページ間のリンクは `[[ページ名]]`、サイドバーは `_Sidebar.md`、フッターは `_Footer.md`）。ページを追加・改名したら `_Sidebar.md` と下の索引も更新する
+- 反映のワークフローは、wiki が前回の `docs/spec/` から変わっている（直接編集された）と失敗する。そのときは wiki の差分を `docs/spec/` に取り込んでから、Actions の画面で `force` を付けて手動実行する
 
 ## 仕様書の索引
 パスはリポジトリルート基準。
-- 基本仕様: unity/docs/wiki/基本仕様.md
-- 技術仕様: unity/docs/wiki/技術仕様.md
-- プレイヤー操作: unity/docs/wiki/プレイヤー操作.md
-- レイヤー管理: unity/docs/wiki/レイヤー管理.md
-- ターゲットシステム: unity/docs/wiki/ターゲットシステム.md
-- ユニット全般: unity/docs/wiki/ユニット全般.md
-- プロトタイプの方針: unity/docs/wiki/プロトタイプの方針.md
+- 基本仕様: docs/spec/基本仕様.md
+- 技術仕様: docs/spec/技術仕様.md
+- プレイヤー操作: docs/spec/プレイヤー操作.md
+- レイヤー管理: docs/spec/レイヤー管理.md
+- ターゲットシステム: docs/spec/ターゲットシステム.md
+- ユニット全般: docs/spec/ユニット全般.md
+- プロトタイプの方針: docs/spec/プロトタイプの方針.md
 
 その他のドキュメント（リポジトリルートの `docs/`）
 - AI 開発の改善プラン: docs/ai-dev-improvement-plan.md
@@ -224,7 +217,7 @@ Issueに着手する際は必ず以下のフローに従うこと。
 
 ### 3. コミット・PR作成
 - 問題がなければコミットしてPRを作成する
-- PRの説明にはIssue番号（Closes #XX）と実装概要を記載する
+- PRの説明にはIssue番号（Closes #XX）と実装概要を記載する（`.github/pull_request_template.md` に沿う。仕様変更があれば `docs/spec/` の変更を含める）
 
 ### 4. マージ後の記録・クローズ
 - マージ完了後、以下の形式で `docs/logs/issue-{番号}-log.md` を作成する
