@@ -10,6 +10,8 @@ argument-hint: "<blender|unity> [.blend ファイル]"
 
 メモリ節約のため、Unity Editor と Blender は同時に起動しない（CLAUDE.md「Unity と Blender の切り替え」）。切り替えは以下のスクリプトで行い、未保存の変更がある場合は終了せずに止まる。**強制終了（`Stop-Process` など）はしない。**
 
+**切り替えスクリプトは Bash ツールで実行する**。PowerShell ツールから `powershell -File ...` を呼ぶと「入れ子の PowerShell プロセスは検証できない」として、許可ルールがあっても毎回承認が必要になる（Bash ツールなら `.claude/settings.json` の許可ルールで確認なしに通る）。
+
 ## Unity → Blender（`/switch-app blender`）
 
 1. **Unity の未保存の変更を片付ける**（Unity が起動している場合）
