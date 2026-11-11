@@ -62,8 +62,7 @@ namespace AdvancedGears
         {
             foreach (var slot in MechFrameSlots.All)
             {
-                // 機体本体は外せないので、保存データに無ければアセットの初期値を使う（本体のスロットが無い古い保存データ向け）
-                var partId = MechFrameSlots.ResolvePartId(assembleDataAsset.GetPartId(slot), assembleDataAsset.GetDefaultPartId(slot));
+                var partId = assembleDataAsset.GetEquippedPartId(slot);
                 var part = PartMaster.Instance.GetSettings(partId)?.InstantiatePart<MechFramePart>();
                 if (part == null)
                     Debug.LogErrorFormat("[PlayerPartsContainer] {0} のパーツ（ID: {1}）を読み込めませんでした", slot, partId);
