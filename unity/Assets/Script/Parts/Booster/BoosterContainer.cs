@@ -11,9 +11,12 @@ namespace AdvancedGears
 
         readonly List<BoosterPart> boosters = new List<BoosterPart>();
 
-        public void SetBoosters(int partId)
+        /// <param name="prioritySources">ブースターパーツの色より優先する色の供給元（内装など）。優先度の高い順</param>
+        public void SetBoosters(int partId, IReadOnlyList<IBoosterColorSource> prioritySources = null)
         {
             boosters.Clear();
+
+            var baseColor = ResolveBaseColor(partId, prioritySources);
 
             foreach (var connector in connectorTrans)
             {
@@ -24,8 +27,21 @@ namespace AdvancedGears
                     continue;
 
                 part.SetBoostVector(connector.BoostVector);
+                part.SetBaseColor(baseColor);
                 boosters.Add(part);
             }
+        }
+
+        static Color ResolveBaseColor(int partId, IReadOnlyList<IBoosterColorSource> prioritySources)
+        {
+            var sources = new List<IBoosterColorSource>();
+            if (prioritySources != null)
+                sources.AddRange(prioritySources);
+
+            if (partId >= 0)
+                sources.Add(new BoosterPartColorSource(BoosterMaster.Instance.GetSettings(partId)));
+
+            return BoosterColorResolver.Resolve(sources, BoosterColorPalette.DefaultBaseColor);
         }
 
         public void RemoveBoosters()
