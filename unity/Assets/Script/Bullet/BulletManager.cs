@@ -40,6 +40,7 @@ namespace AdvancedGears
 
         long instanceId = 1;
 
+        /// <summary>マズルの正面へ撃つ（撃った側の速度は引き継がない）</summary>
         public void Fire(int bulletId, Transform muzzleTrans)
         {
             if (muzzleTrans == null)
@@ -48,6 +49,14 @@ namespace AdvancedGears
                 return;
             }
 
+            Fire(bulletId, muzzleTrans.position, muzzleTrans.forward, Vector3.zero);
+        }
+
+        /// <summary>
+        /// position から direction へ撃つ。弾の初速は「direction × 弾速 + inheritVelocity（撃った側の速度）」
+        /// </summary>
+        public void Fire(int bulletId, Vector3 position, Vector3 direction, Vector3 inheritVelocity)
+        {
             var bullet = bulletQueue.DequeueBullet(bulletId);
             if (bullet == null)
             {
@@ -61,7 +70,7 @@ namespace AdvancedGears
 
             instanceId++;
 
-            bullet.Fire(muzzleTrans.forward, muzzleTrans.position, instanceId);
+            bullet.Fire(direction, position, inheritVelocity, instanceId);
 
             currentBullets[instanceId] = bullet;
         }

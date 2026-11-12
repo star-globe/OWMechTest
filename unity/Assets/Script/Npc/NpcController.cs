@@ -72,8 +72,10 @@ namespace AdvancedGears
             }
         }
 
-        // ─── 目標探索 ─────────────────────────────────────────
-        private bool FindTarget(out Vector3 target)
+        // ─── 目標探索とロック ─────────────────────────────────
+        // 毎フレーム最近傍の目標を探してロックする。見つけた時点で一次ロック、
+        // 同じ目標を狙い続けて銃ごとの時間が経つと二次ロック（偏差射撃）になる
+        private void UpdateLockTarget()
         {
             var pos = this.transform.position;
             bool found = PhysicsUtils.CheckOverlapShpereOthers(
@@ -82,23 +84,25 @@ namespace AdvancedGears
                 this.UnitSide.ToNpcExcludeMask(),
                 GameLayers.EnemyLayerMask,
                 PhysicsUtils.PlayerTag,
-                out target);
+                out BaseObject target);
+
+            SetLockTarget(found ? target : null);
 
             if (found && Role == SquadRole.Scout)
-                LastKnownTarget = target;
-
-            return found;
+                LastKnownTarget = target.transform.position;
         }
+
+        private bool HasLockTarget => LockOn.Target != null;
 
         // ─── 射撃判定 ─────────────────────────────────────────
-        protected override bool CheckLeftFire(out Vector3 target)
+        protected override bool CheckLeftFire()
         {
-            return FindTarget(out target);
+            return HasLockTarget;
         }
 
-        protected override bool CheckRightFire(out Vector3 target)
+        protected override bool CheckRightFire()
         {
-            return FindTarget(out target);
+            return HasLockTarget;
         }
 
         // ─── 上昇 ────────────────────────────────────────────
@@ -112,6 +116,7 @@ namespace AdvancedGears
         // ─── 移動AI ──────────────────────────────────────────
         protected override void UpdateInput()
         {
+            UpdateLockTarget();
             UpdateAgentDestination();
             base.UpdateInput();
         }
@@ -143,9 +148,9 @@ namespace AdvancedGears
                 else
                     agent.ResetPath();
             }
-            else if (FindTarget(out var target))
+            else if (HasLockTarget)
             {
-                agent.SetDestination(target);
+                agent.SetDestination(LockOn.Target.transform.position);
             }
             else if (Squad?.SharedTarget.HasValue == true)
             {

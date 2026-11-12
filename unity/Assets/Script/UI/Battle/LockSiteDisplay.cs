@@ -31,14 +31,11 @@ namespace AdvancedGears
         [SerializeField]
         LockTargetImage lockTargetImage;
 
-        [SerializeField]
-        float leftLockCompletionTime = 1.0f;
+        long currentLockTargetId = LockOnState.NoTargetId;
 
-        [SerializeField]
-        float rightLockCompletionTime = 1.0f;
-
-        CurrentLockStateInfo lockStateInfo;
-        long currentLockTargetId = long.MinValue;
+        // ロックの状態はプレイヤーの機体（PlayerController）が持つ。ここでは目標を選んで渡し、表示するだけ
+        PlayerController controller;
+        long controllerPlayerId = long.MinValue;
 
         private void Awake()
         {
@@ -55,10 +52,11 @@ namespace AdvancedGears
             if (param == null)
                 return;
 
-            if (lockStateInfo == null)
-                lockStateInfo = new CurrentLockStateInfo(leftLockCompletionTime, rightLockCompletionTime);
-
-            lockStateInfo.AddTime(Time.deltaTime);
+            if (controller == null || controllerPlayerId != pc.ID)
+            {
+                controller = pc.GetComponent<PlayerController>();
+                controllerPlayerId = pc.ID;
+            }
 
             if (lockCircleSize != param.LockCircleSize)
             {
@@ -120,9 +118,6 @@ namespace AdvancedGears
 
             returnList.Clear();
 
-            if (lockTargetImage == null)
-                return;
-
             LockImage closestMark = null;
             float closestDistSqr = float.MaxValue;
             for (int i = 0; i < lockMarkPool.ActiveCount; i++)
@@ -135,14 +130,21 @@ namespace AdvancedGears
                 }
             }
 
-            var newTargetId = closestMark != null ? closestMark.ID : long.MinValue;
+            // 射撃の目標としてプレイヤーに渡す（同じ目標なら二次ロックまでの時間はそのまま）
+            var newTarget = closestMark != null ? closestMark.Target : null;
+            if (controller != null)
+                controller.SetLockTarget(newTarget);
+
+            if (lockTargetImage == null)
+                return;
+
+            var newTargetId = closestMark != null ? closestMark.ID : LockOnState.NoTargetId;
             if (newTargetId != currentLockTargetId)
             {
                 currentLockTargetId = newTargetId;
-                lockStateInfo?.ResetDuration();
-                lockTargetImage.SetTarget(closestMark?.Target, cam, lockStateInfo);
+                lockTargetImage.SetTarget(newTarget, cam, controller);
             }
-            var shouldBeActive = currentLockTargetId != long.MinValue;
+            var shouldBeActive = currentLockTargetId != LockOnState.NoTargetId;
             if (lockTargetImage.gameObject.activeSelf != shouldBeActive)
                 lockTargetImage.gameObject.SetActive(shouldBeActive);
         }

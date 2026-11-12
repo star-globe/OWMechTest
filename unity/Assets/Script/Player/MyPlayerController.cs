@@ -10,9 +10,6 @@ namespace AdvancedGears
         [SerializeField]
         float defaultTargetLength = 100;
 
-        [SerializeField]
-        float defaultTargetAngle = 45.0f;
-
         protected override void UpdateXZ(out float inputX, out float inputZ)
         {
             InputUtils.UpdateXZ(out inputX, out inputZ);
@@ -49,33 +46,26 @@ namespace AdvancedGears
         }
 
 
-        private void SetTarget(out Vector3 target)
+        // ロックの目標は LockSiteDisplay（ロックサークル内でいちばん近い目標）が SetLockTarget で設定する。
+        // ロックしていないときは正面へ撃つ
+        protected override Vector3 GetFallbackAimPoint()
         {
-            var trans = this.gameObject.transform;
-            if (PhysicsUtils.CheckOverlapScorn(trans.position, trans.forward * defaultTargetLength, defaultTargetAngle * Mathf.Deg2Rad, this.UnitSide, -1, PhysicsUtils.PlayerTag, out target) == false)
-            {
-                target = trans.position + trans.forward * defaultTargetLength + Vector3.up * this.PlayerHeight;
-            }
+            var trans = this.transform;
+            return trans.position + trans.forward * defaultTargetLength + Vector3.up * this.PlayerHeight;
         }
 
-        protected override bool CheckLeftFire(out Vector3 target)
+        protected override bool CheckLeftFire()
         {
-            SetTarget(out target);
-
             return InputUtils.CheckLeftFire();
         }
 
-        protected override bool CheckRightFire(out Vector3 target)
+        protected override bool CheckRightFire()
         {
-            SetTarget(out target);
-
             return InputUtils.CheckRightFire();
         }
 
-        protected override bool CheckSubFire(out Vector3 target)
+        protected override bool CheckSubFire()
         {
-            SetTarget(out target);
-
             return InputUtils.CheckSubFire();
         }
     }

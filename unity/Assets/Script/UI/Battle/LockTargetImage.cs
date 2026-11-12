@@ -26,13 +26,17 @@ namespace AdvancedGears
         Color color = Color.white;
 
         [SerializeField]
+        [Tooltip("二次ロック（偏差射撃）になった武器の Image の色。一次ロックでは color を使う")]
+        Color secondaryLockColor = new Color(1f, 0.35f, 0.2f, 1f);
+
+        [SerializeField]
         Color textBackgroundColor = Color.clear;
 
         string textBackgroundTag = string.Empty;
 
         BaseObject target;
         Camera worldCam;
-        CurrentLockStateInfo lockStateInfo;
+        PlayerController controller;
 
         int prevDistanceTenth = int.MinValue;
         int prevHp = int.MinValue;
@@ -87,11 +91,11 @@ namespace AdvancedGears
         }
 
 
-        public void SetTarget(BaseObject tgt, Camera cam, CurrentLockStateInfo stateInfo)
+        public void SetTarget(BaseObject tgt, Camera cam, PlayerController lockController)
         {
             this.target = tgt;
             this.worldCam = cam;
-            this.lockStateInfo = stateInfo;
+            this.controller = lockController;
             prevDistanceTenth = int.MinValue;
             prevHp = int.MinValue;
         }
@@ -105,14 +109,22 @@ namespace AdvancedGears
 
         private void UpdateLockImages()
         {
-            if (lockStateInfo == null)
+            if (controller == null)
                 return;
 
-            if (leftLockImage != null)
-                leftLockImage.enabled = lockStateInfo.IsLeftLocked;
+            ApplyLockLevel(leftLockImage, controller.GetLockLevel(WeaponSlot.Left));
+            ApplyLockLevel(rightLockImage, controller.GetLockLevel(WeaponSlot.Right));
+        }
 
-            if (rightLockImage != null)
-                rightLockImage.enabled = lockStateInfo.IsRightLocked;
+        /// <summary>一次ロックは color、二次ロックは secondaryLockColor で表示する。ロックしていなければ消す</summary>
+        private void ApplyLockLevel(Image image, LockLevel level)
+        {
+            if (image == null)
+                return;
+
+            image.enabled = level != LockLevel.None;
+            if (level != LockLevel.None)
+                image.color = level == LockLevel.Secondary ? secondaryLockColor : color;
         }
 
         private void UpdateRectPosition()

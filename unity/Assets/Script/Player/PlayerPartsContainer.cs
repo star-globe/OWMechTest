@@ -84,28 +84,32 @@ namespace AdvancedGears
                 boosterContainer.Boost(vectorBit);
         }
 
-        public void RightFire(Vector3 tgt)
+        GunAttach GetGunAttach(WeaponSlot slot)
         {
-            if (rightGunAttach != null)
-                rightGunAttach.Fire(tgt);
-
-            if (mechRig != null)
-                mechRig.NotifyFire(isRight: true);
+            return slot switch
+            {
+                WeaponSlot.Right => rightGunAttach,
+                WeaponSlot.Left  => leftGunAttach,
+                WeaponSlot.Sub   => subGunAttach,
+                _                => null,
+            };
         }
 
-        public void LeftFire(Vector3 tgt)
+        /// <summary>その武器で二次ロックになるまでの時間（秒）。武器が無ければ二次ロックにならない</summary>
+        public float GetSecondaryLockTime(WeaponSlot slot)
         {
-            if (leftGunAttach != null)
-                leftGunAttach.Fire(tgt);
-
-            if (mechRig != null)
-                mechRig.NotifyFire(isRight: false);
+            var attach = GetGunAttach(slot);
+            return attach != null ? attach.SecondaryLockTime : SecondaryLockTime.Never;
         }
 
-        public void SubFire(Vector3 tgt)
+        public void Fire(WeaponSlot slot, in AimRequest request)
         {
-            if (subGunAttach != null)
-                subGunAttach.Fire(tgt);
+            var attach = GetGunAttach(slot);
+            if (attach != null)
+                attach.Fire(request);
+
+            if (mechRig != null && slot != WeaponSlot.Sub)
+                mechRig.NotifyFire(isRight: slot == WeaponSlot.Right);
         }
 
         public void Quick(int vectorBit)

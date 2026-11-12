@@ -83,6 +83,7 @@ namespace AdvancedGears
 
         private void Update()
         {
+            LockOn.AddTime(Time.deltaTime);
             UpdateInput();
             UpdateParam();
             UpdateEffect();
@@ -130,21 +131,53 @@ namespace AdvancedGears
         {
             return playerCharacter.CharacterParam.CanHyperBoost;
         }
-        protected virtual bool CheckRightFire(out Vector3 target)
+        protected virtual bool CheckRightFire()
         {
-            target = Vector3.zero;
             return false;
         }
-        protected virtual bool CheckLeftFire(out Vector3 target)
+        protected virtual bool CheckLeftFire()
         {
-            target = Vector3.zero;
             return false;
         }
-        protected virtual bool CheckSubFire(out Vector3 target)
+        protected virtual bool CheckSubFire()
         {
-            target = Vector3.zero;
             return false;
         }
+
+        /// <summary>ロックしていないときに狙う点（既定は正面）</summary>
+        protected virtual Vector3 GetFallbackAimPoint()
+        {
+            var trans = this.transform;
+            return trans.position + trans.forward * DefaultFallbackLength + Vector3.up * this.PlayerHeight;
+        }
+
+        const float DefaultFallbackLength = 100f;
+
+        #endregion
+
+        #region ロック
+
+        /// <summary>ロックの状態。プレイヤーはロック UI（LockSiteDisplay）が、NPC は索敵が目標を設定する</summary>
+        public LockOnState LockOn { get; } = new LockOnState();
+
+        /// <summary>ロックの目標を設定する（null でロックを外す）。今と違う目標なら二次ロックまでの時間を数え直す</summary>
+        public void SetLockTarget(BaseObject target)
+        {
+            LockOn.SetTarget(target);
+        }
+
+        /// <summary>その武器での今のロックの段階</summary>
+        public LockLevel GetLockLevel(WeaponSlot slot)
+        {
+            // 目標が破棄されていたらロックを外す
+            if (LockOn.HasTarget && LockOn.Target == null)
+                LockOn.Clear();
+
+            return LockOn.GetLevel(partsContainer.GetSecondaryLockTime(slot));
+        }
+
+        /// <summary>自機の速度（弾が引き継ぐ）</summary>
+        public Vector3 Velocity => rigid != null ? rigid.linearVelocity : Vector3.zero;
 
         #endregion
 
@@ -194,20 +227,19 @@ namespace AdvancedGears
                 hypBstInfo.SetBoost(PlayerMoveCalculator.CalcHyperBoostInput(inputX, inputZ), p.HyperBoostSpeed);
                 playerCharacter.IsHyperBoost = true;
             }
-            Vector3 tgt;
-            if (CheckRightFire(out tgt))
+            if (CheckRightFire())
             {
-                Fire(tgt, isRight: true);
+                Fire(WeaponSlot.Right);
             }
 
-            if (CheckLeftFire(out tgt))
+            if (CheckLeftFire())
             {
-                Fire(tgt, isRight: false);
+                Fire(WeaponSlot.Left);
             }
 
-            if (CheckSubFire(out tgt))
+            if (CheckSubFire())
             {
-                SubFire(tgt);
+                Fire(WeaponSlot.Sub);
             }
         }
 
@@ -241,21 +273,10 @@ namespace AdvancedGears
             playerCharacter.UpdateParam(time, isFloating);
         }
 
-        protected virtual void Fire(Vector3 tgt, bool isRight)
+        protected virtual void Fire(WeaponSlot slot)
         {
-            if (isRight)
-            {
-                partsContainer.RightFire(tgt);
-            }
-            else
-            {
-                partsContainer.LeftFire(tgt);
-            }
-        }
-
-        protected virtual void SubFire(Vector3 tgt)
-        {
-            partsContainer.SubFire(tgt);
+            var request = new AimRequest(LockOn.Target, GetLockLevel(slot), GetFallbackAimPoint(), Velocity);
+            partsContainer.Fire(slot, request);
         }
 
         private void UpdateMove()

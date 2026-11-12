@@ -35,17 +35,25 @@ namespace AdvancedGears
         public float LifeTime => Settings == null ? 0.0f : Settings.LifeTime;
         public int Attack => Settings == null ? 0 : Settings.Attack;
 
-        public void Fire(Vector3 vec, Vector3 pos, long instanceId)
+        /// <summary>
+        /// 発射する。初速は「direction × 弾速 + inheritVelocity（撃った側の速度）」
+        /// </summary>
+        public void Fire(Vector3 direction, Vector3 pos, Vector3 inheritVelocity, long instanceId)
         {
-            vec = vec.normalized * this.VecSpeed;
+            var vec = direction.normalized * this.VecSpeed + inheritVelocity;
+
+            this.transform.position = pos;
+            if (vec.sqrMagnitude > 0f)
+                this.transform.forward = vec.normalized;
 
             trail.Clear();
             trail.AddPosition(pos);
-            rigid.AddForce(vec, ForceMode.VelocityChange);
             this.gameObject.SetActive(true);
 
-            this.transform.position = pos;
-            this.transform.forward = vec.normalized;
+            // プールから再利用したときに前の速度が残らないよう、加算ではなく代入する
+            rigid.position = pos;
+            rigid.linearVelocity = vec;
+            rigid.angularVelocity = Vector3.zero;
 
             this.InstanceId = instanceId;
             this.DeadTime = TimeUtils.Now + TimeSpan.FromSeconds(this.LifeTime);
