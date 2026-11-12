@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b861ec02c3c3ec4c9070eabdb4e044a, type: 3}
   m_Name: GlobalParamSettings
   m_EditorClassIdentifier: 
-  worldSizeRate: 5
+  worldSizeRate: 1

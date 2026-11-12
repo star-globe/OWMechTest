@@ -7,8 +7,9 @@ namespace AdvancedGears
     [CreateAssetMenu(menuName = "TestProject/Global/GlobalParamSettings", order = 0)]
     public class GlobalParamSettings : ScriptableObject
     {
+        // Unity の 1 単位がゲーム内の何 m にあたるか。機体のモデルを 1 単位 = 1 m（全高 8 m）で作っているので 1
         [SerializeField]
-        float worldSizeRate = 5.0f;
+        float worldSizeRate = 1.0f;
         public float WorldSizeRate
         {
             get
@@ -19,7 +20,7 @@ namespace AdvancedGears
 
         private void OnValidate()
         {
-            Assert.IsTrue(worldSizeRate > 1.0f);
+            Assert.IsTrue(worldSizeRate > 0.0f);
         }
     }
 

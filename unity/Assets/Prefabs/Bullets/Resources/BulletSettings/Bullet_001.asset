@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletId: 1
   bulletCategoryType: 1
-  speed: 100
+  speed: 300
   lifeTime: 5
   attack: 1
   muzzleEffectId: 0
-  bulletComp: {fileID: 3872802672286413590, guid: 7bec132d9f693194abf3bf4b4af907a4,
-    type: 3}
+  bulletComp: {fileID: 3872802672286413590, guid: 7bec132d9f693194abf3bf4b4af907a4, type: 3}
