@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17568bf7990e0ab44b88cc11205f4906, type: 3}
+  m_Name: MovePattern_005_StopAndGoSquare
+  m_EditorClassIdentifier: AdvancedGears.Runtime::AdvancedGears.UnitMovePatternSettings
+  patternId: 5
+  patternType: 2
+  centerOffsetX: 0
+  centerOffsetY: 0
+  centerOffsetZ: 0
+  radius: 10
+  circleSpeed: 5
+  circleDirection: 0
+  startAngle: 0
+  circlePlane: 0
+  planeYaw: 0
+  maxSpeed: 40
+  acceleration: 20
+  deceleration: 20
+  moveTime: 5
+  stopTime: 1
+  turnAngle: 90
