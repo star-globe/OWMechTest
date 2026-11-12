@@ -11,6 +11,11 @@ namespace AdvancedGears
         [SerializeField]
         int boostPower;
         public int BoostPower => boostPower;
+
+        /// <summary>エフェクトとノズルの発光の基本色（HDR）。各状態の色はここから計算する（BoosterColorPalette）</summary>
+        [SerializeField, ColorUsage(false, true)]
+        Color baseColor = BoosterColorPalette.DefaultBaseColor;
+        public Color BaseColor => baseColor;
     }
 
     public class BoosterMasterContainer : IDBasedMasterContainer<BoosterSettings>
