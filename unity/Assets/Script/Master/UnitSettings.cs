@@ -58,6 +58,12 @@ namespace AdvancedGears
         UnitParameterSettings parameterSettings;
         public UnitParameterSettings ParameterSettings => parameterSettings;
 
+        [Header("移動パターン")]
+        /// <summary>UnitMovePatternSettings の ID（0 なら移動しない）</summary>
+        [SerializeField]
+        int movePatternId;
+        public int MovePatternId => movePatternId;
+
         // IDBasedMasterSettings
         public int ID => unitId;
     }

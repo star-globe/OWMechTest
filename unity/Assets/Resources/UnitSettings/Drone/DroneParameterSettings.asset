@@ -11,10 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b474df5640534945bc163c106fe81c3, type: 3}
   m_Name: DroneParameterSettings
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   maxAp: 300
   bulletId: 1
-  fireInterval: 2
+  fireInterval: 1.5
+  secondaryLockTime: 1.5
+  searchRadius: 500
   horizontalMoveSpeed: 8
   verticalMoveSpeed: 4
   rotationSpeed: 120

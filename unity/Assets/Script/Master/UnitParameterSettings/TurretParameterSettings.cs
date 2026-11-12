@@ -29,11 +29,5 @@ namespace AdvancedGears
         [SerializeField]
         float elevationMax = 45.0f;
         public float ElevationMax => elevationMax;
-
-        [Header("索敵")]
-        /// <summary>索敵半径（m）</summary>
-        [SerializeField]
-        float searchRadius = 50.0f;
-        public float SearchRadius => searchRadius;
     }
 }

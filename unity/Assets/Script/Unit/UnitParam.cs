@@ -22,7 +22,13 @@ namespace AdvancedGears
         public float ElevationMin { get; private set; }
         public float ElevationMax { get; private set; }
 
-        // ── 索敵（固定砲台） ─────────────────────────────
+        /// <summary>二次ロックになるまでの時間（秒）</summary>
+        public float SecondaryLockTime { get; private set; }
+
+        /// <summary>撃つ設定か（FireInterval が 0 以下なら撃たない）</summary>
+        public bool CanShoot => FireInterval > 0f;
+
+        // ── 索敵（共通） ─────────────────────────────────
         public float SearchRadius { get; private set; }
 
         // ── 移動（ドローン） ────────────────────────────
@@ -42,6 +48,8 @@ namespace AdvancedGears
             BulletId     = param.BulletId;
             FireInterval = param.FireInterval;
             fireTimer    = 0f;
+            SecondaryLockTime = param.SecondaryLockTime;
+            SearchRadius      = param.SearchRadius;
 
             if (param is TurretParameterSettings turret)
             {
@@ -49,7 +57,6 @@ namespace AdvancedGears
                 TurretRotationSpeedY = turret.TurretRotationSpeedY;
                 ElevationMin         = turret.ElevationMin;
                 ElevationMax         = turret.ElevationMax;
-                SearchRadius         = turret.SearchRadius;
             }
             else if (param is DroneParameterSettings drone)
             {

@@ -19,6 +19,7 @@ namespace AdvancedGears
         public void Damage(int damage)
         {
             hitPoint -= damage;
+            OnDamaged(damage);
 
             if (hitPoint <= 0)
             {
@@ -31,5 +32,8 @@ namespace AdvancedGears
                 EffectManager.Instance?.PlayEffect(EffectID.ExplosionSmall, transform.position);
             }
         }
+
+        /// <summary>ダメージを受けたときに呼ぶ（派生クラスで本体のパラメーターに反映する）</summary>
+        protected virtual void OnDamaged(int damage) { }
     }
 }

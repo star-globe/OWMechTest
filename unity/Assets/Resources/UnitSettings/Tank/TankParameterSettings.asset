@@ -11,10 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c0a1242217b01f4293d65ff6e945fb4, type: 3}
   m_Name: TankParameterSettings
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   maxAp: 2000
   bulletId: 1
-  fireInterval: 4
+  fireInterval: 2
+  secondaryLockTime: 1.5
+  searchRadius: 500
   turretRotationSpeedX: 20
   turretRotationSpeedY: 30
   elevationMin: -5
