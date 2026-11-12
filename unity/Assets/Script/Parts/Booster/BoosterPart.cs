@@ -12,16 +12,47 @@ namespace AdvancedGears
         Back = 3,
     }
 
+    /// <summary>噴射を構成する子パーティクルの役割。役割ごとに基本色の使い方が変わる</summary>
+    public enum BoosterParticleRole : byte
+    {
+        /// <summary>芯。芯の色から外炎の色へ変わる</summary>
+        Core = 0,
+
+        /// <summary>外炎。外炎の色から残光の色へ変わる</summary>
+        Outer = 1,
+
+        /// <summary>火花。芯の色で光り、外炎の色に冷えて消える</summary>
+        Spark = 2,
+    }
+
     public class BoosterPart : PartComponent
     {
         [Serializable]
-        class BoosterParticleSystem
+        class ColoredParticle
         {
             [SerializeField]
             ParticleSystem particle;
 
             [SerializeField]
+            BoosterParticleRole role;
+
+            public ParticleSystem Particle => particle;
+            public BoosterParticleRole Role => role;
+        }
+
+        [Serializable]
+        class BoosterParticleSystem
+        {
+            /// <summary>再生と停止を行う親。子のパーティクルもまとめて再生・停止する</summary>
+            [SerializeField]
+            ParticleSystem particle;
+
+            [SerializeField]
             bool isPulse = false;
+
+            /// <summary>基本色で色を付ける子のパーティクル。ヒートヘイズなど色を持たないものは含めない</summary>
+            [SerializeField]
+            ColoredParticle[] coloredParticles = Array.Empty<ColoredParticle>();
 
             bool isOn = false;
             int boostBit = 0;
@@ -52,57 +83,64 @@ namespace AdvancedGears
             }
 
             /// <summary>
-            /// 炎の色を子のパーティクルまで反映する。頂点カラーは 0〜1 に丸められるため、
+            /// 炎の色を役割ごとに子のパーティクルへ反映する。頂点カラーは 0〜1 に丸められるため、
             /// 色味は colorOverLifetime、HDR の強さはマテリアルの _BaseColor で渡す
             /// </summary>
             public void SetColors(in BoosterFlameColors colors, MaterialPropertyBlock block)
             {
-                if (particle == null)
-                    return;
-
-                var gradient = CreateGradient(colors);
-                var intensity = colors.Intensity;
-                var baseColor = new Color(intensity, intensity, intensity, 1f);
-
-                foreach (var ps in particle.GetComponentsInChildren<ParticleSystem>(true))
+                foreach (var colored in coloredParticles)
                 {
+                    if (colored == null || colored.Particle == null)
+                        continue;
+
+                    var (from, to, holdTime) = GetRoleColors(colors, colored.Role);
+                    var intensity = BoosterColorPalette.GetIntensity(from);
+                    var ps = colored.Particle;
+
                     var main = ps.main;
                     main.startColor = Color.white;
 
                     var colorOverLifetime = ps.colorOverLifetime;
                     colorOverLifetime.enabled = true;
-                    colorOverLifetime.color = gradient;
+                    colorOverLifetime.color = CreateGradient(from, to, intensity, holdTime);
 
                     if (ps.TryGetComponent<ParticleSystemRenderer>(out var renderer))
                     {
                         renderer.GetPropertyBlock(block);
-                        block.SetColor(BaseColorId, baseColor);
+                        block.SetColor(BaseColorId, new Color(intensity, intensity, intensity, 1f));
                         renderer.SetPropertyBlock(block);
                     }
                 }
             }
 
-            /// <summary>芯 → 外炎 → 残光の順に変わり、最後に消える</summary>
-            static Gradient CreateGradient(in BoosterFlameColors colors)
+            /// <summary>役割ごとの始まりと終わりの色、不透明のまま保つ時間（寿命に対する割合）</summary>
+            static (Color from, Color to, float holdTime) GetRoleColors(in BoosterFlameColors colors, BoosterParticleRole role)
             {
-                var intensity = colors.Intensity;
-                var core = BoosterColorPalette.ToTint(colors.Core, intensity);
-                var outer = BoosterColorPalette.ToTint(colors.Outer, intensity);
-                var trail = BoosterColorPalette.ToTint(colors.Trail, intensity);
+                return role switch
+                {
+                    BoosterParticleRole.Core  => (colors.Core, colors.Outer, 0.4f),
+                    BoosterParticleRole.Spark => (colors.Core, colors.Outer, 0.6f),
+                    _                         => (colors.Outer, colors.Trail, 0.3f),
+                };
+            }
+
+            /// <summary>from から to へ変わり、holdTime を過ぎると消えていく</summary>
+            static Gradient CreateGradient(Color from, Color to, float intensity, float holdTime)
+            {
+                var start = BoosterColorPalette.ToTint(from, intensity);
+                var end = BoosterColorPalette.ToTint(to, intensity);
 
                 var gradient = new Gradient();
                 gradient.SetKeys(
                     new[]
                     {
-                        new GradientColorKey(core, 0f),
-                        new GradientColorKey(outer, 0.25f),
-                        new GradientColorKey(trail, 1f),
+                        new GradientColorKey(start, 0f),
+                        new GradientColorKey(end, 1f),
                     },
                     new[]
                     {
-                        new GradientAlphaKey(core.a, 0f),
-                        new GradientAlphaKey(outer.a, 0.25f),
-                        new GradientAlphaKey(trail.a, 0.7f),
+                        new GradientAlphaKey(start.a, 0f),
+                        new GradientAlphaKey(Mathf.Lerp(start.a, end.a, holdTime), holdTime),
                         new GradientAlphaKey(0f, 1f),
                     });
                 return gradient;
