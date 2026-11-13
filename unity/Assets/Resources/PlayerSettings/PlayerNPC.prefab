@@ -817,9 +817,9 @@ MonoBehaviour:
   touchChecker: {fileID: 8871830659860910109}
   controllerSettings: {fileID: 11400000, guid: 73710241aa44cc749ad9db7dcca12955, type: 2}
   partsContainer: {fileID: 2832605969727241905}
-  radius: 100
+  radius: 300
   agent: {fileID: 0}
-  ascendHeight: 5
+  ascendHeight: 15
 --- !u!114 &2832605969727241905
 MonoBehaviour:
   m_ObjectHideFlags: 0
