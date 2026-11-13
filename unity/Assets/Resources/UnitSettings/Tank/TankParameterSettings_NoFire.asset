@@ -21,5 +21,5 @@ MonoBehaviour:
   turretRotationSpeedY: 30
   elevationMin: -5
   elevationMax: 20
-  forwardSpeed: 5
+  forwardSpeed: 15
   turnSpeed: 60

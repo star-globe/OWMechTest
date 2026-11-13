@@ -1369,7 +1369,6 @@ MonoBehaviour:
   controllerSettings: {fileID: 11400000, guid: 73710241aa44cc749ad9db7dcca12955, type: 2}
   partsContainer: {fileID: 2832605969727241905}
   defaultTargetLength: 100
-  defaultTargetAngle: 45
 --- !u!114 &2832605969727241905
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1434,10 +1433,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   center: {fileID: 5940345344510896108}
   target: {fileID: 335652087689478720}
-  targetLength: 10
+  targetLength: 30
   moveTime: 0.1
-  cameraDiffMin: 0.1
-  camDeltaRadius: 1
+  cameraDiffMin: 0.3
+  camDeltaRadius: 3
   powerRate: 2
   forwardDiffMin: 0.005
   controllerSettings: {fileID: 11400000, guid: 73710241aa44cc749ad9db7dcca12955, type: 2}

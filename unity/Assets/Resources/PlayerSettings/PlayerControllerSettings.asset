@@ -12,14 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9551ad48999de3c46a8633ce54c04f3e, type: 3}
   m_Name: PlayerControllerSettings
   m_EditorClassIdentifier: 
-  vecSpeed: 3
+  vecSpeed: 9
   accelerateTime: 0.1
-  jumpSpeed: 5
+  jumpSpeed: 8.5
   horizontalBoostRate: 2
   floatRate: 0.9
   rotSpeed: 100
-  quickSpeed: 5
+  quickSpeed: 15
   quickTime: 0.1
   quickInterval: 0.3
   touchQuickRate: 1.5
-  hyperBoostSpeed: 10
+  hyperBoostSpeed: 30
+  ascendSpeed: 6
+  ascendAccel: 24

@@ -17,6 +17,6 @@ MonoBehaviour:
   fireInterval: 0
   secondaryLockTime: 1.5
   searchRadius: 500
-  horizontalMoveSpeed: 8
-  verticalMoveSpeed: 4
+  horizontalMoveSpeed: 24
+  verticalMoveSpeed: 12
   rotationSpeed: 120
