@@ -49,7 +49,7 @@ namespace AdvancedGears
 
             var muzzlePos = muzzleTrans.position;
             var dir = AimSolver.CalcAimDirection(request, muzzlePos, BulletSpeed, muzzleTrans.forward);
-            BulletManager.Instance.Fire(BulletId, muzzlePos, dir, request.ShooterVelocity);
+            BulletManager.Instance.Fire(BulletId, muzzlePos, dir, request.ShooterVelocity, request.Shooter);
         }
     }
 }

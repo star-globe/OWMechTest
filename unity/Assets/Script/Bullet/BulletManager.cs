@@ -15,8 +15,13 @@ namespace AdvancedGears
                 if (bulletQueue.TryGetValue(bulletId, out var queue) == false)
                     return null;
 
-                if (queue.Count > 0)
-                    queue.Dequeue();
+                // シーンの切り替えなどで破棄された弾は飛ばす
+                while (queue.Count > 0)
+                {
+                    var bullet = queue.Dequeue();
+                    if (bullet != null)
+                        return bullet;
+                }
 
                 return null;
             }
@@ -53,9 +58,10 @@ namespace AdvancedGears
         }
 
         /// <summary>
-        /// position から direction へ撃つ。弾の初速は「direction × 弾速 + inheritVelocity（撃った側の速度）」
+        /// position から direction へ撃つ。弾の初速は「direction × 弾速 + inheritVelocity（撃った側の速度）」。
+        /// shooter（撃った側）には当たらない
         /// </summary>
-        public void Fire(int bulletId, Vector3 position, Vector3 direction, Vector3 inheritVelocity)
+        public void Fire(int bulletId, Vector3 position, Vector3 direction, Vector3 inheritVelocity, BaseObject shooter = null)
         {
             var bullet = bulletQueue.DequeueBullet(bulletId);
             if (bullet == null)
@@ -70,7 +76,7 @@ namespace AdvancedGears
 
             instanceId++;
 
-            bullet.Fire(direction, position, inheritVelocity, instanceId);
+            bullet.Fire(direction, position, inheritVelocity, instanceId, shooter);
 
             currentBullets[instanceId] = bullet;
         }

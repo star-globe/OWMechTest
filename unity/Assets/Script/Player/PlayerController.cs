@@ -300,7 +300,7 @@ namespace AdvancedGears
 
         protected virtual void Fire(WeaponSlot slot)
         {
-            var request = new AimRequest(LockOn.Target, GetLockLevel(slot), GetFallbackAimPoint(), Velocity);
+            var request = new AimRequest(LockOn.Target, GetLockLevel(slot), GetFallbackAimPoint(), Velocity, playerCharacter);
             partsContainer.Fire(slot, request);
         }
 

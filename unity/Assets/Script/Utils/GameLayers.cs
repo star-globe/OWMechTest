@@ -11,9 +11,10 @@ namespace AdvancedGears
         public const string TargetableObject = "TargetableObject";
         public const string HitableObject = "HitableObject";
 
+        /// <summary>弾がダメージを与えるレイヤー（撃った本人には当たらない。Bullet で除外する）</summary>
         private static int? _hitLayerMask;
         public static int HitLayerMask =>
-            _hitLayerMask ??= LayerMask.GetMask(OtherPlayer, NonPlayer, Unit, TargetableObject, HitableObject);
+            _hitLayerMask ??= LayerMask.GetMask(MyPlayer, OtherPlayer, NonPlayer, Unit, TargetableObject, HitableObject);
 
         private static int? _targetableLayerMask;
         public static int TargetableLayerMask =>

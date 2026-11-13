@@ -15,13 +15,16 @@ namespace AdvancedGears
         public readonly Vector3 FallbackPoint;
         /// <summary>撃つ側の速度（弾が引き継ぐ）</summary>
         public readonly Vector3 ShooterVelocity;
+        /// <summary>撃つ側（弾は撃った側に当たらない。null なら除外しない）</summary>
+        public readonly BaseObject Shooter;
 
-        public AimRequest(BaseObject target, LockLevel level, Vector3 fallbackPoint, Vector3 shooterVelocity)
+        public AimRequest(BaseObject target, LockLevel level, Vector3 fallbackPoint, Vector3 shooterVelocity, BaseObject shooter = null)
         {
             Target = target;
             Level = level;
             FallbackPoint = fallbackPoint;
             ShooterVelocity = shooterVelocity;
+            Shooter = shooter;
         }
 
         public bool IsLocked => Level != LockLevel.None && Target != null;

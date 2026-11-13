@@ -65,6 +65,27 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void Recovery_AccumulatesFractionPerFrame()
+        {
+            // 2500 / 秒 を 1/1000 秒ずつ 1000 回: 1 回あたり 2.5。切り捨てると 2000 しか回復しない
+            param.ConsumeEnergy(5000);
+            for (int i = 0; i < 1000; i++)
+                param.Recovery(0.001f);
+
+            Assert.That(param.Energy, Is.InRange(param.MaxEnergy - 5000 + 2499, param.MaxEnergy - 5000 + 2500));
+        }
+
+        [Test]
+        public void ConsumeHyperBoostEnergy_AccumulatesFractionPerFrame()
+        {
+            // 2000 / 秒 を 1/3000 秒ずつ 3000 回: 1 回あたり約 0.67。切り捨てると 1 も減らない
+            for (int i = 0; i < 3000; i++)
+                param.ConsumeHyperBoostEnergy(1f / 3000f);
+
+            Assert.That(param.Energy, Is.InRange(settings.MaxEnergy - 2001, settings.MaxEnergy - 1999));
+        }
+
+        [Test]
         public void ConsumeAscendEnergy_ReducesEnergyByTime()
         {
             param.ConsumeAscendEnergy(0.5f);

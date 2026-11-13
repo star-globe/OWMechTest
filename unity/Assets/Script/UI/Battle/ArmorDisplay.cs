@@ -32,7 +32,8 @@ namespace AdvancedGears
             if (param != null)
             {
                 ap = param.Ap;
-                value = param.Ap / param.MaxAp;
+                // int どうしで割ると 0 か 1 になるため、float で割る
+                value = param.MaxAp > 0 ? (float) param.Ap / param.MaxAp : 0f;
             }
 
             slider.value = value;
