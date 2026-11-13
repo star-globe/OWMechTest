@@ -1189,6 +1189,7 @@ GameObject:
   - component: {fileID: 8627606612195392983}
   - component: {fileID: 5618719913140238921}
   - component: {fileID: 2832605969727241905}
+  - component: {fileID: 1726856069593307166}
   m_Layer: 11
   m_Name: Player
   m_TagString: Untagged
@@ -1387,6 +1388,20 @@ MonoBehaviour:
   subGunAttach: {fileID: 0}
   mechRig: {fileID: 4518786747614641969}
   assembleDataAsset: {fileID: 11400000, guid: 148528af726d2c04887206388178c008, type: 2}
+--- !u!114 &1726856069593307166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8069397516925169022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c044b18db3e460d42b3ab66cae9a2aa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AdvancedGears.Runtime::AdvancedGears.CharacterHitReceiver
+  deadComp: {fileID: 0}
+  character: {fileID: 6779917017821725060}
 --- !u!1 &8234829977464033972
 GameObject:
   m_ObjectHideFlags: 0

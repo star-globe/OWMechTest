@@ -9,7 +9,13 @@ namespace AdvancedGears
         public int Ap { get; private set; }
         public int MaxAp { get; private set; }
 
-        public int Energy { get; private set; }
+        /// <summary>
+        /// エネルギーの残量。毎フレームの回復・消費は 1 未満になることがあるため、内部では小数で持ち、
+        /// 切り捨てた値を返す（int で毎フレーム切り捨てると、フレームレートが高いほど回復・消費が少なくなる）
+        /// </summary>
+        public int Energy => (int) energy;
+        float energy;
+
         public int MaxEnergy => EnergyPerformance.MaxEnergy;
 
         /// <summary>エネルギーの性能（最大エネルギーと回復力）。装備から計算した値を SetEnergyPerformance で設定する</summary>
@@ -55,7 +61,7 @@ namespace AdvancedGears
         public void SetEnergyPerformance(EnergyPerformance performance)
         {
             EnergyPerformance = performance;
-            Energy = performance.MaxEnergy;
+            energy = performance.MaxEnergy;
         }
 
         public void SetDamage(int damage)
@@ -65,14 +71,18 @@ namespace AdvancedGears
 
         public void ConsumeEnergy(int consume)
         {
-            Energy = Mathf.Max(Energy - consume, 0);
+            ConsumeEnergy((float) consume);
+        }
+
+        void ConsumeEnergy(float consume)
+        {
+            energy = Mathf.Max(energy - consume, 0f);
         }
 
         /// <summary>今の回復力で回復する（ブースト ON の間の消費は回復力に含まれている）</summary>
         public void Recovery(float time)
         {
-            var add = (int) (EnergyRecovery * time);
-            Energy = Mathf.Clamp(Energy + add, 0, MaxEnergy);
+            energy = Mathf.Clamp(energy + EnergyRecovery * time, 0f, MaxEnergy);
         }
 
         public void ConsumeJumpEnergy()
@@ -87,12 +97,12 @@ namespace AdvancedGears
 
         public void ConsumeHyperBoostEnergy(float time)
         {
-            ConsumeEnergy((int) (time * HyperBoostEnergy));
+            ConsumeEnergy(time * HyperBoostEnergy);
         }
 
         public void ConsumeAscendEnergy(float time)
         {
-            ConsumeEnergy((int) (time * AscendEnergy));
+            ConsumeEnergy(time * AscendEnergy);
         }
 
         public bool CanJump

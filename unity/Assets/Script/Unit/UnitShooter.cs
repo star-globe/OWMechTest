@@ -67,7 +67,7 @@ namespace AdvancedGears
             if (param.CanShoot == false || param.CanFire == false)
                 return;
 
-            BulletManager.Instance.Fire(param.BulletId, muzzlePos, dir, shooterVelocity);
+            BulletManager.Instance.Fire(param.BulletId, muzzlePos, dir, shooterVelocity, unit);
             param.ResetFireTimer();
         }
 
