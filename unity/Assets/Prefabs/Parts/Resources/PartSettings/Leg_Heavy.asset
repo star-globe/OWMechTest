@@ -15,3 +15,4 @@ MonoBehaviour:
   partId: 104003
   categoryType: 104
   partComponent: {fileID: 4464171288007300657, guid: 20495ce3dc8eaaa479a8e953252a74b2, type: 3}
+  constantEnergyConsumption: 500

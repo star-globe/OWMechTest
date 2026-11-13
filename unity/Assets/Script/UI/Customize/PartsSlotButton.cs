@@ -51,6 +51,7 @@ namespace AdvancedGears
                 case PartsAttachType.Core:         return "胴体";
                 case PartsAttachType.Arm:          return "腕部";
                 case PartsAttachType.Leg:          return "脚部";
+                case PartsAttachType.Generator:    return "ジェネレーター";
                 case PartsAttachType.Booster:      return "ブースター";
                 case PartsAttachType.Weapon_Right: return "右腕武装";
                 case PartsAttachType.Weapon_Left:  return "左腕武装";

@@ -12,6 +12,11 @@ namespace AdvancedGears
         int boostPower;
         public int BoostPower => boostPower;
 
+        /// <summary>ブーストが ON の間、常時消費に加えて消費するエネルギー（1 秒あたり。地上でも空中でも）</summary>
+        [SerializeField, Min(0)]
+        int boostOnEnergyConsumption = 1500;
+        public int BoostOnEnergyConsumption => boostOnEnergyConsumption;
+
         /// <summary>エフェクトとノズルの発光の基本色（HDR）。各状態の色はここから計算する（BoosterColorPalette）</summary>
         [SerializeField, ColorUsage(false, true)]
         Color baseColor = BoosterColorPalette.DefaultBaseColor;

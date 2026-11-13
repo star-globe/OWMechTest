@@ -105,6 +105,14 @@ namespace AdvancedGears
             return HasLockTarget;
         }
 
+        // ─── ブースト ────────────────────────────────────────
+        // 暫定：残量の割合で切り替える（NpcBoostDecider）
+        protected override bool CheckBoost()
+        {
+            var param = CharacterParam;
+            return param != null && NpcBoostDecider.ShouldToggle(IsBoost, param.Energy, param.MaxEnergy);
+        }
+
         // ─── 上昇 ────────────────────────────────────────────
         // 最低限の判定：経路の目的地が自分より ascendHeight 以上高いときだけ上昇する（空中・ブースト中かどうかは基底で判定）
         protected override bool CheckAscend()

@@ -28,7 +28,9 @@ namespace AdvancedGears
 
         PlayerMoveParams MoveParams => PlayerMoveParams.From(controllerSettings, PlayerControllerConst.Instance);
 
-        bool IsBoost
+        protected CharacterParam CharacterParam => playerCharacter.CharacterParam;
+
+        protected bool IsBoost
         {
             get
             {
@@ -73,7 +75,26 @@ namespace AdvancedGears
 
         private void Start()
         {
+            ApplyEnergyPerformance();
             SyncParam();
+        }
+
+        /// <summary>装備からエネルギーの性能を計算して機体に設定する。ジェネレーターを読み込めなければ機体の設定の値のまま</summary>
+        private void ApplyEnergyPerformance()
+        {
+            if (!partsContainer.TryGetEnergyPerformance(out var performance))
+            {
+                Debug.LogWarningFormat(this, "[PlayerController] {0}: ジェネレーターを読み込めないため、機体の設定のエネルギー性能を使います", name);
+                return;
+            }
+
+            if (!performance.IsValid)
+            {
+                Debug.LogWarningFormat(this, "[PlayerController] {0}: 回復力が 0 以下の組み合わせです（OFF: {1} / ON: {2}）",
+                                       name, performance.RecoveryBoostOff, performance.RecoveryBoostOn);
+            }
+
+            playerCharacter.CharacterParam.SetEnergyPerformance(performance);
         }
 
         private void SyncParam()
@@ -119,9 +140,13 @@ namespace AdvancedGears
         {
             return false;
         }
+        /// <summary>
+        /// ブーストの ON / OFF を切り替えるか。切り替えはエネルギーの残量に左右されない。
+        /// CheckAscend と同じく基底では false を返す（派生クラスが入力や AI で判定する）
+        /// </summary>
         protected virtual bool CheckBoost()
         {
-            return playerCharacter.CharacterParam.CanBoost;
+            return false;
         }
         protected virtual bool CheckQuick()
         {

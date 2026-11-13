@@ -22,7 +22,8 @@ namespace AdvancedGears
 
         protected override bool CheckBoost()
         {
-            return base.CheckBoost() && InputUtils.CheckBoost();
+            // 残量に関係なく切り替えられる
+            return InputUtils.CheckBoost();
         }
 
         protected override bool CheckJump()

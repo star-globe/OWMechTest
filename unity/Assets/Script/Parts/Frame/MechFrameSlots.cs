@@ -27,6 +27,14 @@ namespace AdvancedGears
             }
         }
 
+        /// <summary>
+        /// 外せないスロット（機体本体とジェネレーター）。ジェネレーターはリグに取り付けないので All には含めない
+        /// </summary>
+        public static bool IsRequiredSlot(PartsAttachType type)
+        {
+            return IsFrameSlot(type) || type == PartsAttachType.Generator;
+        }
+
         /// <summary>パーツ ID が未設定（負）なら初期値の ID を返す</summary>
         public static int ResolvePartId(int partId, int defaultPartId)
         {

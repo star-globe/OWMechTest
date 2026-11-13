@@ -14,14 +14,17 @@ namespace AdvancedGears
         public int MaxAP => maxAp;
 
         [SerializeField]
+        [Tooltip("ジェネレーターを読み込めないときの最大エネルギー（通常はジェネレーターの総容量を使う）")]
         int maxEnergy = 10000;
         public int MaxEnergy => maxEnergy;
 
         [SerializeField]
+        [Tooltip("ジェネレーターを読み込めないときの回復力（1 秒あたり。通常は装備から計算する）")]
         int energyRecovery = 2500;
         public int EnergyRecovery => energyRecovery;
 
         [SerializeField]
+        [Tooltip("ジェネレーターを読み込めないときに、ブースト ON の間に下がる回復力（1 秒あたり。通常はブースターの ON 消費を使う）")]
         int boostEnergy = 1500;
         public int BoostEnergy => boostEnergy;
 
@@ -38,7 +41,7 @@ namespace AdvancedGears
         public int HyperBoostEnergy => hyperBoostEnergy;
 
         [SerializeField]
-        [Tooltip("グライド中の上昇で消費するエネルギー（1 秒あたり。グライドの BoostEnergy に加えて消費する）")]
+        [Tooltip("グライド中の上昇で消費するエネルギー（1 秒あたり。ブースト ON による回復力の低下に加えて消費する）")]
         int ascendEnergy = 5000;
         public int AscendEnergy => ascendEnergy;
 

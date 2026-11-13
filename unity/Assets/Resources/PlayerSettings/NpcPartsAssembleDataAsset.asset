@@ -28,3 +28,5 @@ MonoBehaviour:
       partId: 103001
     - attachType: 104
       partId: 104001
+    - attachType: 401
+      partId: 401001

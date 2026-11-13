@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   partId: 301001
   categoryType: 301
-  partComponent: {fileID: 8438394016752521268, guid: e86c425f1ae653b439be0104cb9b3a2f,
-    type: 3}
+  partComponent: {fileID: 8438394016752521268, guid: e86c425f1ae653b439be0104cb9b3a2f, type: 3}
+  constantEnergyConsumption: 0
   gunCategoryType: 1
   bulletId: 1
   reloadInter: 10
+  secondaryLockTime: 1
