@@ -39,6 +39,7 @@ namespace AdvancedGears
             PartsAttachType.Core,
             PartsAttachType.Arm,
             PartsAttachType.Leg,
+            PartsAttachType.Generator,
             PartsAttachType.Booster,
             PartsAttachType.Weapon_Right,
             PartsAttachType.Weapon_Left,
@@ -75,6 +76,25 @@ namespace AdvancedGears
                 var btn = slotPool.Borrow();
                 btn.SetData(slot, editingDic[slot], OnSelectSlot);
             }
+
+            UpdateSaveButton();
+        }
+
+        /// <summary>組めない組み合わせ（ジェネレーターが無い、回復力が 0 以下）なら保存できなくする。理由の表示は #100</summary>
+        private void UpdateSaveButton()
+        {
+            if (saveButton != null)
+                saveButton.interactable = CanSave();
+        }
+
+        private bool CanSave()
+        {
+            return EnergyPerformanceResolver.TryResolve(GetEditingPartId, out var performance) && performance.IsValid;
+        }
+
+        private int GetEditingPartId(PartsAttachType slot)
+        {
+            return editingDic.TryGetValue(slot, out var partId) ? partId : -1;
         }
 
         private void OnSelectSlot(PartsAttachType slot)
@@ -107,6 +127,12 @@ namespace AdvancedGears
 
         private void OnClickSave()
         {
+            if (!CanSave())
+            {
+                Debug.LogWarning("[CustomizeManager] 組めない組み合わせのため保存しません。");
+                return;
+            }
+
             var data = PartsAssembleData.CreateFromDictionary(editingDic);
             assembleDataAsset.Save(data);
             Debug.Log("[CustomizeManager] 機体データを保存しました。");
@@ -125,6 +151,7 @@ namespace AdvancedGears
                 case PartsAttachType.Core:         return PartCategoryType.Core;
                 case PartsAttachType.Arm:          return PartCategoryType.Arm;
                 case PartsAttachType.Leg:          return PartCategoryType.Leg;
+                case PartsAttachType.Generator:    return PartCategoryType.Generator;
                 case PartsAttachType.Booster:      return PartCategoryType.Booster;
                 case PartsAttachType.Weapon_Right:
                 case PartsAttachType.Weapon_Left:

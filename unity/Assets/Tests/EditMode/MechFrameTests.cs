@@ -71,6 +71,19 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void IsRequiredSlot_FrameAndGenerator()
+        {
+            foreach (var slot in MechFrameSlots.All)
+                Assert.IsTrue(MechFrameSlots.IsRequiredSlot(slot), slot.ToString());
+
+            Assert.IsTrue(MechFrameSlots.IsRequiredSlot(PartsAttachType.Generator));
+            // ジェネレーターはリグに取り付けないので、本体のスロットには含めない
+            Assert.IsFalse(MechFrameSlots.IsFrameSlot(PartsAttachType.Generator));
+            Assert.IsFalse(MechFrameSlots.IsRequiredSlot(PartsAttachType.Booster));
+            Assert.IsFalse(MechFrameSlots.IsRequiredSlot(PartsAttachType.Weapon_Sub));
+        }
+
+        [Test]
         public void ResolvePartId_UsesDefaultOnlyWhenUnset()
         {
             Assert.AreEqual(101001, MechFrameSlots.ResolvePartId(101001, 999));

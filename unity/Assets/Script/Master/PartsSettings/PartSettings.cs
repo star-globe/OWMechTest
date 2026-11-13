@@ -17,6 +17,8 @@ namespace AdvancedGears
         Booster = 201,
 
         Gun = 301,
+
+        Generator = 401,
     }
 
     public class PartSettings : ScriptableObject, IDBasedMasterSettings
@@ -31,6 +33,11 @@ namespace AdvancedGears
 
         [SerializeField]
         PartComponent partComponent;
+
+        /// <summary>装備している間、常に消費するエネルギー（1 秒あたり）。回復力を下げる（EnergyPerformance）</summary>
+        [SerializeField, Min(0)]
+        int constantEnergyConsumption = 0;
+        public int ConstantEnergyConsumption => constantEnergyConsumption;
 
         public int ID => PartID;
 
@@ -76,6 +83,7 @@ namespace AdvancedGears
 
             LoadInheritDic(GunMaster.Instance.GetDictionary());
             LoadInheritDic(BoosterMaster.Instance.GetDictionary());
+            LoadInheritDic(GeneratorMaster.Instance.GetDictionary());
         }
 
         private void LoadInheritDic<T>(Dictionary<int, T> dic) where T : PartSettings

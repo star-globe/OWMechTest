@@ -13,7 +13,8 @@ namespace AdvancedGears
             GunMaster.Instance.Load();
             BulletMaster.Instance.Load();
             BoosterMaster.Instance.Load();
-            // PartMaster は GunMaster / BoosterMaster の内容を取り込むため、それらの後に読み込む
+            GeneratorMaster.Instance.Load();
+            // PartMaster は GunMaster / BoosterMaster / GeneratorMaster の内容を取り込むため、それらの後に読み込む
             PartMaster.Instance.Load();
             EffectMaster.Instance.Load();
 

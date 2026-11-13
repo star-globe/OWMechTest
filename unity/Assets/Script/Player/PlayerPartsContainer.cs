@@ -29,15 +29,22 @@ namespace AdvancedGears
         private void Awake()
         {
             Assert.IsNotNull(assembleDataAsset);
+
+            // プレイヤー機体はカスタマイズ画面で保存した組み合わせを反映する（保存データが無ければアセットの初期値）。
+            // PlayerController.Start がエネルギーの性能を計算するので、Start より前（Awake）に読み込む
+            if (assembleDataAsset is PlayerPartsAssembleDataAsset playerAsset)
+                playerAsset.Load();
         }
 
         private void Start()
         {
-            // プレイヤー機体はカスタマイズ画面で保存した組み合わせを反映する（保存データが無ければアセットの初期値）
-            if (assembleDataAsset is PlayerPartsAssembleDataAsset playerAsset)
-                playerAsset.Load();
-
             Load();
+        }
+
+        /// <summary>装備からエネルギーの性能を計算する。ジェネレーターを読み込めなければ false</summary>
+        public bool TryGetEnergyPerformance(out EnergyPerformance performance)
+        {
+            return EnergyPerformanceResolver.TryResolve(assembleDataAsset.GetEquippedPartId, out performance);
         }
 
         private void Load()

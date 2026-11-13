@@ -10,12 +10,16 @@ namespace AdvancedGears
         public int MaxAp { get; private set; }
 
         public int Energy { get; private set; }
-        public int MaxEnergy { get; private set; }
-        public int EnergyRecovery { get; private set; }
+        public int MaxEnergy => EnergyPerformance.MaxEnergy;
+
+        /// <summary>エネルギーの性能（最大エネルギーと回復力）。装備から計算した値を SetEnergyPerformance で設定する</summary>
+        public EnergyPerformance EnergyPerformance { get; private set; }
+
+        /// <summary>今の回復力（1 秒あたり）。ブースト ON の間は下がる</summary>
+        public int EnergyRecovery => EnergyPerformance.GetRecovery(IsBoost);
 
         public float Speed { get; private set; } = 0;
 
-        public int BoostEnergy { get; private set; }
         public int JumpEnergy { get; private set; }
         public int QuickBoostEnergy { get; private set; }
         public int HyperBoostEnergy { get; private set; }
@@ -35,12 +39,8 @@ namespace AdvancedGears
             Ap = param.MaxAP;
             MaxAp = param.MaxAP;
 
-            Energy = param.MaxEnergy;
-            MaxEnergy = param.MaxEnergy;
-            EnergyRecovery = param.EnergyRecovery;
-
-
-            BoostEnergy = param.BoostEnergy;
+            // 装備から性能を計算するまで（またはジェネレーターを読み込めないとき）は、機体の設定の値を使う
+            SetEnergyPerformance(EnergyPerformance.FromFixedValues(param.MaxEnergy, param.EnergyRecovery, param.BoostEnergy));
 
             JumpEnergy = param.JumpEnergy;
             QuickBoostEnergy = param.QuickBoostEnergy;
@@ -49,6 +49,13 @@ namespace AdvancedGears
 
             LockCircleSize = param.LockCircleSize;
             LockLength = param.LockLength;
+        }
+
+        /// <summary>エネルギーの性能を設定し、エネルギーを満タンにする</summary>
+        public void SetEnergyPerformance(EnergyPerformance performance)
+        {
+            EnergyPerformance = performance;
+            Energy = performance.MaxEnergy;
         }
 
         public void SetDamage(int damage)
@@ -61,15 +68,11 @@ namespace AdvancedGears
             Energy = Mathf.Max(Energy - consume, 0);
         }
 
+        /// <summary>今の回復力で回復する（ブースト ON の間の消費は回復力に含まれている）</summary>
         public void Recovery(float time)
         {
             var add = (int) (EnergyRecovery * time);
-            Energy = Mathf.Min(MaxEnergy, Energy + add);
-        }
-
-        public void ConsumeBoostEnergy(float time)
-        {
-            ConsumeEnergy((int)(time * BoostEnergy));
+            Energy = Mathf.Clamp(Energy + add, 0, MaxEnergy);
         }
 
         public void ConsumeJumpEnergy()
@@ -90,11 +93,6 @@ namespace AdvancedGears
         public void ConsumeAscendEnergy(float time)
         {
             ConsumeEnergy((int) (time * AscendEnergy));
-        }
-
-        public bool CanBoost
-        {
-            get { return Energy > BoostEnergy; }
         }
 
         public bool CanJump

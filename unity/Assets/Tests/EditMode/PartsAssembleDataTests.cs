@@ -199,6 +199,17 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void GetEquippedPartId_FillsGeneratorWithDefault()
+        {
+            var asset = CreateAsset<PlayerPartsAssembleDataAsset>((PartsAttachType.Generator, 401001));
+            // ジェネレーターを追加する前の保存データ（#97）
+            asset.Save(PartsAssembleData.CreateFromDictionary(Dic((PartsAttachType.Booster, 201001))));
+
+            Assert.AreEqual(-1, asset.GetPartId(PartsAttachType.Generator));
+            Assert.AreEqual(401001, asset.GetEquippedPartId(PartsAttachType.Generator));
+        }
+
+        [Test]
         public void GetEquippedPartId_PrefersSavedFramePart()
         {
             var asset = CreateAsset<PlayerPartsAssembleDataAsset>((PartsAttachType.Head, 101001));

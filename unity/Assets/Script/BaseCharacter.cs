@@ -95,12 +95,8 @@ namespace AdvancedGears
 
         public void UpdateParam(float time, bool isFloat)
         {
+            // ブースト ON の間の消費は回復力に含まれている（CharacterParam.EnergyRecovery）
             CharacterParam.Recovery(time);
-
-            if (IsBoost && isFloat)
-            {
-                CharacterParam.ConsumeBoostEnergy(time);
-            }
 
             if (IsAscend)
             {

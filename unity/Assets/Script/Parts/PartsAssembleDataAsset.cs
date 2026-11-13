@@ -43,13 +43,13 @@ namespace AdvancedGears
         }
 
         /// <summary>
-        /// 装備するパーツIDを返す。機体本体（頭部・胴体・腕・脚）は外せないので、未設定なら初期値を使う
-        /// （本体のスロットが無い古い保存データ向け）。それ以外のスロットは GetPartId と同じ。
+        /// 装備するパーツIDを返す。機体本体（頭部・胴体・腕・脚）とジェネレーターは外せないので、未設定なら初期値を使う
+        /// （そのスロットが無い古い保存データ向け）。それ以外のスロットは GetPartId と同じ。
         /// </summary>
         public int GetEquippedPartId(PartsAttachType type)
         {
             var partId = GetPartId(type);
-            if (!MechFrameSlots.IsFrameSlot(type))
+            if (!MechFrameSlots.IsRequiredSlot(type))
                 return partId;
 
             return MechFrameSlots.ResolvePartId(partId, GetDefaultPartId(type));
@@ -136,5 +136,7 @@ namespace AdvancedGears
         Weapon_Right = 301,
         Weapon_Left,
         Weapon_Sub,
+
+        Generator = 401,
     }
 }
