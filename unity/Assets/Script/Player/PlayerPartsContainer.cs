@@ -32,8 +32,15 @@ namespace AdvancedGears
 
             // プレイヤー機体はカスタマイズ画面で保存した組み合わせを反映する（保存データが無ければアセットの初期値）。
             // PlayerController.Start がエネルギーの性能を計算するので、Start より前（Awake）に読み込む
-            if (assembleDataAsset is PlayerPartsAssembleDataAsset playerAsset)
-                playerAsset.Load();
+            if (assembleDataAsset is PlayerPartsAssembleDataAsset playerAsset && playerAsset.Load())
+            {
+                // マスタの調整で保存データが組めなくなっていたら、初期の組み合わせで出撃する（保存データは消さない）
+                if (!playerAsset.IsAssemblable())
+                {
+                    Debug.LogWarningFormat(this, "[PlayerPartsContainer] {0}: 保存済みの組み合わせが組めないため、初期の組み合わせを使います", name);
+                    playerAsset.UseDefaultData();
+                }
+            }
         }
 
         private void Start()

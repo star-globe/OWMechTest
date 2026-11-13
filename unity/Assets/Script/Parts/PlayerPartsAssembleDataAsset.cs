@@ -38,6 +38,15 @@ namespace AdvancedGears
             return true;
         }
 
+        /// <summary>
+        /// 読み込んだ保存データを使わず、アセットの初期値に戻す。PlayerPrefs は消さない
+        /// （マスタを直せば、次の Load で保存データがそのまま使われる）
+        /// </summary>
+        public void UseDefaultData()
+        {
+            savedData = null;
+        }
+
         public void Save(PartsAssembleData assembleData)
         {
             if (assembleData == null)

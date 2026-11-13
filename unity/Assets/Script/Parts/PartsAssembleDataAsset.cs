@@ -55,6 +55,12 @@ namespace AdvancedGears
             return MechFrameSlots.ResolvePartId(partId, GetDefaultPartId(type));
         }
 
+        /// <summary>組める組み合わせか（ジェネレーターがあり、ブースト OFF / ON のどちらでも回復力が 0 より大きい）</summary>
+        public bool IsAssemblable()
+        {
+            return EnergyPerformanceResolver.TryResolve(GetEquippedPartId, out var performance) && performance.IsValid;
+        }
+
         public Dictionary<PartsAttachType, int> GetPartId_All()
         {
             return CurrentData?.GetDictionary();
