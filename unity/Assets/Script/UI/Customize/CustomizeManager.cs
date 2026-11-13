@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace AdvancedGears
 {
@@ -25,11 +26,19 @@ namespace AdvancedGears
         [SerializeField] Button saveButton;
         [SerializeField] Button backButton;
 
+        [Header("エネルギー")]
+        [SerializeField] TextMeshProUGUI energyPerformanceText;
+        [Tooltip("組めない理由と、保存データが組めなくなったときの警告")]
+        [SerializeField] TextMeshProUGUI assembleMessageText;
+
         [Header("データ")]
         [SerializeField] PlayerPartsAssembleDataAsset assembleDataAsset;
 
         // 編集中の組み合わせ（スロット→パーツID）
         readonly Dictionary<PartsAttachType, int> editingDic = new Dictionary<PartsAttachType, int>();
+
+        // 保存データがマスタの調整で組めなくなっているか（組める組み合わせを保存すると false に戻る）
+        bool isSavedDataInvalid;
 
         PartsAttachType selectedSlot = PartsAttachType.None;
 
@@ -60,7 +69,11 @@ namespace AdvancedGears
 
         private void LoadCurrentData()
         {
-            assembleDataAsset.Load();
+            // 組めない保存データもそのまま編集できるようにし、警告だけ出す（Battle では初期の組み合わせを使う）
+            isSavedDataInvalid = assembleDataAsset.Load() && !assembleDataAsset.IsAssemblable();
+            if (isSavedDataInvalid)
+                Debug.LogWarning("[CustomizeManager] 保存済みの組み合わせが組めない状態になっています。");
+
             editingDic.Clear();
 
             // 機体本体のスロットは、保存データに無ければ初期値のパーツを表示する（Battle と同じ組み合わせになる）
@@ -77,19 +90,46 @@ namespace AdvancedGears
                 btn.SetData(slot, editingDic[slot], OnSelectSlot);
             }
 
-            UpdateSaveButton();
+            UpdateEnergyView();
         }
 
-        /// <summary>組めない組み合わせ（ジェネレーターが無い、回復力が 0 以下）なら保存できなくする。理由の表示は #100</summary>
-        private void UpdateSaveButton()
+        /// <summary>
+        /// エネルギーの性能と組めない理由を表示する。
+        /// 組めない組み合わせ（ジェネレーターが無い、回復力が 0 以下）なら保存できなくする
+        /// </summary>
+        private void UpdateEnergyView()
         {
+            var resolved = EnergyPerformanceResolver.TryResolve(GetEditingPartId, out var performance);
+
+            if (energyPerformanceText != null)
+            {
+                energyPerformanceText.SetText(resolved
+                    ? CustomizeEnergyText.FormatPerformance(performance, GetEditingGeneratorOutput())
+                    : CustomizeEnergyText.FormatUnresolvedPerformance());
+            }
+
+            var messages = CustomizeEnergyText.GetInvalidReasons(resolved, performance);
+            if (isSavedDataInvalid)
+                messages.Add(CustomizeEnergyText.SavedDataInvalidWarning);
+
+            if (assembleMessageText != null)
+                assembleMessageText.SetText(string.Join("\n", messages));
+
             if (saveButton != null)
-                saveButton.interactable = CanSave();
+                saveButton.interactable = resolved && performance.IsValid;
         }
 
         private bool CanSave()
         {
             return EnergyPerformanceResolver.TryResolve(GetEditingPartId, out var performance) && performance.IsValid;
+        }
+
+        /// <summary>編集中のジェネレーターの総出力。TryResolve が true なら必ずマスタにある</summary>
+        private int GetEditingGeneratorOutput()
+        {
+            return GeneratorMaster.Instance.GetDictionary().TryGetValue(GetEditingPartId(PartsAttachType.Generator), out var generator) && generator != null
+                ? generator.EnergyOutput
+                : 0;
         }
 
         private int GetEditingPartId(PartsAttachType slot)
@@ -114,7 +154,7 @@ namespace AdvancedGears
             {
                 if (kvp.Value.CategoryType != category) continue;
                 var btn = partsPool.Borrow();
-                btn.SetData(kvp.Value.PartID, kvp.Value.name, OnSelectPart);
+                btn.SetData(kvp.Value, OnSelectPart);
             }
         }
 
@@ -136,6 +176,9 @@ namespace AdvancedGears
             var data = PartsAssembleData.CreateFromDictionary(editingDic);
             assembleDataAsset.Save(data);
             Debug.Log("[CustomizeManager] 機体データを保存しました。");
+
+            isSavedDataInvalid = false;
+            UpdateEnergyView();
         }
 
         private void OnClickBack()
