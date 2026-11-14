@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: MuzzleFlash
   m_EditorClassIdentifier: 
   effectId: 10
-  effectPrefab: {fileID: 0}
+  effectPrefab: {fileID: 3177822527668500868, guid: 65da5731acd3f5246a1d2f036e3f4deb, type: 3}
   maxPoolSize: 16

@@ -40,6 +40,12 @@ namespace AdvancedGears
         int muzzleEffectId;
         public int MuzzleEffectId => muzzleEffectId;
 
+        /// <summary>発射時に再生するエフェクトの ID（未設定なら標準のマズルフラッシュ）</summary>
+        public int ResolvedMuzzleEffectId => ResolveMuzzleEffectId(muzzleEffectId);
+
+        public static int ResolveMuzzleEffectId(int muzzleEffectId)
+            => muzzleEffectId > 0 ? muzzleEffectId : EffectID.MuzzleFlash;
+
         [SerializeField]
         Bullet bulletComp;
 
