@@ -93,23 +93,35 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
-        public void CanAscend_WhileEnergyRemains()
+        public void CanAscend_UntilOverheat()
         {
-            param.ConsumeEnergy(param.MaxEnergy - 1);
+            // ちょうど 0 ではオーバーヒートしないので、上昇を続けられる
+            param.ConsumeEnergy(param.MaxEnergy);
             Assert.IsTrue(param.CanAscend);
 
-            param.ConsumeEnergy(1);
+            param.ConsumeAscendEnergy(0.01f);
+            Assert.IsTrue(param.IsOverheat);
             Assert.IsFalse(param.CanAscend);
         }
 
         [Test]
-        public void CanJump_RequiresMoreEnergyThanCost()
+        public void CanJump_WithLessEnergyThanCost()
         {
+            // プレイヤーは残量が 0 以上なら行動できる
+            param.ConsumeEnergy(param.MaxEnergy - 1);
+            Assert.IsTrue(param.CanJump);
+            Assert.IsTrue(param.CanQuick);
+        }
+
+        [Test]
+        public void HasEnergyFor_RequiresMoreEnergyThanCost()
+        {
+            // NPC の判断に使う。消費量より多く残っているときだけ true
             param.ConsumeEnergy(param.MaxEnergy - param.JumpEnergy);   // 残りエネルギー = JumpEnergy
-            Assert.IsFalse(param.CanJump);
+            Assert.IsFalse(param.HasEnergyFor(param.JumpEnergy));
 
             param.Recovery(1f);
-            Assert.IsTrue(param.CanJump);
+            Assert.IsTrue(param.HasEnergyFor(param.JumpEnergy));
         }
     }
 

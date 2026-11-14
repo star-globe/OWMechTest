@@ -14,6 +14,16 @@ namespace AdvancedGears
         [SerializeField, Min(0)]
         int energyOutput = 5000;
         public int EnergyOutput => energyOutput;
+
+        /// <summary>オーバーヒートしてから解除されるまでの時間（秒）</summary>
+        [SerializeField, Min(0)]
+        float overheatTime = EnergyPerformance.DefaultOverheatTime;
+        public float OverheatTime => overheatTime;
+
+        /// <summary>復帰エネルギー（オーバーヒートの解除時の残量）の、最大エネルギーに対する割合</summary>
+        [SerializeField, Range(0f, 1f)]
+        float overheatRecoveryRate = EnergyPerformance.DefaultOverheatRecoveryRate;
+        public float OverheatRecoveryRate => overheatRecoveryRate;
     }
 
     public class GeneratorMasterContainer : IDBasedMasterContainer<GeneratorSettings>

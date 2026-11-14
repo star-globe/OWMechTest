@@ -355,7 +355,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 6e72656b
+  m_ActiveFontFeatures: 6e72656bu
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -429,6 +429,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slider: {fileID: 659263398946460959}
   valueText: {fileID: 2862756795541402910}
+  overheatGraphics:
+  - {fileID: 7811326917473539514}
+  - {fileID: 1772315439601017460}
+  - {fileID: 6656538269684105405}
+  overheatColor: {r: 1, g: 0, b: 0, a: 1}
+  overheatBlinkPeriod: 0.5
 --- !u!1 &6706638798203910920
 GameObject:
   m_ObjectHideFlags: 0
