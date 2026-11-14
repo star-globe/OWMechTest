@@ -50,6 +50,7 @@ WarGameProject
 - RenderGraph ラジアルブラー: docs/rendergraph-radial-blur-guide.md
 - 管理用セッションのトークン節約ポリシー: docs/management-session-policy.md
 - クラウドセッションの基本方針: docs/cloud-session-policy.md
+- エフェクトの対応一覧（進捗の管理）: docs/effects-plan.md
 - 作業ログ: docs/logs/issue-{番号}-log.md
 
 ## ディレクトリマップ
@@ -287,4 +288,5 @@ Issue と PR は分野ラベルで区別する。作業の中心になるもの�
 - 作業用セッションが承認を求める Blender のコマンド（`execute_blender_code` のコードや `export.sh` など）について人間に頼まれたら、管理用セッションが内容を評価し、何をするか・書き込むファイル・元に戻せない操作・承認してよいかを解説する（ポリシーの「Blender のコマンドを評価して解説する」）
 - 大きな出力（ファイル全体、diff 全体、シーン階層、コンソール）を読み込まない
 - 作業の区切りで、新しいセッションに引き継ぐよう人間に提案する（引き継ぎの形式はポリシーを参照）
+- 複数の Issue・セッションにまたがる作業は、`docs/` に進捗の表を持つドキュメントを作って管理し、状態が変わるたびに更新する（例: `docs/effects-plan.md`。ポリシーの「複数のセッションにまたがる作業は docs で進捗を管理する」）
 - 作業用セッションと作業フォルダを共有しているときは、ブランチを切り替えない。別の PR は scratchpad に短いフォルダ名（`wt-xx` など）の git worktree を作って行う（長いと Windows のパス長制限で失敗する）
