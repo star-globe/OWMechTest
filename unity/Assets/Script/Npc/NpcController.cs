@@ -121,6 +121,23 @@ namespace AdvancedGears
             return agent.destination.y - transform.position.y >= ascendHeight;
         }
 
+        // ─── 撃破 ────────────────────────────────────────────
+        public override void StopControl()
+        {
+            base.StopControl();
+
+            if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+                agent.ResetPath();
+            if (agent != null)
+                agent.enabled = false;
+
+            // 部隊から外す（撃破された機体はリーダーの目的地の配布や部隊の中心の計算に含めない）
+            Squad?.RemoveMember(this);
+            Squad = null;
+            Role  = SquadRole.None;
+            hasDestination = false;
+        }
+
         // ─── 移動AI ──────────────────────────────────────────
         protected override void UpdateInput()
         {

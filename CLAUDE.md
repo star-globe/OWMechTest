@@ -40,6 +40,7 @@ WarGameProject
 - レイヤー管理: docs/spec/レイヤー管理.md
 - ターゲットシステム: docs/spec/ターゲットシステム.md
 - ユニット全般: docs/spec/ユニット全般.md
+- 撃破と任務の結果: docs/spec/撃破と任務の結果.md
 - プロトタイプの方針: docs/spec/プロトタイプの方針.md
 
 その他のドキュメント（リポジトリルートの `docs/`）

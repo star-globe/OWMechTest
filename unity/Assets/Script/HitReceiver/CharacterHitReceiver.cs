@@ -4,7 +4,7 @@ namespace AdvancedGears
 {
     /// <summary>
     /// 機体（プレイヤー・NPC）の被弾。HP は機体の MaxAp から始め、受けたダメージを CharacterParam にも反映する。
-    /// AP が 0 になったときの撃破・敗北の処理はまだ無い（#108。撃破の処理は DeadComponent を付けたときだけ行う）
+    /// AP が 0 になったときの撃破・任務失敗の処理は CharacterDeadComponent が行う（deadComp に設定する）
     /// </summary>
     public class CharacterHitReceiver : HitReceiver
     {

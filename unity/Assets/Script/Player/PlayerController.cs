@@ -102,6 +102,30 @@ namespace AdvancedGears
             this.IsBoost = playerCharacter.IsBoost;
         }
 
+        /// <summary>
+        /// 撃破されたときに操作を止める。入力・移動・射撃をやめ、ブーストを切って速度を 0 にする。
+        /// NPC は AI の移動と部隊も止める（NpcController）
+        /// </summary>
+        public virtual void StopControl()
+        {
+            hypBstInfo.ResetBoost();
+            playerCharacter.IsHyperBoost = false;
+            this.IsBoost = false;
+            LockOn.Clear();
+
+            inputX = 0;
+            inputZ = 0;
+            hasAscendInput = false;
+
+            if (rigid != null && !rigid.isKinematic)
+            {
+                rigid.linearVelocity = Vector3.zero;
+                rigid.angularVelocity = Vector3.zero;
+            }
+
+            this.enabled = false;
+        }
+
         private void Update()
         {
             LockOn.AddTime(Time.deltaTime);
