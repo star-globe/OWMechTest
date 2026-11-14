@@ -5,8 +5,10 @@ Blender → Unity FBXエクスポートスクリプト
 unity/Assets/Models/ 以下のカテゴリ別フォルダへ FBX をエクスポートする。
   body_standard → Parts/Body/body_standard.fbx
   arm_left_blade → Parts/Arms/arm_left_blade.fbx
+  booster_standard → Parts/Booster/booster_standard.fbx
   rig_mech       → Rig/rig_mech.fbx（アニメーションを含めるのは rig_ だけ）
 スキンメッシュは、Armature モディファイアが参照するアーマチュアも同じ FBX に含める。
+子孫の空オブジェクト（ノズルの出口などの目印）も FBX に含める。
 
 使い方 A: Blender の Text Editor
   1. このファイルを開く
@@ -56,6 +58,7 @@ CATEGORY_MAP = {
     "arm":    "Parts/Arms",
     "leg":    "Parts/Legs",
     "head":   "Parts/Head",
+    "booster": "Parts/Booster",
     "weapon": "Weapons",
     "rig":    "Rig",
 }
@@ -70,6 +73,7 @@ NAME_PATTERNS = {
     "arm":    re.compile(rf"^arm_(?:left|right)_{_VARIANT}$"),
     "leg":    re.compile(rf"^leg_(?:left|right)_{_VARIANT}$"),
     "head":   re.compile(rf"^head_{_VARIANT}$"),
+    "booster": re.compile(rf"^booster_{_VARIANT}$"),
     "weapon": re.compile(rf"^weapon_{_VARIANT}$"),
     "rig":    re.compile(rf"^rig_{_VARIANT}$"),
 }
@@ -79,6 +83,10 @@ ALLOWED_MATERIALS = ("Mat_Body", "Mat_Detail", "Mat_Visor", "Mat_Thruster")
 
 EXPORT_OBJECT_TYPES = {"ARMATURE", "MESH"}
 
+# FBX に書き出す種類。空オブジェクトは、エフェクトの発生位置（ブースターのノズルの出口など）の目印として
+# メッシュの子に置いたものを Unity の Transform として書き出す
+FBX_OBJECT_TYPES = EXPORT_OBJECT_TYPES | {"EMPTY"}
+
 FBX_SETTINGS = dict(
     use_selection=True,
     # FBX_SCALE_ALL と組み合わせると Blender の 1 m が Unity の 1 になる（0.01 だと 1/100 になる。#68 で確認）
@@ -86,7 +94,7 @@ FBX_SETTINGS = dict(
     apply_scale_options='FBX_SCALE_ALL',
     axis_forward='-Z',
     axis_up='Y',
-    object_types=EXPORT_OBJECT_TYPES,
+    object_types=FBX_OBJECT_TYPES,
     use_mesh_modifiers=True,
     mesh_smooth_type='FACE',
     primary_bone_axis='Y',
