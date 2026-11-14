@@ -10,7 +10,7 @@
 - 単発のものは `EffectManager.PlayEffect` で再生する（プールで使い回す）。続けて出すもの（ブースターの炎、接地移動の火花）は、機体側にループする ParticleSystem を持たせ、`PlayerEffectPresenter` から再生と停止を切り替える
 - 見た目をすぐに確認できないことがあるため、大きさ・色・持続時間は数値で確かめ、根拠を PR に書く
 
-## 進捗（2026-11-14 時点）
+## 進捗（2026-11-15 時点）
 
 状態: 未着手 / 進行中 / PR レビュー待ち / 完了 / 保留
 
@@ -19,9 +19,9 @@
 | 命中の火花（HitSpark） | 11 | 弾の命中（`Bullet.OnHit`） | 区別あり（今はオレンジのみ。青は #133） | 高 | 完了 | #130 / PR #131 |
 | 被弾の小爆発（ExplosionSmall） | 13 | `HitReceiver` を持つ相手への被弾（`HitReceiver.Damage`） | 不要 | 高 | 完了 | #130 / PR #131 |
 | 撃破の爆発（Explosion） | 12 | 撃破（`HitReceiver.Damage`） | 不要 | 高 | 完了 | #130 / PR #131 |
-| マズルフラッシュ | 10 | 発射（`GunPart.Fire` / `UnitShooter.Fire`。弾の `muzzleEffectId`） | 区別あり（今はオレンジのみ。青は #133） | 中〜高 | 進行中 | #132 |
-| 着地の砂煙（LandingDust） | 20 | `TouchChecker` が `None` → `Ground` に変わったとき | 不要 | 中 | 未着手 | #136 |
-| 接地ブースト中の足元の火花 | - | 地上でのブースト移動中（`IsBoost && !isFloating`）。ループ | 不要 | 中 | 未着手 | #135 |
+| マズルフラッシュ | 10 | 発射（`GunPart.Fire` / `UnitShooter.Fire`。弾の `muzzleEffectId`） | 区別あり（今はオレンジのみ。青は #133） | 中〜高 | PR レビュー待ち | #132 / PR #141 |
+| 着地の砂煙（LandingDust） | 20 | `TouchChecker` が `None` → `Ground` に変わったとき | 不要 | 中 | PR レビュー待ち | #136 / PR #142 |
+| 接地ブースト中の足元の火花 | - | 地上でのブースト移動中（`IsBoost && !isFloating`）。ループ | 不要 | 中 | 進行中（PR #142 から派生） | #135 |
 | 壁を蹴って上るときのエフェクト | 新規 | `PlayerMoveCalculator.KickAndJump` が `TouchState.Wall` のとき | 不要 | 中 | 未着手 | #134 |
 | 実弾 / EN 弾の色分け（命中・マズル・軌跡） | 新規 | 弾の属性で切り替える | - | 中 | 保留（#114・#117・#132 待ち） | #133 |
 | ジャンプの足元の噴射 | 4 | `StartJump`（今はクイックのブースター炎で代用） | 不要 | 低 | 未着手 | #137 |
