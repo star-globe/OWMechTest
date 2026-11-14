@@ -21,7 +21,8 @@ unity/Assets/
 │   │   ├── Body/       # 胴体パーツ (.fbx)
 │   │   ├── Arms/       # 腕パーツ (.fbx)
 │   │   ├── Legs/       # 脚パーツ (.fbx)
-│   │   └── Head/       # 頭部パーツ (.fbx)
+│   │   ├── Head/       # 頭部パーツ (.fbx)
+│   │   └── Booster/    # ブースターパーツ (.fbx)
 │   ├── Rig/            # 共通リグとアニメーション (.fbx)
 │   └── Weapons/        # 武装 (.fbx)
 └── Textures/
@@ -41,6 +42,7 @@ unity/Assets/
 | 腕 | `arm_{left/right}_{バリアント名}.fbx` | `arm_left_blade.fbx` |
 | 脚 | `leg_{left/right}_{バリアント名}.fbx` | `leg_left_standard.fbx` |
 | 頭部 | `head_{バリアント名}.fbx` | `head_sensor.fbx` |
+| ブースター | `booster_{バリアント名}.fbx` | `booster_standard.fbx` |
 | 武装 | `weapon_{バリアント名}.fbx` | `weapon_rifle.fbx` |
 | 共通リグ・アニメーション | `rig_{名前}.fbx` | `rig_mech.fbx` |
 
@@ -52,6 +54,17 @@ unity/Assets/
 - サイズを変えるときもボーンの位置（関節の位置）は変えず、メッシュの形で差をつける
 - アニメーション（アクション `idle` / `walk` / `aim_right` / `aim_left`）は `rig_mech` に作る。FBX に書き出すのは `rig_` の FBX だけで、パーツの FBX には入れない
 - Unity 側では `Prefabs/Mech/MechRig.prefab`（`rig_mech.fbx` のバリアント。Animator と `MechRig` を持つ）が、パーツの `SkinnedMeshRenderer` のボーンを名前で自分のボーンに付け替える
+
+### ブースターパーツ（#70）
+
+- `.blend` は `blender/booster.blend`、メッシュは `tools/blender/booster_parts.py` で作る（リグは使わない）。今あるのは `booster_standard`（円筒）と `booster_heavy`（角張った太いもの）
+- 原点が取り付け位置（`BoosterPartConnector`）、Blender の **+Z が噴射の向き**。原点より -Z 側の 0.35 m は機体に差し込む取り付け部で、胴体の大きさの違いを吸収する
+- ノズルの出口に空オブジェクト `nozzle_exit_{バリアント名}` をメッシュの子として置く。矢印（+Z）が噴射の向き。エクスポートスクリプトは子孫の空オブジェクトも FBX に含める
+- ノズルの内側と奥の面を `Mat_Thruster` にする。Blender では白で発光させておく（Unity で `_EMISSION` が有効なマテリアルになる）。色は `BoosterPart.SetBaseColor` が `BoosterSettings` の基本色で上書きする
+- 取り込んだ FBX では、Blender の +Z が FBX の +Z になる（ルートに回転は付かない）。インポート設定は Animation Type を None にする（Animator を付けない）
+- Unity 側のプレハブ（`Prefabs/Parts/Booster/Booster_XXX_part.prefab`）の構成
+  - `Model`（FBX のインスタンス）: 回転 (-90, 0, 0) で FBX の +Z をパーツの +Y（コネクターの規約での噴射の向き）に合わせる。スケール 0.5 で、コネクターのスケール 2 を打ち消して実寸（1 単位 = 1 m）にする
+  - `EffectorPos`（噴射のエフェクト）: `nozzle_exit_*` の子に置き、位置・回転は 0、スケール 2（エフェクトはコネクターのスケール 2 の下で調整してあるため）。ノズルが大きいものはスケールを大きくする（heavy は 2.6）
 
 ### マテリアルスロット名（Blender側）
 
@@ -162,7 +175,7 @@ tools/blender/export.sh model.blend --all --base-path /c/temp/Models   # 別の�
 | オプション | 内容 |
 |---|---|
 | `--objects <名前...>` | 対象のオブジェクト。`--objects` も `--all` も無いときは、`.blend` に保存された選択状態が対象 |
-| `--all` | 名前がカテゴリ（`body` / `arm` / `leg` / `head` / `weapon` / `rig`）で始まるオブジェクトをすべて対象にする |
+| `--all` | 名前がカテゴリ（`body` / `arm` / `leg` / `head` / `booster` / `weapon` / `rig`）で始まるオブジェクトをすべて対象にする |
 | `--validate-only` / `--dry-run` | 検証だけ / 出力先の確認だけ（どちらも FBX を書き出さない） |
 | `--base-path <path>` | エクスポート先の Models フォルダ |
 | `--json-out <path>` | 結果の JSON をファイルにも書く |
