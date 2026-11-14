@@ -1,11 +1,13 @@
 namespace AdvancedGears
 {
     /// <summary>
-    /// 移動の状態に合わせて、ブースターのエフェクト（PlayerPartsContainer）を切り替える
+    /// 移動の状態に合わせて、ブースターのエフェクト（PlayerPartsContainer）を切り替える。
+    /// 着地の砂煙など、足元に出すエフェクトも再生する
     /// </summary>
     public class PlayerEffectPresenter
     {
         readonly PlayerPartsContainer partsContainer;
+        readonly LandingDetector landingDetector = new LandingDetector();
 
         public PlayerEffectPresenter(PlayerPartsContainer partsContainer)
         {
@@ -57,6 +59,13 @@ namespace AdvancedGears
             }
 
             partsContainer.HyperBoost(CalcHyperBoostBit(hyperBoostInfo));
+        }
+
+        /// <summary>着地した瞬間に、足元へ砂煙を出す</summary>
+        public void ApplyLanding(bool isFloating, float velocityY, UnityEngine.Vector3 footPosition)
+        {
+            if (landingDetector.Update(isFloating, velocityY))
+                EffectManager.Instance?.PlayEffect(EffectID.LandingDust, footPosition);
         }
     }
 }

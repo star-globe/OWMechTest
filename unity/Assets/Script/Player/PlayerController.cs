@@ -394,6 +394,9 @@ namespace AdvancedGears
         private void UpdateEffect()
         {
             effectPresenter.Apply(IsBoost, isFloating, isAscend, inputX, inputZ, jumpInfo, quickInfo, hypBstInfo);
+
+            if (touchChecker != null)
+                effectPresenter.ApplyLanding(isFloating, rigid.linearVelocity.y, touchChecker.BottomPosition);
         }
 
         private PlayerMoveState CurrentMoveState
