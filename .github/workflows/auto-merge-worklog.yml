@@ -1,0 +1,102 @@
+# 作業ログ（docs/logs/issue-*-log.md）だけを変える PR を自動でマージする。
+# 対象は WorkLog ラベルが付いた PR で、次の条件をすべて満たすもの。
+#   - 作者が ALLOWED_AUTHORS に含まれる
+#   - このリポジトリのブランチから出された PR（フォークからの PR は対象外）
+#   - 下書き（draft）ではない
+#   - 変更されたファイルがすべて docs/logs/issue-<番号>-log.md の追加か変更（削除・改名は対象外）
+#   - 1 ファイルの追加行数が MAX_ADDITIONS 以下
+# 条件を満たさないときはマージせず、理由を PR にコメントしてジョブを失敗させる。
+#
+# pull_request_target を使うので、このワークフローは常に main 側の定義で動く。
+# PR の中でこのファイルを書き換えても判定は変わらない。
+# PR のコードは checkout せず、変更ファイルの一覧は API で取得する（PR の内容を実行しない）。
+name: 作業ログの PR を自動マージ
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: auto-merge-worklog-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  # 自動マージを許可する作者（スペース区切り）。必要になったら追加する
+  ALLOWED_AUTHORS: "star-globe"
+  # 1 ファイルあたりの追加行数の上限。超えたら人が確認する
+  MAX_ADDITIONS: "200"
+
+jobs:
+  merge:
+    if: contains(github.event.pull_request.labels.*.name, 'WorkLog')
+    runs-on: ubuntu-latest
+    steps:
+      - name: 条件の確認とマージ
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          IS_DRAFT: ${{ github.event.pull_request.draft }}
+        run: |
+          set -euo pipefail
+          reasons=()
+
+          # 作者
+          allowed=false
+          for a in $ALLOWED_AUTHORS; do
+            if [ "$AUTHOR" = "$a" ]; then allowed=true; fi
+          done
+          if [ "$allowed" != true ]; then
+            reasons+=("作者 \`$AUTHOR\` が許可リストにない")
+          fi
+
+          # フォークからの PR
+          if [ "$HEAD_REPO" != "$REPO" ]; then
+            reasons+=("このリポジトリのブランチから出された PR ではない")
+          fi
+
+          # 下書き
+          if [ "$IS_DRAFT" = "true" ]; then
+            reasons+=("下書き（draft）の PR")
+          fi
+
+          # 変更ファイル
+          files=$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" \
+            --jq '.[] | [.filename, .status, (.additions | tostring)] | @tsv')
+          if [ -z "$files" ]; then
+            reasons+=("変更されたファイルがない")
+          fi
+          while IFS=$'\t' read -r name status additions; do
+            [ -z "$name" ] && continue
+            if ! [[ "$name" =~ ^docs/logs/issue-[0-9]+-log\.md$ ]]; then
+              reasons+=("\`$name\` は作業ログのファイルではない")
+              continue
+            fi
+            if [ "$status" != "added" ] && [ "$status" != "modified" ]; then
+              reasons+=("\`$name\` の変更の種類が \`$status\`（追加か変更だけが対象）")
+            fi
+            if [ "$additions" -gt "$MAX_ADDITIONS" ]; then
+              reasons+=("\`$name\` の追加行数が $additions 行（上限 $MAX_ADDITIONS 行）")
+            fi
+          done <<< "$files"
+
+          if [ ${#reasons[@]} -gt 0 ]; then
+            {
+              echo "作業ログの自動マージの条件を満たさないため、マージしませんでした。人が確認してマージしてください。"
+              echo
+              for r in "${reasons[@]}"; do echo "- $r"; done
+            } > "$RUNNER_TEMP/comment.md"
+            gh pr comment "$PR_NUMBER" --repo "$REPO" --body-file "$RUNNER_TEMP/comment.md"
+            printf '%s\n' "${reasons[@]}"
+            exit 1
+          fi
+
+          # 確認した時点の head のまま、通常のマージコミットでマージする
+          gh pr merge "$PR_NUMBER" --repo "$REPO" --merge --match-head-commit "$HEAD_SHA"
