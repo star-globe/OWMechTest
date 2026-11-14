@@ -20,5 +20,6 @@ namespace AdvancedGears
 
         // 環境・UI補助
         public const int LandingDust  = 20; // 着地砂煙
+        public const int GroundBoostSpark = 21; // 接地ブースト中の足元の火花（機体に付けてループ再生する）
     }
 }
