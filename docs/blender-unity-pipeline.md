@@ -78,6 +78,8 @@ unity/Assets/
 - 当たり判定の箱は、空オブジェクト `col_{名前から env_ を除いたもの}_{番号}`（立方体の表示。位置が箱の中心、スケールが箱の大きさの半分）としてメッシュの子に置く。建物は区画ごとの箱（屋上の床の上面まで）で、がれき・突き出た柱・手すり壁は含めない
 - 取り込んだ FBX では、ルートに回転 (270, 0, 0) が付き、Unity の Y が上になる。Blender の -Y（正面）は Unity の +Z。インポート設定は Animation Type を None、Import Animation を OFF にする
 - Unity 側のプレハブ（`Prefabs/Environment/{Buildings,Props}/Building_{Small,Medium,Large}_X.prefab`、`Prop_{名前}.prefab`）は FBX のプレハブバリアント。`col_*` に BoxCollider（中心 0、size 2）を付け、全体を Static（Contribute GI 以外）にする
+  - プレハブのルートは FBX のルートなので、回転 (270, 0, 0) を持つ。**シーンに置くときは X の 270 を残して Y だけを変える**（スクリプトでは `Quaternion.Euler(270, yaw, 0)`。`Euler(0, yaw, 0)` にすると横倒しになる）
+  - 建物の `col_*` には `NavMeshModifierVolume`（Not Walkable、size 2.02）も付ける。NavMesh のベイクは当たり判定の箱の中を埋めないため、高さがエージェント（8 m）を超える箱では、中の地面が歩ける場所になってしまう（#124）
 
 ### マテリアルスロット名（Blender側）
 
