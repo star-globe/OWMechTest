@@ -83,7 +83,7 @@ namespace AdvancedGears
                 EffectiveRadius,
                 this.UnitSide.ToNpcExcludeMask(),
                 GameLayers.EnemyLayerMask,
-                PhysicsUtils.PlayerTag,
+                null,       // 砲台（TurretController）と同じく、タグでは絞らない（機体は Untagged）
                 out BaseObject target);
 
             SetLockTarget(found ? target : null);
@@ -94,31 +94,92 @@ namespace AdvancedGears
 
         private bool HasLockTarget => LockOn.Target != null;
 
-        // ─── 射撃判定 ─────────────────────────────────────────
-        protected override bool CheckLeftFire()
+        // ─── 行動の判断 ──────────────────────────────────────
+        // ブースト・ジャンプ・射撃などの判断は INpcDecider に任せる。AI を作り込むときはここを差し替える
+        INpcDecider decider;
+        public INpcDecider Decider
         {
-            return HasLockTarget;
+            get => decider ??= new NpcDecider(ascendHeight);
+            set => decider = value;
         }
 
-        protected override bool CheckRightFire()
-        {
-            return HasLockTarget;
-        }
+        // 1 フレームの UpdateInput の中で使う判断の材料（UpdateInput の最初に作り直す）
+        NpcDecisionContext context;
 
-        // ─── ブースト ────────────────────────────────────────
-        // 暫定：残量の割合で切り替える（NpcBoostDecider）
-        protected override bool CheckBoost()
+        private NpcDecisionContext CreateContext()
         {
             var param = CharacterParam;
-            return param != null && NpcBoostDecider.ShouldToggle(IsBoost, param.Energy, param.MaxEnergy);
+            float? heightToDest = HasAgentPath ? agent.destination.y - transform.position.y : (float?)null;
+            return new NpcDecisionContext(IsBoost,
+                                          param?.Energy ?? 0,
+                                          param?.MaxEnergy ?? 0,
+                                          IsFloating,
+                                          HasLockTarget,
+                                          heightToDest);
         }
 
-        // ─── 上昇 ────────────────────────────────────────────
-        // 最低限の判定：経路の目的地が自分より ascendHeight 以上高いときだけ上昇する（空中・ブースト中かどうかは基底で判定）
-        protected override bool CheckAscend()
+        protected override bool CheckLeftFire()      => Decider.ShouldFire(WeaponSlot.Left, context);
+        protected override bool CheckRightFire()     => Decider.ShouldFire(WeaponSlot.Right, context);
+        protected override bool CheckBoost()         => Decider.ShouldToggleBoost(context);
+        protected override bool CheckJump()          => Decider.ShouldJump(context);
+        protected override bool CheckQuick()         => Decider.ShouldQuick(context);
+        protected override bool CheckHyperBoost()    => Decider.ShouldHyperBoost(context);
+        protected override bool CheckAscend()        => Decider.ShouldAscend(context);
+
+        // ─── 経路に沿った移動 ─────────────────────────────────
+        // NavMeshAgent は経路を求めるだけにして（位置・回転は動かさない）、移動は機体と同じ Rigidbody の処理で行う
+
+        [SerializeField]
+        [Tooltip("この角度（度）以上ずれていたら、最大の速さで旋回する")]
+        float turnFullAngle = 45f;
+
+        private bool HasAgentPath => agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh && agent.hasPath;
+
+        /// <summary>経路の次の曲がり角への向きを、機体から見た移動の入力にする</summary>
+        protected override void UpdateXZ(out float inputX, out float inputZ)
         {
-            if (agent == null || !agent.isActiveAndEnabled || !agent.hasPath) return false;
-            return agent.destination.y - transform.position.y >= ascendHeight;
+            inputX = 0;
+            inputZ = 0;
+            if (!HasAgentPath)
+                return;
+
+            var toCorner = agent.steeringTarget - transform.position;
+            toCorner.y = 0;
+            if (toCorner.sqrMagnitude < StopDistance * StopDistance)
+                return;
+
+            var local = transform.InverseTransformDirection(toCorner.normalized);
+            inputX = local.x;
+            inputZ = local.z;
+        }
+
+        const float StopDistance = 0.5f;
+
+        /// <summary>ロックしている目標、なければ経路の次の曲がり角の方へ旋回する</summary>
+        protected override Vector2 GetCameraPos()
+        {
+            Vector3? lookPoint = HasLockTarget ? LockOn.Target.transform.position
+                               : HasAgentPath ? agent.steeringTarget
+                               : (Vector3?)null;
+            if (!lookPoint.HasValue)
+                return Vector2.zero;
+
+            var dir = lookPoint.Value - transform.position;
+            dir.y = 0;
+            if (dir.sqrMagnitude < StopDistance * StopDistance)
+                return Vector2.zero;
+
+            var angle = Vector3.SignedAngle(transform.forward, dir, Vector3.up);
+            return new Vector2(CalcTurnInput(angle, turnFullAngle), 0);
+        }
+
+        /// <summary>向きのずれ（度。右が正）から旋回の入力（-1〜1）を求める。turnFullAngle 以上ずれていれば最大</summary>
+        public static float CalcTurnInput(float signedAngle, float turnFullAngle)
+        {
+            if (turnFullAngle <= 0)
+                return signedAngle > 0 ? 1f : signedAngle < 0 ? -1f : 0f;
+
+            return Mathf.Clamp(signedAngle / turnFullAngle, -1f, 1f);
         }
 
         // ─── 撃破 ────────────────────────────────────────────
@@ -141,14 +202,31 @@ namespace AdvancedGears
         // ─── 移動AI ──────────────────────────────────────────
         protected override void UpdateInput()
         {
+            SyncAgentPosition();
             UpdateLockTarget();
             UpdateAgentDestination();
+            context = CreateContext();
             base.UpdateInput();
+        }
+
+        /// <summary>
+        /// 経路の計算の起点を機体の位置に合わせる。Agent には位置・回転を動かさせない。
+        /// （基底の Start が private のため、派生クラスで Start を定義せずにここで設定する）
+        /// </summary>
+        private void SyncAgentPosition()
+        {
+            if (agent == null || !agent.isActiveAndEnabled)
+                return;
+
+            agent.updatePosition = false;
+            agent.updateRotation = false;
+            agent.nextPosition = transform.position;
         }
 
         private void UpdateAgentDestination()
         {
-            if (agent == null) return;
+            // NavMesh の上にいないとき（スポーン直後の落下中など）は経路を設定できない
+            if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
 
             var order = Squad?.CurrentOrder ?? SquadOrder.Advance;
 

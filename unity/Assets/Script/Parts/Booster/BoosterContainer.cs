@@ -18,10 +18,20 @@ namespace AdvancedGears
 
             var baseColor = ResolveBaseColor(partId, prioritySources);
 
+            if (connectorTrans == null)
+                return;
+
             foreach (var connector in connectorTrans)
             {
+                // 参照の切れたコネクターは飛ばす（生成したブースターが宙に浮いたまま残らないよう、生成より前に判定する）
+                if (connector == null)
+                {
+                    Debug.LogWarningFormat(this, "[BoosterContainer] {0}: connectorTrans に未設定の要素があります", name);
+                    continue;
+                }
+
                 var part = BoosterMaster.InstantiateBoosterPart(partId);
-                connector?.Exchange(part?.gameObject);
+                connector.Exchange(part?.gameObject);
 
                 if (part == null)
                     continue;

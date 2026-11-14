@@ -170,8 +170,9 @@ namespace AdvancedGears
             return Vector2.zero;
         }
 
-        // CheckJump / CheckQuick / CheckHyperBoost の基底は NPC 向けの判断で、消費量より多く残っているときだけ行動する
-        // （オーバーヒートしない範囲で行動させる）。プレイヤーは残量が 0 以上なら行動できる（CharacterParam.CanJump など）
+        // CheckJump / CheckQuick / CheckHyperBoost の基底は、消費量より多く残っているときだけ行動する
+        // （オーバーヒートしない範囲で行動させる）。プレイヤーは残量が 0 以上なら行動できる（CharacterParam.CanJump など）。
+        // NPC はすべて INpcDecider で判断する（NpcController）
 
         protected virtual bool CheckJump()
         {
@@ -444,6 +445,9 @@ namespace AdvancedGears
                        touchChecker.CurrentTouchState != TouchState.Ground;
             }
         }
+
+        /// <summary>空中にいるか（NPC の判断に使う）</summary>
+        protected bool IsFloating => isFloating;
 
         /// <summary>グライド中の上昇をしているか</summary>
         private bool isAscend
