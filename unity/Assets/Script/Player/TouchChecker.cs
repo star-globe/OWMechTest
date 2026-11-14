@@ -69,6 +69,24 @@ namespace AdvancedGears
             }
         }
 
+        /// <summary>カプセルの下端（足元）のワールド座標。カプセルが無ければ自分の位置</summary>
+        public Vector3 BottomPosition
+        {
+            get
+            {
+                if (this.Capsule == null)
+                    return transform.position;
+
+                var vec = this.Capsule.direction switch
+                {
+                    0 => Vector3.right,
+                    2 => Vector3.forward,
+                    _ => Vector3.up,
+                };
+                return this.Capsule.transform.TransformPoint(this.Capsule.center - vec * (this.Capsule.height / 2));
+            }
+        }
+
         void OnCollisionEnter(Collision collision)
         {
             UpdateCollisionState(collision);

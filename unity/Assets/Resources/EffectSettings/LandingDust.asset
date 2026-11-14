@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: LandingDust
   m_EditorClassIdentifier: 
   effectId: 20
-  effectPrefab: {fileID: 0}
+  effectPrefab: {fileID: 8449513515160607034, guid: 5e243f78d08302745ab44035df0b3d0d, type: 3}
   maxPoolSize: 4
