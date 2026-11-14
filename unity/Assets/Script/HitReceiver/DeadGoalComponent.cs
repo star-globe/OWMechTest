@@ -10,7 +10,11 @@ namespace AdvancedGears
         public override void DeadAction()
         {
             base.DeadAction();
-            StateManager.Instance.NextState();
+
+            // 自機が撃破された後（演出中）に目標を壊しても、任務は失敗のまま
+            var state = StateManager.Instance;
+            if (state.TryDecideMissionResult(MissionResult.Success))
+                state.FinishBattle();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace AdvancedGears
         public void Damage(int damage)
         {
             // 撃破した後に当たっても、爆発のエフェクトや撃破の処理を繰り返さない
-            // （プレイヤーは撃破しても消えないため。撃破後の処理は #108）
+            // （機体は撃破の演出が終わるまで消えないため。CharacterDeadComponent）
             if (isDead)
                 return;
 

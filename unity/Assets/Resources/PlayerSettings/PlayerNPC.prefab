@@ -638,6 +638,7 @@ GameObject:
   - component: {fileID: 949113190780115188}
   - component: {fileID: 2832605969727241905}
   - component: {fileID: 2441389677768592546}
+  - component: {fileID: 7670019935554236280}
   m_Layer: 0
   m_Name: PlayerNPC
   m_TagString: Untagged
@@ -851,8 +852,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c044b18db3e460d42b3ab66cae9a2aa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AdvancedGears.Runtime::AdvancedGears.CharacterHitReceiver
-  deadComp: {fileID: 0}
+  deadComp: {fileID: 7670019935554236280}
   character: {fileID: 6779917017821725060}
+--- !u!114 &7670019935554236280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8069397516925169022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c46cdfcb68e40543a038f4755b159aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AdvancedGears.Runtime::AdvancedGears.CharacterDeadComponent
+  character: {fileID: 6779917017821725060}
+  controller: {fileID: 949113190780115188}
+  hideDelay: 1.5
+  resultDelay: 1
 --- !u!1 &8234829977464033972
 GameObject:
   m_ObjectHideFlags: 0
