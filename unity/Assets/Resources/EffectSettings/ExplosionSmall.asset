@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: ExplosionSmall
   m_EditorClassIdentifier: 
   effectId: 13
-  effectPrefab: {fileID: 0}
+  effectPrefab: {fileID: 7081429515772019257, guid: 0b3d9b6c1b029a4409167f6bc02e17a9, type: 3}
   maxPoolSize: 8
