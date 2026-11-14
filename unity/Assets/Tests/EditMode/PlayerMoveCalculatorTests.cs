@@ -484,6 +484,27 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void CalcGroundSparkRate_NotBoostOrFloating_Zero()
+        {
+            Assert.AreEqual(0f, PlayerEffectPresenter.CalcGroundSparkRate(false, false, 18f));
+            Assert.AreEqual(0f, PlayerEffectPresenter.CalcGroundSparkRate(true, true, 18f));
+        }
+
+        [Test]
+        public void CalcGroundSparkRate_ScalesWithSpeedOnGround()
+        {
+            var min = PlayerEffectPresenter.GroundSparkMinSpeed;
+            var full = PlayerEffectPresenter.GroundSparkFullSpeed;
+            var max = PlayerEffectPresenter.GroundSparkMaxRate;
+
+            Assert.AreEqual(0f, PlayerEffectPresenter.CalcGroundSparkRate(true, false, min), 1e-4f);
+            Assert.AreEqual(max * 0.5f, PlayerEffectPresenter.CalcGroundSparkRate(true, false, (min + full) * 0.5f), 1e-4f);
+            Assert.AreEqual(max, PlayerEffectPresenter.CalcGroundSparkRate(true, false, full), 1e-4f);
+            // ハイパーブーストなどで最高速度を超えても最大のまま
+            Assert.AreEqual(max, PlayerEffectPresenter.CalcGroundSparkRate(true, false, 30f), 1e-4f);
+        }
+
+        [Test]
         public void CalcHyperBoostBit_OffIsZero_OnIsBoostDirection()
         {
             var info = new HyperBoostInfo();

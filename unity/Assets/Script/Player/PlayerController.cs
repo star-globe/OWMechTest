@@ -77,6 +77,21 @@ namespace AdvancedGears
         {
             ApplyEnergyPerformance();
             SyncParam();
+            AttachGroundSpark();
+        }
+
+        /// <summary>足元の火花（ループのエフェクト）を、カプセルの下端に付ける。マスタにプレハブが無ければ付けない</summary>
+        private void AttachGroundSpark()
+        {
+            if (touchChecker == null)
+                return;
+
+            var settings = EffectMaster.Instance.GetSettings(EffectID.GroundBoostSpark);
+            if (settings == null || settings.EffectPrefab == null)
+                return;
+
+            var inst = Instantiate(settings.EffectPrefab, touchChecker.BottomPosition, touchChecker.transform.rotation, touchChecker.transform);
+            effectPresenter.SetGroundSpark(inst.GetComponent<ParticleSystem>());
         }
 
         /// <summary>装備からエネルギーの性能を計算して機体に設定する。ジェネレーターを読み込めなければ機体の設定の値のまま</summary>
@@ -116,6 +131,9 @@ namespace AdvancedGears
             inputX = 0;
             inputZ = 0;
             hasAscendInput = false;
+
+            // 止めた後は Update が呼ばれないため、ここで足元の火花を止める
+            effectPresenter?.ApplyGroundSpark(false, false, 0f);
 
             if (rigid != null && !rigid.isKinematic)
             {
@@ -397,6 +415,9 @@ namespace AdvancedGears
 
             if (touchChecker != null)
                 effectPresenter.ApplyLanding(isFloating, rigid.linearVelocity.y, touchChecker.BottomPosition);
+
+            var velocity = rigid.linearVelocity;
+            effectPresenter.ApplyGroundSpark(IsBoost, isFloating, new Vector2(velocity.x, velocity.z).magnitude);
         }
 
         private PlayerMoveState CurrentMoveState
