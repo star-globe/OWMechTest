@@ -7,6 +7,8 @@ unity/Assets/Models/ 以下のカテゴリ別フォルダへ FBX をエクスポ
   arm_left_blade → Parts/Arms/arm_left_blade.fbx
   booster_standard → Parts/Booster/booster_standard.fbx
   rig_mech       → Rig/rig_mech.fbx（アニメーションを含めるのは rig_ だけ）
+  env_building_small_a → Environment/Buildings/env_building_small_a.fbx
+  env_prop_car   → Environment/Props/env_prop_car.fbx
 スキンメッシュは、Armature モディファイアが参照するアーマチュアも同じ FBX に含める。
 子孫の空オブジェクト（ノズルの出口などの目印）も FBX に含める。
 
@@ -61,6 +63,9 @@ CATEGORY_MAP = {
     "booster": "Parts/Booster",
     "weapon": "Weapons",
     "rig":    "Rig",
+    # 環境オブジェクト（#124）。カテゴリは名前の先頭 2 語
+    "env_building": "Environment/Buildings",
+    "env_prop":     "Environment/Props",
 }
 
 # アニメーションを書き出すカテゴリ（パーツの FBX には入れない。アニメーションは共通リグの FBX にまとめる）
@@ -76,6 +81,8 @@ NAME_PATTERNS = {
     "booster": re.compile(rf"^booster_{_VARIANT}$"),
     "weapon": re.compile(rf"^weapon_{_VARIANT}$"),
     "rig":    re.compile(rf"^rig_{_VARIANT}$"),
+    "env_building": re.compile(rf"^env_building_(?:small|medium|large)_{_VARIANT}$"),
+    "env_prop":     re.compile(rf"^env_prop_{_VARIANT}$"),
 }
 
 # docs/blender-unity-pipeline.md の「マテリアルスロット名」
@@ -150,9 +157,16 @@ def resolve_base_path(base_path=None):
 
 
 def get_category(obj_name):
-    """名前の先頭からカテゴリ（body / arm / ...）を返す。該当しなければ None"""
-    head = obj_name.lower().split("_", 1)[0]
-    return head if head in CATEGORY_MAP else None
+    """名前の先頭からカテゴリ（body / arm / env_building / ...）を返す。該当しなければ None
+
+    先頭 2 語のカテゴリ（env_building など）を先に調べる。
+    """
+    words = obj_name.lower().split("_")
+    for n in (2, 1):
+        head = "_".join(words[:n])
+        if len(words) >= n and head in CATEGORY_MAP:
+            return head
+    return None
 
 
 def get_export_path(obj_name, base_path=None):
