@@ -47,7 +47,8 @@ namespace AdvancedGears
             if (boosterId >= 0 && BoosterMaster.Instance.GetDictionary().TryGetValue(boosterId, out var booster) && booster != null)
                 boostOn = booster.BoostOnEnergyConsumption;
 
-            performance = EnergyPerformance.Calc(generator.EnergyCapacity, generator.EnergyOutput, consumptions, boostOn);
+            performance = EnergyPerformance.Calc(generator.EnergyCapacity, generator.EnergyOutput, consumptions, boostOn,
+                                                 generator.OverheatTime, generator.OverheatRecoveryRate);
             return true;
         }
     }

@@ -28,6 +28,16 @@ namespace AdvancedGears
         int boostEnergy = 1500;
         public int BoostEnergy => boostEnergy;
 
+        [SerializeField, Min(0)]
+        [Tooltip("ジェネレーターを読み込めないときのオーバーヒート時間（秒。通常はジェネレーターの値を使う）")]
+        float overheatTime = EnergyPerformance.DefaultOverheatTime;
+        public float OverheatTime => overheatTime;
+
+        [SerializeField, Range(0f, 1f)]
+        [Tooltip("ジェネレーターを読み込めないときの復帰エネルギー（最大エネルギーに対する割合。通常はジェネレーターの値を使う）")]
+        float overheatRecoveryRate = EnergyPerformance.DefaultOverheatRecoveryRate;
+        public float OverheatRecoveryRate => overheatRecoveryRate;
+
         [SerializeField]
         int jumpEnergy = 3500;
         public int JumpEnergy => jumpEnergy;

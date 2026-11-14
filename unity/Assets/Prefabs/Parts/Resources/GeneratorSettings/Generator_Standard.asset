@@ -18,3 +18,5 @@ MonoBehaviour:
   constantEnergyConsumption: 0
   energyCapacity: 10000
   energyOutput: 5000
+  overheatTime: 3
+  overheatRecoveryRate: 0.3

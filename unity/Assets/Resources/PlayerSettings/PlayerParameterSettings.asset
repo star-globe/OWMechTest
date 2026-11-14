@@ -16,9 +16,12 @@ MonoBehaviour:
   maxEnergy: 10000
   energyRecovery: 3500
   boostEnergy: 1500
+  overheatTime: 3
+  overheatRecoveryRate: 0.3
   jumpEnergy: 2000
   quickBoostEnergy: 2500
   hyperBoostEnergy: 4000
+  ascendEnergy: 5000
   quickTime: 0.5
   quickInterval: 0.5
   touchQuickRate: 1.5

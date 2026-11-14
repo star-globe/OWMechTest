@@ -26,9 +26,12 @@ namespace AdvancedGears
             return InputUtils.CheckBoost();
         }
 
+        // プレイヤーは残量が 0 以上なら（オーバーヒートしていなければ）行動できる。
+        // 基底の CheckJump などは NPC 向けの判断（消費量より多く残っているか）なので使わない
+
         protected override bool CheckJump()
         {
-            return base.CheckJump() && InputUtils.CheckJump();
+            return CharacterParam.CanJump && InputUtils.CheckJump();
         }
 
         protected override bool CheckAscend()
@@ -38,12 +41,12 @@ namespace AdvancedGears
 
         protected override bool CheckQuick()
         {
-            return base.CheckQuick() && InputUtils.CheckQuick();
+            return CharacterParam.CanQuick && InputUtils.CheckQuick();
         }
 
         protected override bool CheckHyperBoost()
         {
-            return base.CheckHyperBoost() && InputUtils.CheckHyperBoost();
+            return CharacterParam.CanHyperBoost && InputUtils.CheckHyperBoost();
         }
 
 

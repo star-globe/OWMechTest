@@ -128,9 +128,13 @@ namespace AdvancedGears
             return Vector2.zero;
         }
 
+        // CheckJump / CheckQuick / CheckHyperBoost の基底は NPC 向けの判断で、消費量より多く残っているときだけ行動する
+        // （オーバーヒートしない範囲で行動させる）。プレイヤーは残量が 0 以上なら行動できる（CharacterParam.CanJump など）
+
         protected virtual bool CheckJump()
         {
-            return playerCharacter.CharacterParam.CanJump;
+            var param = playerCharacter.CharacterParam;
+            return param.HasEnergyFor(param.JumpEnergy);
         }
         /// <summary>
         /// グライド中の上昇の入力（押し続けている間 true）。エネルギーや空中かどうかは PlayerController 側で判定する。
@@ -150,11 +154,13 @@ namespace AdvancedGears
         }
         protected virtual bool CheckQuick()
         {
-            return playerCharacter.CharacterParam.CanQuick;
+            var param = playerCharacter.CharacterParam;
+            return param.HasEnergyFor(param.QuickBoostEnergy);
         }
         protected virtual bool CheckHyperBoost()
         {
-            return playerCharacter.CharacterParam.CanHyperBoost;
+            var param = playerCharacter.CharacterParam;
+            return param.HasEnergyFor(param.HyperBoostEnergy);
         }
         protected virtual bool CheckRightFire()
         {
@@ -296,6 +302,14 @@ namespace AdvancedGears
             var time = Time.deltaTime;
             playerCharacter.IsAscend = isAscend;
             playerCharacter.UpdateParam(time, isFloating);
+
+            // オーバーヒートしたら、継続して消費する行動を止める。グライド中の上昇は CanAscend が false になるので止まる。
+            // 原因になったジャンプ・クイックブーストは最後まで出す
+            if (playerCharacter.CharacterParam.IsOverheat && hypBstInfo.isOn)
+            {
+                hypBstInfo.ResetBoost();
+                playerCharacter.IsHyperBoost = false;
+            }
         }
 
         protected virtual void Fire(WeaponSlot slot)
