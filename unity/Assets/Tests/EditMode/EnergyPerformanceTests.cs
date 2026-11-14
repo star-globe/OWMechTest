@@ -111,37 +111,37 @@ namespace AdvancedGears.Tests
             Assert.AreEqual(7000, param.Energy);
         }
 
-        // ── NpcBoostDecider ────────────────────────────
+        // ── NpcDecider（ブースト） ────────────────────────────
 
         [Test]
         public void NpcBoost_OnTurnsOffAtTenPercentOrLess()
         {
-            Assert.IsFalse(NpcBoostDecider.ShouldToggle(true, 1001, 10000));
-            Assert.IsTrue(NpcBoostDecider.ShouldToggle(true, 1000, 10000));
-            Assert.IsTrue(NpcBoostDecider.ShouldToggle(true, 0, 10000));
+            Assert.IsFalse(NpcDecider.ShouldToggleBoost(true, 1001, 10000));
+            Assert.IsTrue(NpcDecider.ShouldToggleBoost(true, 1000, 10000));
+            Assert.IsTrue(NpcDecider.ShouldToggleBoost(true, 0, 10000));
         }
 
         [Test]
         public void NpcBoost_OffTurnsOnAtFiftyPercentOrMore()
         {
-            Assert.IsFalse(NpcBoostDecider.ShouldToggle(false, 4999, 10000));
-            Assert.IsTrue(NpcBoostDecider.ShouldToggle(false, 5000, 10000));
-            Assert.IsTrue(NpcBoostDecider.ShouldToggle(false, 10000, 10000));
+            Assert.IsFalse(NpcDecider.ShouldToggleBoost(false, 4999, 10000));
+            Assert.IsTrue(NpcDecider.ShouldToggleBoost(false, 5000, 10000));
+            Assert.IsTrue(NpcDecider.ShouldToggleBoost(false, 10000, 10000));
         }
 
         [Test]
         public void NpcBoost_BetweenThresholdsKeepsState()
         {
             // 10% より多く 50% 未満のときは、どちらの状態でも切り替えない（毎フレームの切り替えを防ぐ）
-            Assert.IsFalse(NpcBoostDecider.ShouldToggle(true, 3000, 10000));
-            Assert.IsFalse(NpcBoostDecider.ShouldToggle(false, 3000, 10000));
+            Assert.IsFalse(NpcDecider.ShouldToggleBoost(true, 3000, 10000));
+            Assert.IsFalse(NpcDecider.ShouldToggleBoost(false, 3000, 10000));
         }
 
         [Test]
         public void NpcBoost_ZeroMaxEnergyStaysOff()
         {
-            Assert.IsTrue(NpcBoostDecider.ShouldToggle(true, 0, 0));
-            Assert.IsFalse(NpcBoostDecider.ShouldToggle(false, 0, 0));
+            Assert.IsTrue(NpcDecider.ShouldToggleBoost(true, 0, 0));
+            Assert.IsFalse(NpcDecider.ShouldToggleBoost(false, 0, 0));
         }
     }
 }

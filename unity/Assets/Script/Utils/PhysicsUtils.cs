@@ -41,7 +41,7 @@ namespace AdvancedGears
         /// 指定した除外マスク（UnitSide ビットマスク）に一致しない最近傍の BaseObject の座標を返す。
         /// excludeSideMask は UnitSideExtensions.ToExcludeMask() で生成する。
         /// </summary>
-        public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, TagHandle tag, out Vector3 targetPos)
+        public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, TagHandle? tag, out Vector3 targetPos)
         {
             var found = CheckOverlapShpereOthers(pos, radius, excludeSideMask, layerMask, tag, out BaseObject target);
             targetPos = found ? target.transform.position : Vector3.zero;
@@ -52,7 +52,7 @@ namespace AdvancedGears
         /// 指定した除外マスク（UnitSide ビットマスク）に一致しない最近傍の BaseObject を返す。
         /// excludeSideMask は UnitSideExtensions.ToNpcExcludeMask() などで生成する。
         /// </summary>
-        public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, TagHandle tag, out BaseObject target)
+        public static bool CheckOverlapShpereOthers(Vector3 pos, float radius, int excludeSideMask, int layerMask, TagHandle? tag, out BaseObject target)
         {
             target = null;
             float length = float.MaxValue;
@@ -60,7 +60,8 @@ namespace AdvancedGears
             for (int i = 0; i < count; i++)
             {
                 var col = colliders[i];
-                if (col.CompareTag(tag) == false)
+                // tag が null ならタグで絞らない（OverlapShpereOthers と同じ）
+                if (tag != null && col.CompareTag(tag.Value) == false)
                     continue;
 
                 var baseObject = col.gameObject.GetComponent<BaseObject>();
