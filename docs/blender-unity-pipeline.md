@@ -24,7 +24,10 @@ unity/Assets/
 │   │   ├── Head/       # 頭部パーツ (.fbx)
 │   │   └── Booster/    # ブースターパーツ (.fbx)
 │   ├── Rig/            # 共通リグとアニメーション (.fbx)
-│   └── Weapons/        # 武装 (.fbx)
+│   ├── Weapons/        # 武装 (.fbx)
+│   └── Environment/
+│       ├── Buildings/  # フィールドの建物 (.fbx)
+│       └── Props/      # フィールドの小物 (.fbx)
 └── Textures/
     ├── Parts/          # パーツ用テクスチャ
     └── Weapons/        # 武装用テクスチャ
@@ -45,6 +48,8 @@ unity/Assets/
 | ブースター | `booster_{バリアント名}.fbx` | `booster_standard.fbx` |
 | 武装 | `weapon_{バリアント名}.fbx` | `weapon_rifle.fbx` |
 | 共通リグ・アニメーション | `rig_{名前}.fbx` | `rig_mech.fbx` |
+| 建物（環境） | `env_building_{small/medium/large}_{バリアント名}.fbx` | `env_building_small_a.fbx` |
+| 小物（環境） | `env_prop_{名前}.fbx` | `env_prop_car.fbx` |
 
 ### 機体本体のパーツと共通リグ（#68）
 
@@ -65,6 +70,14 @@ unity/Assets/
 - Unity 側のプレハブ（`Prefabs/Parts/Booster/Booster_XXX_part.prefab`）の構成
   - `Model`（FBX のインスタンス）: 回転 (-90, 0, 0) で FBX の +Z をパーツの +Y（コネクターの規約での噴射の向き）に合わせる。スケール 0.5 で、コネクターのスケール 2 を打ち消して実寸（1 単位 = 1 m）にする
   - `EffectorPos`（噴射のエフェクト）: `nozzle_exit_*` の子に置き、位置・回転は 0、スケール 2（エフェクトはコネクターのスケール 2 の下で調整してあるため）。ノズルが大きいものはスケールを大きくする（heavy は 2.6）
+
+### 環境オブジェクト（#124）
+
+- `.blend` は `blender/environment.blend`、メッシュは `tools/blender/environment_parts.py` で作る（リグは使わない）。原点が地面での中心、+Z が上、正面は -Y。マテリアルは `Mat_Body` / `Mat_Detail` の単色だけ
+- 建物の大きさは `small`（屋上 8 m 程度。機体と同じくらい）、`medium`（20〜30 m）、`large`（100 m 程度のランドマーク）。廃墟ビルは `ruined_building()` の引数（大きさ・階数・`seed`・崩れる階数・壁の抜ける割合など）でバリアントを増やす。今あるのは `env_building_{small,medium,large}_a` と `env_prop_{car,truck,sign}`
+- 当たり判定の箱は、空オブジェクト `col_{名前から env_ を除いたもの}_{番号}`（立方体の表示。位置が箱の中心、スケールが箱の大きさの半分）としてメッシュの子に置く。建物は区画ごとの箱（屋上の床の上面まで）で、がれき・突き出た柱・手すり壁は含めない
+- 取り込んだ FBX では、ルートに回転 (270, 0, 0) が付き、Unity の Y が上になる。Blender の -Y（正面）は Unity の +Z。インポート設定は Animation Type を None、Import Animation を OFF にする
+- Unity 側のプレハブ（`Prefabs/Environment/{Buildings,Props}/Building_{Small,Medium,Large}_X.prefab`、`Prop_{名前}.prefab`）は FBX のプレハブバリアント。`col_*` に BoxCollider（中心 0、size 2）を付け、全体を Static（Contribute GI 以外）にする
 
 ### マテリアルスロット名（Blender側）
 
