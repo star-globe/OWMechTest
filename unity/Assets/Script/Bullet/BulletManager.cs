@@ -79,6 +79,19 @@ namespace AdvancedGears
             bullet.Fire(direction, position, inheritVelocity, instanceId, shooter);
 
             currentBullets[instanceId] = bullet;
+
+            PlayMuzzleEffect(bulletId, position, direction);
+        }
+
+        /// <summary>マズルの位置に、発射の向き（+Z）でマズルフラッシュを出す</summary>
+        void PlayMuzzleEffect(int bulletId, Vector3 position, Vector3 direction)
+        {
+            var settings = BulletMaster.Instance.GetSettings(bulletId);
+            if (settings == null)
+                return;
+
+            var rotation = direction.sqrMagnitude > 0f ? Quaternion.LookRotation(direction) : Quaternion.identity;
+            EffectManager.Instance?.PlayEffect(settings.ResolvedMuzzleEffectId, position, rotation);
         }
 
         public void Vanish(long instanceId)
