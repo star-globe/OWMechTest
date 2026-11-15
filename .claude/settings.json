@@ -1,5 +1,81 @@
 {
   "env": {
     "MAX_THINKING_TOKENS": "10000"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git ls-files *)",
+      "Bash(git rev-parse *)",
+      "Bash(git switch *)",
+      "Bash(git pull *)",
+      "Bash(git fetch *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git merge *)",
+      "Bash(git worktree *)",
+      "Bash(git push -u origin feature/*)",
+      "Bash(gh issue list *)",
+      "Bash(gh issue view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr create *)",
+      "PowerShell(git status *)",
+      "PowerShell(git log *)",
+      "PowerShell(git diff *)",
+      "PowerShell(git show *)",
+      "PowerShell(git branch *)",
+      "PowerShell(git switch *)",
+      "PowerShell(git pull *)",
+      "PowerShell(git fetch *)",
+      "PowerShell(git add *)",
+      "PowerShell(git commit *)",
+      "PowerShell(git merge *)",
+      "PowerShell(git worktree *)",
+      "PowerShell(git push -u origin feature/*)",
+      "PowerShell(gh issue list *)",
+      "PowerShell(gh issue view *)",
+      "PowerShell(gh pr list *)",
+      "PowerShell(gh pr view *)",
+      "PowerShell(gh pr diff *)",
+      "PowerShell(gh pr create *)",
+      "EnterWorktree",
+      "ExitWorktree"
+    ],
+    "ask": [
+      "Bash(git push *--force*)",
+      "Bash(git push *-f *)",
+      "Bash(git push origin main*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf *)",
+      "PowerShell(git push *--force*)",
+      "PowerShell(git push *-f *)",
+      "PowerShell(git push origin main*)",
+      "PowerShell(git reset --hard*)",
+      "PowerShell(Remove-Item *)"
+    ],
+    "deny": [
+      "PowerShell(Stop-Process *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/unity/.claude/hooks/block-compound-git.ps1\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   }
 }
