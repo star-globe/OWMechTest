@@ -164,11 +164,13 @@ git 管理外の設定なので、それぞれのマシンで行う。終わっ�
 
 | 片付け | 場所 | マシン A | マシン B |
 |---|---|---|---|
-| `mcp__blender__execute_blender_code` の allow を消す | `unity/.claude/settings.local.json` | [ ] | 該当なし |
-| `Bash(git *)` を消す（必要な git 操作はプロジェクトの許可リストで足りる） | ユーザー設定（`~/.claude/settings.json`）、`unity/.claude/settings.local.json` | [ ] | [ ]（あれば） |
-| `Bash(python3 -c ' *)` を消す | `~/.claude/settings.local.json` | [ ] | [ ]（あれば） |
-| `PowerShell(Remove-Item *)` の allow を消す（プロジェクトの設定で ask） | `unity/.claude/settings.local.json` | [ ] | [ ]（あれば） |
-| 旧 UnityMCP のツール名（`mcp__UnityMCP__*`、`mcp__unity-mcp__Unity_RunCommand`）を消す | `unity/.claude/settings.local.json` | [ ] | [ ]（あれば） |
-| その場限りの完全一致の許可（特定の `gh pr create`、GUID を含む `grep`、`Get-ChildItem ...` など）を消す | `settings.local.json` の各所 | [ ] | [ ] |
+| `mcp__blender__execute_blender_code` の allow を消す | `unity/.claude/settings.local.json` | 該当なし（片付けの時点で既に無かった） | 該当なし |
+| `Bash(git *)` を消す（必要な git 操作はプロジェクトの許可リストで足りる） | ユーザー設定（`~/.claude/settings.json`）、`unity/.claude/settings.local.json` | [x] | [ ]（あれば） |
+| `Bash(python3 -c ' *)` を消す | `~/.claude/settings.local.json` | 該当なし（片付けの時点で既に無かった） | [ ]（あれば） |
+| `PowerShell(Remove-Item *)` の allow を消す（プロジェクトの設定で ask） | `unity/.claude/settings.local.json` | [x] | [ ]（あれば） |
+| 旧 UnityMCP のツール名（`mcp__UnityMCP__*`、`mcp__unity-mcp__Unity_RunCommand`）を消す | `unity/.claude/settings.local.json` | [x] | [ ]（あれば） |
+| その場限りの完全一致の許可（特定の `gh pr create`、GUID を含む `grep`、`Get-ChildItem ...` など）を消す | `settings.local.json` の各所 | [x] | [ ] |
+
+マシン A の片付け（2026-11-15）で消したもの: `Bash(git *)`（2 か所）、`PowerShell(Remove-Item *)`、旧 UnityMCP のツール名 14 件（`mcp__UnityMCP__*` 13 件と `mcp__unity-mcp__Unity_RunCommand`）、その場限りの許可 11 件（`gh pr create --title 'feat: SelectMenu→Briefing→Field …'`、`xargs grep -l "EntityId"`、`xargs grep -l "<GUID>"`、`docker --version` / `node --version` と対の `if ($?) …` 2 件、`Get-ChildItem …` の完全一致 4 件）。残したもの: `PowerShell(New-Item *)`、`PowerShell(claude mcp *)`、`Skill(update-config)`、`WebFetch(domain:api.github.com)`、`WebSearch`、Blender MCP の読み取り 2 件、GitHub MCP 4 件、`Read(...)` のパス指定。
 
 片付けの後、しばらく作業してから「集計の手順」で集計し直すと、改修の効果を確かめられる。
