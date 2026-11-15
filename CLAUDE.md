@@ -51,6 +51,7 @@ WarGameProject
 - 管理用セッションのトークン節約ポリシー: docs/management-session-policy.md
 - クラウドセッションの基本方針: docs/cloud-session-policy.md
 - エフェクトの対応一覧（進捗の管理）: docs/effects-plan.md
+- 許可確認（承認画面）の調査: docs/permission-prompt-survey.md（集計スクリプト: `tools/claude/survey-permission-prompts.ps1`）
 - 作業ログ: docs/logs/issue-{番号}-log.md
 
 ## ディレクトリマップ
