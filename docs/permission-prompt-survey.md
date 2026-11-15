@@ -9,8 +9,8 @@ Claude Code の作業中に出る承認画面を減らすため、手元のセ�
 | マシン | 集計日 | 対象 | 状態 |
 |---|---|---|---|
 | マシン A（PR #146 の検証をしたマシン） | 2026-11-15 | 16 セッション（2026-11-08 以降） | 集計済み |
-| マシン B | - | - | 未集計 |
-| 改修用のセッション | - | - | 2 台の結果がそろってから作る |
+| マシン B | 2026-11-15 | 29 セッション（2026-11-10 以降） | 集計済み |
+| 改修用のセッション | - | - | 未着手（2 台の結果がそろったので作れる） |
 
 ## 集計の手順
 
@@ -21,7 +21,7 @@ pwsh -NoProfile -File tools/claude/survey-permission-prompts.ps1
 ```
 
 - `~/.claude/projects/**/*.jsonl` のうち新しい順に 50 件（`-MaxFiles` で変更）を読む。記録は `cleanupPeriodDays`（ユーザー設定）の日数で消えるので、それより前の分は残っていない
-- 許可リストは、ユーザー設定（`~/.claude/settings.json`、`settings.local.json`）、repo ルートの `.claude/settings.json`、`unity/.claude/settings.json`、`unity/.claude/settings.local.json` を読む。worktree から実行するときは、`-RepoRoot` に本体のフォルダを指定する（`settings.local.json` は git 管理外で worktree に無いため）
+- 許可リストは、ユーザー設定（`~/.claude/settings.json`、`settings.local.json`）、repo ルートの `.claude/settings.json`、`unity/.claude/settings.json`、`unity/.claude/settings.local.json` を読む。worktree から実行するときは、`-RepoRoot` に本体のフォルダを指定する（`settings.local.json` は git 管理外で worktree に無いため）。ただし本体のフォルダが main より古いブランチにあると、新しい許可リストで判定されない。そのときは `unity/.claude/settings.local.json` を worktree にコピーし、`-RepoRoot` を付けずに worktree から実行する
 - 出力は「承認画面の原因」「許可リストに無い MCP ツール」「ツール別の呼び出し回数」の 3 つ。結果は下の「集計結果」にマシンごとの節を作って貼る
 
 判定の限界:
@@ -66,9 +66,47 @@ pwsh -NoProfile -File tools/claude/survey-permission-prompts.ps1
 - `git -C` は、Bash の単独の呼び出しならユーザー設定の `Bash(git *)` で通る。承認が出るのは、ほかのコマンドとつないだときと PowerShell のとき
 - 待機（`Start-Sleep`、`unity status` のループ）は、Unity の起動やテストの完了を待つときに出ている
 
-### マシン B
+### マシン B（2026-11-15）
 
-（未集計。上の手順で集計して、マシン A と同じ形で書く）
+対象は 29 セッション（2026-11-10 以降）。Bash 435 回 / PowerShell 240 回のうち、承認画面が出たと見込まれるのは Bash 261 回 / PowerShell 112 回。記録の多くは PR #146 のマージ前のもの。集計したセッション自身の呼び出し（PowerShell 7 を探す・起動する数回）も含む。
+
+| # | 原因 | 件数 | 例 | 対策の状況 |
+|---|---|---|---|---|
+| 1 | `cd` と git / gh をつないだ | 144 | `cd /c/.../OWMechTest && git status --short && git fetch origin main` | PR #146 のフックで拒否する |
+| 2 | `git -C` | 39（PowerShell 29 / Bash 10） | `git -C C:/.../wt-bc add CLAUDE.md ...` | PR #146 のフックで拒否する |
+| 3 | ループ（`for` で Issue をまとめて読むなど） | 33 | `for n in 130 132 133 ...; do gh issue view $n ...; done` | 未対応 |
+| 4 | PowerShell の変数代入・here-string（`$env:Path` を含む） | 29 | `$b = gh issue view 66 ... ; $b = $b.Replace(...)` | CLAUDE.md にルールはあるが、フックでは拒否していない |
+| 5 | PowerShell のパイプ・コマンドレット（`Get-Content`、`Select-Object`、`Out-String`、`Out-File`、`Test-Path` など） | 約 28 | `Get-Content ...cs.meta \| Select-String guid` | CLAUDE.md にルールはあるが、フックでは拒否していない |
+| 6 | Bash のシェル変数の代入・`export`（長いパスを変数に入れる） | 24 | `SP="/c/Users/.../scratchpad"; ...`、`export PATH=...; gh issue list ...` | 未対応 |
+| 7 | git / gh の書き込み（`gh issue edit` / `create`、`gh pr create`、PowerShell での `git push` / `git checkout`） | 16 | `gh issue edit 66 --body-file ...` | 書き込みなので承認が出てよい。複数行の本文の誤判定（「許可リストに無い: Closes」など）を 7 件含む |
+| 8 | シェルでのファイル書き込み（`>`、`sed -i`、`cat > ... <<EOF`、`mkdir`、`rm`、`cp`） | 15 | `gh issue view 66 ... > issue66.md` | PR #146 で「Write / Edit を使う」ルールを追加 |
+| 9 | スクリプト・別のシェルの起動（`powershell -File`、`uv run python`、`pwsh`） | 18 | `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/switch-to-blender.ps1`（PowerShell ツールから） | Bash からの `switch-to-*.ps1` だけ許可リストにある |
+| 10 | プロセスの確認・待機（`tasklist`、`time`、`Start-Sleep`、UI Automation） | 10 | `unity status ...; tasklist //FI "IMAGENAME eq Unity.exe"` | 未対応 |
+| 11 | コマンド置換 `$(...)` | 9 | `g=$(grep guid ...cs.meta \| awk ...); grep -rl "$g" Assets` | 未対応 |
+
+許可リストに無い MCP ツール:
+
+| ツール | 件数 | 読み取り系か |
+|---|---|---|
+| `mcp__blender__execute_blender_code` | 27 | いいえ（任意のコードを実行する） |
+| `mcp__claude-code-remote__get_session` | 18 | はい |
+| `mcp__claude-code-remote__create_session` | 12 | いいえ（セッションを作る） |
+| `mcp__claude-code-remote__send_message` | 11 | いいえ（メッセージを送る） |
+| `mcp__claude-code-remote__list_events` | 10 | はい |
+| `mcp__claude-code-remote__archive_session` | 7 | いいえ（セッションをアーカイブする） |
+| `mcp__unity-mcp__simulate_key` | 3 | いいえ（Play 中に入力を送る） |
+| `mcp__claude-code-remote__list_environments` | 2 | はい |
+| `mcp__claude-code-remote__list_sessions` | 2 | はい |
+| `mcp__claude-code-remote__interrupt_session` | 2 | いいえ |
+| `mcp__unity-mcp__delete_asset`、`quit`、`mcp__blender__execute_blender_code_for_cli` | 各 1 | いいえ |
+
+わかったこと:
+
+- マシン A と同じく、承認画面の大半はつなぎ方が原因。`cd` と git / gh、`git -C` の 2 つで 183 件（承認画面の約半分）あり、PR #146 のフックが効けば次からは拒否と理由の表示に変わる
+- マシン A に無かった原因として、ループで Issue をまとめて読む（33 件）、scratchpad などの長いパスをシェル変数に入れる（24 件）が多い。どちらも呼び出しを 1 つずつに分ければ承認画面は出ない
+- PowerShell の `git -C`（29 件）は、管理用セッションが worktree を操作するときに出ている
+- `mcp__blender__execute_blender_code` は、マシン A では `settings.local.json` で許可しているが、マシン B では許可リストに無く、27 回承認している。「設定で気になった点」の任意のコードを実行できる許可と合わせて、どちらにそろえるか決める
+- `claude-code-remote` の読み取り系（`get_session`、`list_events`、`list_sessions`、`list_environments`）は計 32 回で、改修の案 4 がそのまま効く
 
 ## 設定で気になった点（マシン A）
 
