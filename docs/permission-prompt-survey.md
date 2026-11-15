@@ -139,7 +139,7 @@ pwsh -NoProfile -File tools/claude/survey-permission-prompts.ps1
 | 項目 | 決定 |
 |---|---|
 | `mcp__blender__execute_blender_code` | 2 台とも承認画面を出す（任意のコードを実行でき、管理用セッションの「Blender のコマンドを評価して解説する」流れも承認画面を前提にしているため）。回数はモデリングのポリシーどおり 1 回の呼び出しにまとめて減らす |
-| `claude-code-remote` の書き込み系 | `send_message` だけ許可する（送り先は自分のセッション）。`create_session`（コストがかかる）、`archive_session`（元に戻しにくい）、`interrupt_session` は承認画面を残す |
+| `claude-code-remote` の書き込み系 | `send_message` だけ許可する（送り先は自分のセッション）。ただし `send_message` は許可リストでは止められなかった（「許可リストでは止められない承認画面」）。`create_session`（コストがかかる）、`archive_session`（元に戻しにくい）、`interrupt_session` は承認画面を残す |
 | `gh issue edit` / `gh pr edit` | すべての Issue / PR で許可する。変えられるのはタイトル・本文・ラベルなどで、本文は GitHub の編集履歴から戻せる。クローズ・削除・移動は別のコマンドなので許可しない |
 
 ### プロジェクトの設定で行ったこと
@@ -159,11 +159,23 @@ pwsh -NoProfile -File tools/claude/survey-permission-prompts.ps1
    - 許可リストに追加し、CLAUDE.md と `/unity-verify` から案内する
 3. **許可リストに足す**（`unity/.claude/settings.json` と repo ルートの `.claude/settings.json`）
    - `mcp__claude-code-remote__get_session`、`list_sessions`、`list_events`、`get_event`、`list_environments`、`send_message`
+     - `send_message` の行は効いていない（「許可リストでは止められない承認画面」）。害はないので残している
    - `gh issue edit *`、`gh pr edit *`、`git push -u origin docs/*`、PowerShell の `gh pr checks *`
    - PowerShell ツールからの `switch-to-blender.ps1` / `switch-to-unity.ps1` / `wait-unity-ready.ps1`（`unity/` のみ）
 4. **ask に足す**（ユーザー設定の `Bash(git *)` などより優先される）
    - `git branch -D`、`git clean`、`git checkout --`、`git restore`、`git stash drop`
    - `git push *origin main*`（それまでの `git push origin main*` は `git push -u origin main` に当てはまらなかった）
+
+### 許可リストでは止められない承認画面
+
+`mcp__claude-code-remote__send_message` は、両方の `settings.json` の `allow` に入れても、呼ぶたびに承認画面が出る（2026-11-15、マシン A の作業用セッションで確認）。
+
+- 確認した例: デバッグ用タスクのセッション（`session_01LnjZSZJeiBqHezLcvAxx6L`）が、16:03 UTC に管理用セッションへ報告を送ったとき
+  - このセッションは許可の追加（`6eca0a2`）より後に作られ、`unity/` の `.mcp.json` とスキルも読み込んでいた。設定が読まれていないせいではない
+- 承認の要求（`list_events` の `control_request`、`subtype: can_use_tool`）に `"suppress_always_allow_rule": true` が付いている。ツール側（`claude-code-remote` の MCP サーバー）が「常に許可」のルールを適用させない指定で、承認画面にも「常に許可」が出ない
+- 別のセッションに指示を送り込める操作のため、人間の確認を必須にしていると思われる（推測）
+- 影響: 作業用セッションが管理用セッションへ報告するたびに、作業用セッションの側で人間の承認が要る。報告の回数を減らすには、報告の時点（管理用セッションのポリシーの「7. 作業用セッションに指示を出す」）を必要なものに絞る
+- 承認画面の原因を調べるときは、`list_events` の `kinds` に `control_request` を指定し、`can_use_tool` の要求を探す。結果は大きいので、ファイルに保存して `tool_name` と `suppress_always_allow_rule` を検索する
 
 ### 各マシンで行う片付け
 
