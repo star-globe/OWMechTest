@@ -505,6 +505,17 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void IsWallKick_OnlyWhenTouchingWallWithNormal()
+        {
+            Assert.IsTrue(PlayerEffectPresenter.IsWallKick(TouchState.Wall, Vector3.left));
+            // 地面を蹴るジャンプや空中では出さない
+            Assert.IsFalse(PlayerEffectPresenter.IsWallKick(TouchState.Ground, Vector3.up));
+            Assert.IsFalse(PlayerEffectPresenter.IsWallKick(TouchState.None, Vector3.zero));
+            // 法線が取れていなければ向きを決められないので出さない
+            Assert.IsFalse(PlayerEffectPresenter.IsWallKick(TouchState.Wall, Vector3.zero));
+        }
+
+        [Test]
         public void CalcHyperBoostBit_OffIsZero_OnIsBoostDirection()
         {
             var info = new HyperBoostInfo();

@@ -68,6 +68,21 @@ namespace AdvancedGears
                 EffectManager.Instance?.PlayEffect(EffectID.LandingDust, footPosition);
         }
 
+        /// <summary>壁を蹴ってジャンプしたか（壁に接していて、法線が取れている）</summary>
+        public static bool IsWallKick(TouchState touch, UnityEngine.Vector3 normal)
+        {
+            return touch == TouchState.Wall && normal != UnityEngine.Vector3.zero;
+        }
+
+        /// <summary>壁を蹴ってジャンプした瞬間に、接触点から壁の外向き（法線の向き）へ粉じんと火花を出す</summary>
+        public void ApplyWallKick(TouchState touch, UnityEngine.Vector3 point, UnityEngine.Vector3 normal)
+        {
+            if (!IsWallKick(touch, normal))
+                return;
+
+            EffectManager.Instance?.PlayEffect(EffectID.WallKick, point, UnityEngine.Quaternion.LookRotation(normal));
+        }
+
         /// <summary>足元の火花が出始める水平速度（m/s）。歩きの最高速度 9 m/s より下から、ブーストで加速し始めたら出す</summary>
         public const float GroundSparkMinSpeed = 4f;
 
