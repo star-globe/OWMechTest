@@ -193,6 +193,9 @@ Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバ
   - 新しいブランチ: `EnterWorktree`（`name` に短い名前）で repo ルートの `.claude/worktrees/<名前>/` に `origin/main` から作られる。ブランチ名は自動で付くので、作った直後に `git branch -m feature/issue-{番号}-{内容}` で命名規則に合わせる。作業が終わって push したら `ExitWorktree`（`action: remove`）で片付ける（未 push の変更があると拒否される）
   - 既存のブランチ（作業中の PR など）: `git worktree add ../.claude/worktrees/<名前> <ブランチ名>` で作り、`EnterWorktree` の `path` で入る。この worktree は `ExitWorktree` では消えないので、`ExitWorktree`（`action: keep`）で戻ってから `git worktree remove ../.claude/worktrees/<名前>` で片付ける
   - worktree の中で Unity Editor を開く作業はしない（Library の再生成と Windows のパス長制限のため）。docs・設定ファイル・C# の数か所の修正に使う
+- **許可設定は 2 か所にある**。`unity/.claude/settings.json` は `unity/` で起動した通常のセッション用で、repo ルートの `.claude/settings.json` は worktree 用（worktree に入ると作業フォルダが worktree のルートになり、こちらだけが読まれる）。repo ルートには git / gh の規則、`EnterWorktree` / `ExitWorktree`、PreToolUse フックだけを置き、Unity / Blender の MCP の許可は置かない
+  - git / gh の allow・ask・deny とフックを変えるときは、両方のファイルを揃える
+  - フックのスクリプトは `unity/.claude/hooks/` の 1 つだけ。repo ルートの設定からは `$CLAUDE_PROJECT_DIR/unity/.claude/hooks/...` で参照する
 
 ## UI 実装ポリシー
 
