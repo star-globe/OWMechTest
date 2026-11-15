@@ -12,7 +12,7 @@ Unity CLI MCP（`unity-mcp`）のツールで検証する。MCP ツールが使�
 
 1. **Editor の状態を確認する**
    - `unity status` で対象プロジェクトの Editor が `ready` であること
-   - 起動していなければ `unity/` で `unity open .` を実行し、`ready` になるまで待つ（Monitor の until ループで `unity status` を確認する）
+   - 起動していなければ `unity/` で `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/wait-unity-ready.ps1` を実行する（起動して `ready` になるまで待つ。`sleep` やループで `unity status` を繰り返し呼ばない）
 
 2. **コンパイルする**
    - 変更が Editor に反映されていなければ `recompile` を実行し、`recompile_status` で完了を待つ
