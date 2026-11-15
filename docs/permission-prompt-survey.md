@@ -10,7 +10,7 @@ Claude Code の作業中に出る承認画面を減らすため、手元のセ�
 |---|---|---|---|
 | マシン A（PR #146 の検証をしたマシン） | 2026-11-15 | 16 セッション（2026-11-08 以降） | 集計済み |
 | マシン B | 2026-11-15 | 29 セッション（2026-11-10 以降） | 集計済み |
-| 改修 | 2026-11-15 | プロジェクトの設定・フック・ルール | PR を作成（「改修の内容」）。各マシンの片付けは未着手 |
+| 改修 | 2026-11-15 | プロジェクトの設定・フック・ルール | PR #150 でマージ済み（「改修の内容」）。マシン B は動作確認と片付けが済み、マシン A の片付けは未着手 |
 
 ## 集計の手順
 
@@ -165,10 +165,10 @@ git 管理外の設定なので、それぞれのマシンで行う。終わっ�
 | 片付け | 場所 | マシン A | マシン B |
 |---|---|---|---|
 | `mcp__blender__execute_blender_code` の allow を消す | `unity/.claude/settings.local.json` | [ ] | 該当なし |
-| `Bash(git *)` を消す（必要な git 操作はプロジェクトの許可リストで足りる） | ユーザー設定（`~/.claude/settings.json`）、`unity/.claude/settings.local.json` | [ ] | [ ]（あれば） |
-| `Bash(python3 -c ' *)` を消す | `~/.claude/settings.local.json` | [ ] | [ ]（あれば） |
-| `PowerShell(Remove-Item *)` の allow を消す（プロジェクトの設定で ask） | `unity/.claude/settings.local.json` | [ ] | [ ]（あれば） |
-| 旧 UnityMCP のツール名（`mcp__UnityMCP__*`、`mcp__unity-mcp__Unity_RunCommand`）を消す | `unity/.claude/settings.local.json` | [ ] | [ ]（あれば） |
-| その場限りの完全一致の許可（特定の `gh pr create`、GUID を含む `grep`、`Get-ChildItem ...` など）を消す | `settings.local.json` の各所 | [ ] | [ ] |
+| `Bash(git *)` を消す（必要な git 操作はプロジェクトの許可リストで足りる） | ユーザー設定（`~/.claude/settings.json`）、`unity/.claude/settings.local.json` | [ ] | [x]（ユーザー設定にあった。`settings.local.json` には無し） |
+| `Bash(python3 -c ' *)` を消す | `~/.claude/settings.local.json` | [ ] | 該当なし（ファイルが無い） |
+| `PowerShell(Remove-Item *)` の allow を消す（プロジェクトの設定で ask） | `unity/.claude/settings.local.json` | [ ] | 該当なし |
+| 旧 UnityMCP のツール名（`mcp__UnityMCP__*`、`mcp__unity-mcp__Unity_RunCommand`）を消す | `unity/.claude/settings.local.json` | [ ] | 該当なし |
+| その場限りの完全一致の許可（特定の `gh pr create`、GUID を含む `grep`、`Get-ChildItem ...` など）を消す | `settings.local.json` の各所 | [ ] | [x]（`unity/.claude/settings.local.json` の `$env:Path = ...; gh issue list ...` で始まる 1 件） |
 
 片付けの後、しばらく作業してから「集計の手順」で集計し直すと、改修の効果を確かめられる。
