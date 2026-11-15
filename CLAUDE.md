@@ -154,7 +154,7 @@ Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバ
 - Blender MCP も `unity/.mcp.json` に `blender` として登録済み（`uv --directory C:/blender_mcp/mcp run blender-mcp`、環境変数 `BLENDER_MCP_DIR` / `BLENDER_MCP_PORT` で変更可）。ツール呼び出し時に `localhost:9876` のアドオンへ接続するため、Blender を後から起動しても再接続は不要（ただしセッション開始時に MCP サーバー自体の起動に失敗していた場合は、`/mcp` から再接続が必要）。Unity と同時に起動しないこと（「Unity と Blender の切り替え」参照）。SessionStart フック（`check-blender-mcp.ps1`）が接続可否を通知する。Blender 側は MCP アドオンの Auto Start を有効にしておく
 - Editor 操作はプロジェクトの Pipeline パッケージ（`com.unity.pipeline`）経由で行う
 - MCP ツールが使えない場合は、ターミナルから `unity command <コマンド名> --caller plugin --skill unity-cli` で同等の操作を行う
-- 作業前に `unity status` で Editor が `ready` であることを確認する。Editor が起動していなければ `unity open .`（`unity/` で実行）で起動する
+- 作業前に `unity status` で Editor が `ready` であることを確認する。Editor が起動していなければ `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/wait-unity-ready.ps1`（`unity/` で実行）で起動して `ready` まで待つ。`sleep` / `Start-Sleep` やループで `unity status` を繰り返し呼ばない（呼ぶたびに承認画面が出る）
 - 利用できるコマンドは `unity command`（一覧）で確認し、名前を推測しない
 - よく使うコマンド
   - コンパイル・コンソール確認: `console_status` / `console`
@@ -188,14 +188,21 @@ Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバ
   - 出力を絞るために `Select-String` / `Select-Object` をつながない。`gh` は `--json` / `--jq`（`-q`）、git は `--oneline` / `--short` / `-n` などのオプションで絞る
   - **`cd` と `git -C` は使わない**。`cd` と git をつないだコマンドは、Claude Code が安全確認で毎回承認を求める（「常に許可」も選べない）。git は `unity/` の中でもそのまま動くので、repo ルートのファイルは `git add ../docs/xxx.md` のように相対パスで指定する
   - push は `git push -u origin <ブランチ名>` の形で書く（許可ルールに合わせるため。`git push` だけや `git push -q` は承認待ちになる）
-  - この決まりは PreToolUse フック（`unity/.claude/hooks/block-compound-git.ps1`）でも確認している。つないだ git / gh コマンド、`cd` と git の組み合わせ、`git -C` は承認画面を出さずに拒否されるので、1 つずつに分けて実行し直す
 - **ファイルの書き込みは Write / Edit を使う**。`printf ... > ファイル`、`echo ... >`、`sed -i` などシェルでの書き込みや、`sed -n` / `cat` での読み取りはしない
+- **承認画面の原因になる書き方をしない**。次の書き方は PreToolUse フック（`unity/.claude/hooks/enforce-command-style.ps1`）が承認画面を出さずに拒否し、代わりのやり方を返すので、それに従って書き直す（調査: `docs/permission-prompt-survey.md`）
+  - git / gh をほかのコマンドとつなぐ、`cd` と git の組み合わせ、`git -C`
+  - ループ（`for` / `while` / `ForEach-Object`）: 1 回に 1 つずつ呼ぶ。互いに依存しない呼び出しは 1 つのメッセージで並べて呼ぶ。Issue をまとめて読むときは `gh issue list --json ... --jq ...`
+  - 変数の代入（Bash の `X=...`・`export`、PowerShell の `$x = ...`・`$env:...`）、here-string、コマンド置換 `$(...)`: パスや値は毎回そのまま書く
+  - PowerShell のパイプ（`Select-String`、`Select-Object`、`Where-Object`、`Out-*`、`ConvertFrom-Json` など）: Grep / Read ツールや `--json` / `--jq` を使う
+  - シェルでのファイル書き込み（`>` / `>>`、heredoc、`sed -i`、`tee`、`Set-Content`、`Out-File`）: Write / Edit を使う
+  - `sleep` / `Start-Sleep` での待機: Unity の起動は `wait-unity-ready.ps1`、それ以外は `Monitor` ツール
+  - どうしても必要なときだけ、コマンドの末尾に `# 承認が必要: <理由>` のコメントを付ける。フックは判定せず通常の許可判定（承認画面）に回す。理由は人間が承認画面で読むので具体的に書く
 - **別のブランチの作業は `EnterWorktree` / `ExitWorktree` ツールで行う**（`git worktree` を手で使うより承認が少ない）
   - 新しいブランチ: `EnterWorktree`（`name` に短い名前）で repo ルートの `.claude/worktrees/<名前>/` に `origin/main` から作られる。ブランチ名は自動で付くので、作った直後に `git branch -m feature/issue-{番号}-{内容}` で命名規則に合わせる。作業が終わって push したら `ExitWorktree`（`action: remove`）で片付ける（未 push の変更があると拒否される）
   - 既存のブランチ（作業中の PR など）: `git worktree add ../.claude/worktrees/<名前> <ブランチ名>` で作り、`EnterWorktree` の `path` で入る。この worktree は `ExitWorktree` では消えないので、`ExitWorktree`（`action: keep`）で戻ってから `git worktree remove ../.claude/worktrees/<名前>` で片付ける
   - worktree の中で Unity Editor を開く作業はしない（Library の再生成と Windows のパス長制限のため）。docs・設定ファイル・C# の数か所の修正に使う
-- **許可設定は 2 か所にある**。`unity/.claude/settings.json` は `unity/` で起動した通常のセッション用で、repo ルートの `.claude/settings.json` は worktree 用（worktree に入ると作業フォルダが worktree のルートになり、こちらだけが読まれる）。repo ルートには git / gh の規則、`EnterWorktree` / `ExitWorktree`、PreToolUse フックだけを置き、Unity / Blender の MCP の許可は置かない
-  - git / gh の allow・ask・deny とフックを変えるときは、両方のファイルを揃える
+- **許可設定は 2 か所にある**。`unity/.claude/settings.json` は `unity/` で起動した通常のセッション用で、repo ルートの `.claude/settings.json` は worktree 用（worktree に入ると作業フォルダが worktree のルートになり、こちらだけが読まれる）。repo ルートには git / gh の規則、`EnterWorktree` / `ExitWorktree`、`claude-code-remote` の MCP の許可、PreToolUse フックだけを置き、Unity / Blender の MCP の許可は置かない
+  - git / gh と `claude-code-remote` の allow・ask・deny とフックを変えるときは、両方のファイルを揃える
   - フックのスクリプトは `unity/.claude/hooks/` の 1 つだけ。repo ルートの設定からは `$CLAUDE_PROJECT_DIR/unity/.claude/hooks/...` で参照する
 
 ## UI 実装ポリシー

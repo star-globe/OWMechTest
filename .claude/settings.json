@@ -46,7 +46,20 @@
       "PowerShell(gh pr diff *)",
       "PowerShell(gh pr create *)",
       "EnterWorktree",
-      "ExitWorktree"
+      "ExitWorktree",
+      "Bash(git push -u origin docs/*)",
+      "Bash(gh issue edit *)",
+      "Bash(gh pr edit *)",
+      "PowerShell(git push -u origin docs/*)",
+      "PowerShell(gh issue edit *)",
+      "PowerShell(gh pr edit *)",
+      "PowerShell(gh pr checks *)",
+      "mcp__claude-code-remote__get_session",
+      "mcp__claude-code-remote__list_sessions",
+      "mcp__claude-code-remote__list_events",
+      "mcp__claude-code-remote__get_event",
+      "mcp__claude-code-remote__list_environments",
+      "mcp__claude-code-remote__send_message"
     ],
     "ask": [
       "Bash(git push *--force*)",
@@ -58,7 +71,19 @@
       "PowerShell(git push *-f *)",
       "PowerShell(git push origin main*)",
       "PowerShell(git reset --hard*)",
-      "PowerShell(Remove-Item *)"
+      "PowerShell(Remove-Item *)",
+      "Bash(git push *origin main*)",
+      "Bash(git branch -D *)",
+      "Bash(git clean *)",
+      "Bash(git checkout -- *)",
+      "Bash(git restore *)",
+      "Bash(git stash drop *)",
+      "PowerShell(git push *origin main*)",
+      "PowerShell(git branch -D *)",
+      "PowerShell(git clean *)",
+      "PowerShell(git checkout -- *)",
+      "PowerShell(git restore *)",
+      "PowerShell(git stash drop *)"
     ],
     "deny": [
       "PowerShell(Stop-Process *)"
@@ -71,7 +96,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/unity/.claude/hooks/block-compound-git.ps1\"",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/unity/.claude/hooks/enforce-command-style.ps1\"",
             "timeout": 10
           }
         ]

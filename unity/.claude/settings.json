@@ -116,7 +116,24 @@
       "mcp__unity-mcp__recompile",
       "mcp__unity-mcp__clear_console",
       "mcp__unity-mcp__editor_stop",
-      "mcp__unity-mcp__save_scene"
+      "mcp__unity-mcp__save_scene",
+      "Bash(git push -u origin docs/*)",
+      "Bash(gh issue edit *)",
+      "Bash(gh pr edit *)",
+      "PowerShell(git push -u origin docs/*)",
+      "PowerShell(gh issue edit *)",
+      "PowerShell(gh pr edit *)",
+      "PowerShell(gh pr checks *)",
+      "mcp__claude-code-remote__get_session",
+      "mcp__claude-code-remote__list_sessions",
+      "mcp__claude-code-remote__list_events",
+      "mcp__claude-code-remote__get_event",
+      "mcp__claude-code-remote__list_environments",
+      "mcp__claude-code-remote__send_message",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File *wait-unity-ready.ps1*)",
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File *switch-to-blender.ps1*)",
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File *switch-to-unity.ps1*)",
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File *wait-unity-ready.ps1*)"
     ],
     "ask": [
       "Bash(git push *--force*)",
@@ -130,7 +147,19 @@
       "PowerShell(git reset --hard*)",
       "PowerShell(Remove-Item *)",
       "mcp__unity-mcp__delete_asset",
-      "mcp__unity-mcp__quit"
+      "mcp__unity-mcp__quit",
+      "Bash(git push *origin main*)",
+      "Bash(git branch -D *)",
+      "Bash(git clean *)",
+      "Bash(git checkout -- *)",
+      "Bash(git restore *)",
+      "Bash(git stash drop *)",
+      "PowerShell(git push *origin main*)",
+      "PowerShell(git branch -D *)",
+      "PowerShell(git clean *)",
+      "PowerShell(git checkout -- *)",
+      "PowerShell(git restore *)",
+      "PowerShell(git stash drop *)"
     ],
     "deny": [
       "PowerShell(Stop-Process *)"
@@ -143,7 +172,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-compound-git.ps1\"",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/enforce-command-style.ps1\"",
             "timeout": 10
           }
         ]

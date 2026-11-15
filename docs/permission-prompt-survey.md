@@ -10,7 +10,7 @@ Claude Code の作業中に出る承認画面を減らすため、手元のセ�
 |---|---|---|---|
 | マシン A（PR #146 の検証をしたマシン） | 2026-11-15 | 16 セッション（2026-11-08 以降） | 集計済み |
 | マシン B | 2026-11-15 | 29 セッション（2026-11-10 以降） | 集計済み |
-| 改修用のセッション | - | - | 未着手（2 台の結果がそろったので作れる） |
+| 改修 | 2026-11-15 | プロジェクトの設定・フック・ルール | PR を作成（「改修の内容」）。各マシンの片付けは未着手 |
 
 ## 集計の手順
 
@@ -121,20 +121,52 @@ pwsh -NoProfile -File tools/claude/survey-permission-prompts.ps1
 | `mcp__UnityMCP__*`（12 件）、`mcp__unity-mcp__Unity_RunCommand` | `unity/.claude/settings.local.json` | 旧 UnityMCP プラグインのツール名で、今は使わない |
 | その場限りの許可（特定の `gh pr create`、`xargs grep -l "<GUID>"`、`Get-ChildItem ...` の完全一致など） | `settings.local.json` の各所 | 二度と一致しないので不要 |
 
-## 改修の案
+## 改修の内容
 
-2 台の結果を見てから、改修用のセッションで優先順を決める。
+2 台の結果をもとに、次のように決めて改修した（PR #146 で済んでいた 1 を除く）。
 
-1. **PR #146 のフックと許可リストを、worktree の中でも効く場所に移す**
-   - `EnterWorktree` で入ると作業フォルダが worktree のルートになり、`unity/.claude/settings.json` が読まれない（PR #146 の検証で確認済み）
-   - repo ルートの `.claude/settings.json` に移し、フックのパスも worktree の中で解決できるようにする
-2. **PowerShell のつなぎ方もフックで拒否する**
-   - 変数代入、here-string、`Select-String` / `Select-Object` などのパイプを、git / gh と組み合わせたときに拒否し、理由を返す（#4・#8）
-3. **待機のやり方をルールにする**
-   - `Start-Sleep` やループの代わりに `Monitor` ツールか、既存のスクリプト（`switch-to-unity.ps1` など）を使う（#5・#6）
-4. **読み取り系の MCP ツールを許可リストに足す**
-   - `mcp__claude-code-remote__get_session`、`list_sessions`、`list_events`、`list_environments`（管理用セッションの状態確認）
-5. **確認なしで通る設定を見直す**
-   - `Bash(git *)` を読み取りと決まった書き込み（`add`、`commit`、`fetch`、`switch`、`worktree` など）に分ける、または `git branch -D` / `git clean` / `git checkout --` を ask に足す
-   - 任意のコードが実行できる許可（`python3 -c`、`execute_blender_code`）を残すか決める
-   - `settings.local.json` の古いエントリとその場限りのエントリを消す（各マシンで行う。git 管理外のため）
+### 決めたこと
+
+| 項目 | 決定 |
+|---|---|
+| `mcp__blender__execute_blender_code` | 2 台とも承認画面を出す（任意のコードを実行でき、管理用セッションの「Blender のコマンドを評価して解説する」流れも承認画面を前提にしているため）。回数はモデリングのポリシーどおり 1 回の呼び出しにまとめて減らす |
+| `claude-code-remote` の書き込み系 | `send_message` だけ許可する（送り先は自分のセッション）。`create_session`（コストがかかる）、`archive_session`（元に戻しにくい）、`interrupt_session` は承認画面を残す |
+| `gh issue edit` / `gh pr edit` | すべての Issue / PR で許可する。変えられるのはタイトル・本文・ラベルなどで、本文は GitHub の編集履歴から戻せる。クローズ・削除・移動は別のコマンドなので許可しない |
+
+### プロジェクトの設定で行ったこと
+
+1. **フックを広げる**（`unity/.claude/hooks/block-compound-git.ps1` を `enforce-command-style.ps1` に改名）
+   - git / gh が無くても、次の書き方を承認画面なしで拒否し、代わりのやり方を返す
+     - ループ（A #6、B #3）
+     - Bash のシェル変数の代入・`export`（B #6）
+     - PowerShell の変数代入・here-string（A #4、B #4）
+     - コマンド置換 `$(...)`（A #6、B #11）
+     - PowerShell のパイプ（A #8、B #5）
+     - シェルでのファイル書き込み（A #7、B #8）
+     - `sleep` / `Start-Sleep` での待機（A #5、B #10）
+   - 逃げ道: コマンドの末尾に `# 承認が必要: <理由>` があれば判定せず、通常の許可判定（承認画面）に回す
+2. **待機用のスクリプトを追加する**: `unity/.claude/scripts/wait-unity-ready.ps1`
+   - Unity が起動していなければ起動し、`ready` まで待つ。Blender が起動中なら起動しない
+   - 許可リストに追加し、CLAUDE.md と `/unity-verify` から案内する
+3. **許可リストに足す**（`unity/.claude/settings.json` と repo ルートの `.claude/settings.json`）
+   - `mcp__claude-code-remote__get_session`、`list_sessions`、`list_events`、`get_event`、`list_environments`、`send_message`
+   - `gh issue edit *`、`gh pr edit *`、`git push -u origin docs/*`、PowerShell の `gh pr checks *`
+   - PowerShell ツールからの `switch-to-blender.ps1` / `switch-to-unity.ps1` / `wait-unity-ready.ps1`（`unity/` のみ）
+4. **ask に足す**（ユーザー設定の `Bash(git *)` などより優先される）
+   - `git branch -D`、`git clean`、`git checkout --`、`git restore`、`git stash drop`
+   - `git push *origin main*`（それまでの `git push origin main*` は `git push -u origin main` に当てはまらなかった）
+
+### 各マシンで行う片付け
+
+git 管理外の設定なので、それぞれのマシンで行う。終わったらチェックを付ける。
+
+| 片付け | 場所 | マシン A | マシン B |
+|---|---|---|---|
+| `mcp__blender__execute_blender_code` の allow を消す | `unity/.claude/settings.local.json` | [ ] | 該当なし |
+| `Bash(git *)` を消す（必要な git 操作はプロジェクトの許可リストで足りる） | ユーザー設定（`~/.claude/settings.json`）、`unity/.claude/settings.local.json` | [ ] | [ ]（あれば） |
+| `Bash(python3 -c ' *)` を消す | `~/.claude/settings.local.json` | [ ] | [ ]（あれば） |
+| `PowerShell(Remove-Item *)` の allow を消す（プロジェクトの設定で ask） | `unity/.claude/settings.local.json` | [ ] | [ ]（あれば） |
+| 旧 UnityMCP のツール名（`mcp__UnityMCP__*`、`mcp__unity-mcp__Unity_RunCommand`）を消す | `unity/.claude/settings.local.json` | [ ] | [ ]（あれば） |
+| その場限りの完全一致の許可（特定の `gh pr create`、GUID を含む `grep`、`Get-ChildItem ...` など）を消す | `settings.local.json` の各所 | [ ] | [ ] |
+
+片付けの後、しばらく作業してから「集計の手順」で集計し直すと、改修の効果を確かめられる。
