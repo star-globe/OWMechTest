@@ -83,6 +83,29 @@ namespace AdvancedGears
             EffectManager.Instance?.PlayEffect(EffectID.WallKick, point, UnityEngine.Quaternion.LookRotation(normal));
         }
 
+        /// <summary>
+        /// 衝撃波の向き。プレハブの +Z をハイパーブーストの方向に向け、リングを進行方向に垂直な面（XY 平面）に広げる。
+        /// 方向が無ければ null（再生しない）
+        /// </summary>
+        public static UnityEngine.Quaternion? CalcShockwaveRotation(UnityEngine.Vector3 direction)
+        {
+            if (direction == UnityEngine.Vector3.zero)
+                return null;
+
+            return UnityEngine.Quaternion.LookRotation(direction);
+        }
+
+        /// <summary>ハイパーブーストに入った瞬間に、機体のまわりに衝撃波を出す</summary>
+        /// <param name="direction">ハイパーブーストの方向（ワールド座標）</param>
+        public void ApplyHyperBoostStart(UnityEngine.Vector3 position, UnityEngine.Vector3 direction)
+        {
+            var rotation = CalcShockwaveRotation(direction);
+            if (rotation == null)
+                return;
+
+            EffectManager.Instance?.PlayEffect(EffectID.HyperBoostShockwave, position, rotation.Value);
+        }
+
         /// <summary>足元の火花が出始める水平速度（m/s）。歩きの最高速度 9 m/s より下から、ブーストで加速し始めたら出す</summary>
         public const float GroundSparkMinSpeed = 4f;
 

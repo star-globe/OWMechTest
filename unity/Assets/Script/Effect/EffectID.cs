@@ -11,6 +11,7 @@ namespace AdvancedGears
         public const int ThrusterQuick = 2; // クイックブースト炎
         public const int ThrusterHyper = 3; // ハイパーブースト炎
         public const int Jump          = 4; // ジャンプ噴射
+        public const int HyperBoostShockwave = 5; // ハイパーブースト開始時の衝撃波
 
         // 戦闘系
         public const int MuzzleFlash  = 10; // 発砲マズルフラッシュ

@@ -300,6 +300,7 @@ namespace AdvancedGears
             {
                 hypBstInfo.SetBoost(PlayerMoveCalculator.CalcHyperBoostInput(inputX, inputZ), p.HyperBoostSpeed);
                 playerCharacter.IsHyperBoost = true;
+                effectPresenter.ApplyHyperBoostStart(rigid.position, rigid.transform.TransformDirection(hypBstInfo.localBoostVector));
             }
             if (CheckRightFire())
             {
