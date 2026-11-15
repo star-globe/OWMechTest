@@ -10,7 +10,7 @@ Claude Code の作業中に出る承認画面を減らすため、手元のセ�
 |---|---|---|---|
 | マシン A（PR #146 の検証をしたマシン） | 2026-11-15 | 16 セッション（2026-11-08 以降） | 集計済み |
 | マシン B | 2026-11-15 | 29 セッション（2026-11-10 以降） | 集計済み |
-| 改修 | 2026-11-15 | プロジェクトの設定・フック・ルール | PR を作成（「改修の内容」）。各マシンの片付けは未着手 |
+| 改修 | 2026-11-15 | プロジェクトの設定・フック・ルール | PR #150 でマージ済み（「改修の内容」）。2 台とも片付けが済んだ（マシン B は PR #150 の動作確認も済み） |
 
 ## 集計の手順
 
@@ -165,11 +165,11 @@ git 管理外の設定なので、それぞれのマシンで行う。終わっ�
 | 片付け | 場所 | マシン A | マシン B |
 |---|---|---|---|
 | `mcp__blender__execute_blender_code` の allow を消す | `unity/.claude/settings.local.json` | 該当なし（片付けの時点で既に無かった） | 該当なし |
-| `Bash(git *)` を消す（必要な git 操作はプロジェクトの許可リストで足りる） | ユーザー設定（`~/.claude/settings.json`）、`unity/.claude/settings.local.json` | [x] | [ ]（あれば） |
-| `Bash(python3 -c ' *)` を消す | `~/.claude/settings.local.json` | 該当なし（片付けの時点で既に無かった） | [ ]（あれば） |
-| `PowerShell(Remove-Item *)` の allow を消す（プロジェクトの設定で ask） | `unity/.claude/settings.local.json` | [x] | [ ]（あれば） |
-| 旧 UnityMCP のツール名（`mcp__UnityMCP__*`、`mcp__unity-mcp__Unity_RunCommand`）を消す | `unity/.claude/settings.local.json` | [x] | [ ]（あれば） |
-| その場限りの完全一致の許可（特定の `gh pr create`、GUID を含む `grep`、`Get-ChildItem ...` など）を消す | `settings.local.json` の各所 | [x] | [ ] |
+| `Bash(git *)` を消す（必要な git 操作はプロジェクトの許可リストで足りる） | ユーザー設定（`~/.claude/settings.json`）、`unity/.claude/settings.local.json` | [x] | [x]（ユーザー設定にあった。`settings.local.json` には無し） |
+| `Bash(python3 -c ' *)` を消す | `~/.claude/settings.local.json` | 該当なし（片付けの時点で既に無かった） | 該当なし（ファイルが無い） |
+| `PowerShell(Remove-Item *)` の allow を消す（プロジェクトの設定で ask） | `unity/.claude/settings.local.json` | [x] | 該当なし |
+| 旧 UnityMCP のツール名（`mcp__UnityMCP__*`、`mcp__unity-mcp__Unity_RunCommand`）を消す | `unity/.claude/settings.local.json` | [x] | 該当なし |
+| その場限りの完全一致の許可（特定の `gh pr create`、GUID を含む `grep`、`Get-ChildItem ...` など）を消す | `settings.local.json` の各所 | [x] | [x]（`unity/.claude/settings.local.json` の `$env:Path = ...; gh issue list ...` で始まる 1 件） |
 
 マシン A の片付け（2026-11-15）で消したもの: `Bash(git *)`（2 か所）、`PowerShell(Remove-Item *)`、旧 UnityMCP のツール名 14 件（`mcp__UnityMCP__*` 13 件と `mcp__unity-mcp__Unity_RunCommand`）、その場限りの許可 11 件（`gh pr create --title 'feat: SelectMenu→Briefing→Field …'`、`xargs grep -l "EntityId"`、`xargs grep -l "<GUID>"`、`docker --version` / `node --version` と対の `if ($?) …` 2 件、`Get-ChildItem …` の完全一致 4 件）。残したもの: `PowerShell(New-Item *)`、`PowerShell(claude mcp *)`、`Skill(update-config)`、`WebFetch(domain:api.github.com)`、`WebSearch`、Blender MCP の読み取り 2 件、GitHub MCP 4 件、`Read(...)` のパス指定。
 
