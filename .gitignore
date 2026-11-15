@@ -30,3 +30,6 @@ unity/.idea/
 
 # Python bytecode (tools/blender を import したときに生成される)
 __pycache__/
+
+# Claude Code の EnterWorktree が作る worktree
+.claude/worktrees/

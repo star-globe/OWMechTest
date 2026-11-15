@@ -185,6 +185,14 @@ Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバ
 - **git / gh のコマンドは 1 回の呼び出しで 1 つずつ実行する**。PowerShell と Bash は `;` / `&&` / パイプでつないだコマンドを 1 つずつ判定し、許可リストに無いもの（`Select-String`、`Select-Object`、`Out-Null`、変数への代入など）が 1 つでも混ざると全体が承認待ちになる
   - コミットメッセージと PR / Issue の本文は、Write で scratchpad のファイルに書いてから `git commit -F <ファイル>`、`gh pr create --body-file <ファイル>` で渡す。`$body = @'...'@` のような here-string と変数は使わない
   - 出力を絞るために `Select-String` / `Select-Object` をつながない。`gh` は `--json` / `--jq`（`-q`）、git は `--oneline` / `--short` / `-n` などのオプションで絞る
+  - **`cd` と `git -C` は使わない**。`cd` と git をつないだコマンドは、Claude Code が安全確認で毎回承認を求める（「常に許可」も選べない）。git は `unity/` の中でもそのまま動くので、repo ルートのファイルは `git add ../docs/xxx.md` のように相対パスで指定する
+  - push は `git push -u origin <ブランチ名>` の形で書く（許可ルールに合わせるため。`git push` だけや `git push -q` は承認待ちになる）
+  - この決まりは PreToolUse フック（`unity/.claude/hooks/block-compound-git.ps1`）でも確認している。つないだ git / gh コマンド、`cd` と git の組み合わせ、`git -C` は承認画面を出さずに拒否されるので、1 つずつに分けて実行し直す
+- **ファイルの書き込みは Write / Edit を使う**。`printf ... > ファイル`、`echo ... >`、`sed -i` などシェルでの書き込みや、`sed -n` / `cat` での読み取りはしない
+- **別のブランチの作業は `EnterWorktree` / `ExitWorktree` ツールで行う**（`git worktree` を手で使うより承認が少ない）
+  - 新しいブランチ: `EnterWorktree`（`name` に短い名前）で repo ルートの `.claude/worktrees/<名前>/` に `origin/main` から作られる。ブランチ名は自動で付くので、作った直後に `git branch -m feature/issue-{番号}-{内容}` で命名規則に合わせる。作業が終わって push したら `ExitWorktree`（`action: remove`）で片付ける（未 push の変更があると拒否される）
+  - 既存のブランチ（作業中の PR など）: `git worktree add ../.claude/worktrees/<名前> <ブランチ名>` で作り、`EnterWorktree` の `path` で入る。この worktree は `ExitWorktree` では消えないので、`ExitWorktree`（`action: keep`）で戻ってから `git worktree remove ../.claude/worktrees/<名前>` で片付ける
+  - worktree の中で Unity Editor を開く作業はしない（Library の再生成と Windows のパス長制限のため）。docs・設定ファイル・C# の数か所の修正に使う
 
 ## UI 実装ポリシー
 
@@ -289,4 +297,4 @@ Issue と PR は分野ラベルで区別する。作業の中心になるもの�
 - 大きな出力（ファイル全体、diff 全体、シーン階層、コンソール）を読み込まない
 - 作業の区切りで、新しいセッションに引き継ぐよう人間に提案する（引き継ぎの形式はポリシーを参照）
 - 複数の Issue・セッションにまたがる作業は、`docs/` に進捗の表を持つドキュメントを作って管理し、状態が変わるたびに更新する（例: `docs/effects-plan.md`。ポリシーの「複数のセッションにまたがる作業は docs で進捗を管理する」）
-- 作業用セッションと作業フォルダを共有しているときは、ブランチを切り替えない。別の PR は scratchpad に短いフォルダ名（`wt-xx` など）の git worktree を作って行う（長いと Windows のパス長制限で失敗する）
+- 作業用セッションと作業フォルダを共有しているときは、ブランチを切り替えない。別の PR は `EnterWorktree` / `ExitWorktree` で worktree を作って行う（「作業上のルール」参照）

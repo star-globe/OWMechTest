@@ -23,6 +23,8 @@
       "Bash(gh pr diff *)",
       "Bash(gh pr checks *)",
       "Bash(unity status *)",
+      "Bash(unity open *)",
+      "Bash(unity command *)",
       "PowerShell(git status *)",
       "PowerShell(git log *)",
       "PowerShell(git diff *)",
@@ -34,6 +36,8 @@
       "PowerShell(gh pr view *)",
       "PowerShell(gh pr diff *)",
       "PowerShell(unity status *)",
+      "PowerShell(unity open *)",
+      "PowerShell(unity command *)",
       "mcp__unity-mcp__console",
       "mcp__unity-mcp__console_status",
       "mcp__unity-mcp__editor_status",
@@ -92,6 +96,8 @@
       "Bash(git fetch *)",
       "Bash(git add *)",
       "Bash(git commit *)",
+      "Bash(git merge *)",
+      "Bash(git worktree *)",
       "Bash(git push -u origin feature/*)",
       "Bash(gh pr create *)",
       "PowerShell(git switch *)",
@@ -99,8 +105,12 @@
       "PowerShell(git fetch *)",
       "PowerShell(git add *)",
       "PowerShell(git commit *)",
+      "PowerShell(git merge *)",
+      "PowerShell(git worktree *)",
       "PowerShell(git push -u origin feature/*)",
       "PowerShell(gh pr create *)",
+      "EnterWorktree",
+      "ExitWorktree",
       "mcp__unity-mcp__eval",
       "mcp__unity-mcp__menu",
       "mcp__unity-mcp__recompile",
@@ -127,6 +137,18 @@
     ]
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-compound-git.ps1\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": "startup",
