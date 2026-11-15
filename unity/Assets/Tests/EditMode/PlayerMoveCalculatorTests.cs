@@ -505,6 +505,18 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void CalcShockwaveRotation_FacesBoostDirection()
+        {
+            var rotation = PlayerEffectPresenter.CalcShockwaveRotation(Vector3.right);
+            Assert.IsTrue(rotation.HasValue);
+            var forward = rotation.Value * Vector3.forward;
+            Assert.AreEqual(1f, Vector3.Dot(forward, Vector3.right), 1e-4f);
+
+            // 方向が無ければ向きを決められないので出さない
+            Assert.IsFalse(PlayerEffectPresenter.CalcShockwaveRotation(Vector3.zero).HasValue);
+        }
+
+        [Test]
         public void IsWallKick_OnlyWhenTouchingWallWithNormal()
         {
             Assert.IsTrue(PlayerEffectPresenter.IsWallKick(TouchState.Wall, Vector3.left));
