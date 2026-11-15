@@ -192,6 +192,7 @@ Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバ
   - 出力を絞るために `Select-String` / `Select-Object` をつながない。`gh` は `--json` / `--jq`（`-q`）、git は `--oneline` / `--short` / `-n` などのオプションで絞る
   - **`cd` と `git -C` は使わない**。`cd` と git をつないだコマンドは、Claude Code が安全確認で毎回承認を求める（「常に許可」も選べない）。git は `unity/` の中でもそのまま動くので、repo ルートのファイルは `git add ../docs/xxx.md` のように相対パスで指定する
   - push は `git push -u origin <ブランチ名>` の形で書く（許可ルールに合わせるため。`git push` だけや `git push -q` は承認待ちになる）
+  - ブランチの作成・切り替えは `git switch -c <ブランチ名>` / `git switch <ブランチ名>` で行い、`git checkout` は使わない（`git switch` は許可済み。`git checkout` は許可リストに無く承認待ちになる。`git checkout .` などで変更を捨てられるため、許可にも追加しない）
 - **ファイルの書き込みは Write / Edit を使う**。`printf ... > ファイル`、`echo ... >`、`sed -i` などシェルでの書き込みや、`sed -n` / `cat` での読み取りはしない
 - **承認画面の原因になる書き方をしない**。次の書き方は PreToolUse フック（`unity/.claude/hooks/enforce-command-style.ps1`）が承認画面を出さずに拒否し、代わりのやり方を返すので、それに従って書き直す（調査: `docs/permission-prompt-survey.md`）
   - git / gh をほかのコマンドとつなぐ、`cd` と git の組み合わせ、`git -C`
