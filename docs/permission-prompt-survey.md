@@ -26,6 +26,13 @@ pwsh -NoProfile -File tools/claude/survey-permission-prompts.ps1
 - 許可リストは、ユーザー設定（`~/.claude/settings.json`、`settings.local.json`）、repo ルートの `.claude/settings.json`、`unity/.claude/settings.json`、`unity/.claude/settings.local.json` を読む。worktree から実行するときは、`-RepoRoot` に本体のフォルダを指定する（`settings.local.json` は git 管理外で worktree に無いため）。ただし本体のフォルダが main より古いブランチにあると、新しい許可リストで判定されない。そのときは `unity/.claude/settings.local.json` を worktree にコピーし、`-RepoRoot` を付けずに worktree から実行する
 - 出力は「承認画面の原因」「許可リストに無い MCP ツール」「ツール別の呼び出し回数」の 3 つ。結果は下の「集計結果」にマシンごとの節を作って貼る
 
+週次の集計（毎週日曜。scheduled task「承認画面の週次集計のリマインド（OWMechTest）」が依頼文を通知し、人間が各マシンのセッションに送る）:
+
+- 2 台が同じ節を編集するので、マシン A → マシン B の順に 1 台ずつ行う。マシン A の PR をマージしてから、マシン B に依頼する
+- 各マシンは main を最新にしてから集計し、「週次の集計（YYYY-MM-DD）」の節が無ければ作り、あれば自分のマシンの欄だけを足す（ほかのマシンの欄は変えない）
+- 書くこと: 対象のセッション数、Bash / PowerShell の呼び出し回数と承認画面の見込み件数、原因の上位、許可リストに無い MCP ツール、前回と比べた増減。フックの拒否をすり抜けている書き方や新しい原因は、改修の候補として書くだけにする（設定やフックは直さない）
+- PR はマシンごとに `docs/permission-survey-weekly-YYYY-MM-DD-<マシン名>` ブランチで作り、このファイルだけを変更する（ラベル `Management`、マージは人間が行う）
+
 判定の限界:
 
 - 記録には承認画面が実際に出たかどうかが残らないので、今の許可リストで判定し直した「見込み」の件数になる
