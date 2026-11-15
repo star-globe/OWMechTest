@@ -22,13 +22,14 @@ namespace AdvancedGears
             }
         }
 
-        private readonly Dictionary<int, ValueTuple<TouchState,Vector3>> touchStateDic = new Dictionary<int, ValueTuple<TouchState, Vector3>>();
+        // 接触している相手ごとの（状態, 法線, 接触点）
+        private readonly Dictionary<int, ValueTuple<TouchState, Vector3, Vector3>> touchStateDic = new Dictionary<int, ValueTuple<TouchState, Vector3, Vector3>>();
 
-        private ValueTuple<TouchState, Vector3>? CurrentStateTuple
+        private ValueTuple<TouchState, Vector3, Vector3>? CurrentStateTuple
         {
             get
             {
-                ValueTuple<TouchState, Vector3>? tuple = null;
+                ValueTuple<TouchState, Vector3, Vector3>? tuple = null;
                 foreach (var kvp in touchStateDic)
                 {
                     if (tuple != null && tuple.Value.Item1 == TouchState.Wall)
@@ -66,6 +67,19 @@ namespace AdvancedGears
                     return Vector3.zero;
 
                 return tuple.Value.Item2;
+            }
+        }
+
+        /// <summary>CurrentNormal と同じ接触の接触点（ワールド座標）。接触していなければ自分の位置</summary>
+        public Vector3 CurrentPoint
+        {
+            get
+            {
+                var tuple = this.CurrentStateTuple;
+                if (tuple == null)
+                    return transform.position;
+
+                return tuple.Value.Item3;
             }
         }
 
@@ -108,6 +122,7 @@ namespace AdvancedGears
             var colId = (int)EntityId.ToULong(collision.gameObject.GetEntityId());
             TouchState bestState = TouchState.None;
             Vector3 bestNormal = Vector3.zero;
+            Vector3 bestPoint = Vector3.zero;
 
             foreach (ContactPoint contact in collision.contacts)
             {
@@ -119,6 +134,7 @@ namespace AdvancedGears
                 {
                     bestState = TouchState.Ground;
                     bestNormal = normal;
+                    bestPoint = contact.point;
                     break;
                 }
 
@@ -126,13 +142,14 @@ namespace AdvancedGears
                 {
                     bestState = state;
                     bestNormal = normal;
+                    bestPoint = contact.point;
                 }
             }
 
             if (bestState == TouchState.None)
                 touchStateDic.Remove(colId);
             else
-                touchStateDic[colId] = (bestState, bestNormal);
+                touchStateDic[colId] = (bestState, bestNormal, bestPoint);
         }
 
         private TouchState CheckPoint(Vector3 point, out Vector3 normal)

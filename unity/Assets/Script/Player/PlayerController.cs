@@ -323,8 +323,14 @@ namespace AdvancedGears
             if (PlayerMoveCalculator.HasInput(inputX, inputZ))
                 horizontal = rigid.transform.TransformDirection(horizontal);
 
-            var jumpVec = touchChecker == null ? Vector3.zero :
-                PlayerMoveCalculator.KickAndJump(p, touchChecker.CurrentTouchState, touchChecker.CurrentNormal, horizontal);
+            var jumpVec = Vector3.zero;
+            if (touchChecker != null)
+            {
+                var touch = touchChecker.CurrentTouchState;
+                var normal = touchChecker.CurrentNormal;
+                jumpVec = PlayerMoveCalculator.KickAndJump(p, touch, normal, horizontal);
+                effectPresenter.ApplyWallKick(touch, touchChecker.CurrentPoint, normal);
+            }
 
             jumpInfo.SetJump(jumpVec, local, p.JumpInterval);
             playerCharacter.IgnitJumpBoost();
