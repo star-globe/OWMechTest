@@ -116,6 +116,8 @@
       "mcp__unity-mcp__recompile",
       "mcp__unity-mcp__clear_console",
       "mcp__unity-mcp__editor_stop",
+      "mcp__unity-mcp__editor_pause",
+      "mcp__unity-mcp__capture_game_view",
       "mcp__unity-mcp__save_scene",
       "Bash(git push -u origin docs/*)",
       "Bash(gh issue edit *)",
