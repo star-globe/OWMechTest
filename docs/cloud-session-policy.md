@@ -13,7 +13,8 @@
 | 作業 | 内容 |
 |---|---|
 | Issue の作成・整理 | Issue の起票、分野ラベルの付与、Issue #66（小さなタスク）のチェックリストの更新 |
-| `Management` | CLAUDE.md、スキル、フック、CI、ドキュメント、作業ログ |
+| `Management` | CLAUDE.md、スキル、フック、CI、ドキュメント |
+| `WorkLog` | 作業ログ（`docs/logs/issue-{番号}-log.md`）の PR。ラベルは `WorkLog` だけを付ける |
 | `Spec-Discussion` | 仕様の検証、案出し、`docs/spec/` の更新 |
 | 簡素なコード修正 | 下の「簡素なコード修正の範囲」に収まるもの |
 
