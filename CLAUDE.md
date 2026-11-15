@@ -196,7 +196,7 @@ Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバ
   - PowerShell のパイプ（`Select-String`、`Select-Object`、`Where-Object`、`Out-*`、`ConvertFrom-Json` など）: Grep / Read ツールや `--json` / `--jq` を使う
   - シェルでのファイル書き込み（`>` / `>>`、heredoc、`sed -i`、`tee`、`Set-Content`、`Out-File`）: Write / Edit を使う
   - `sleep` / `Start-Sleep` での待機: Unity の起動は `wait-unity-ready.ps1`、それ以外は `Monitor` ツール
-  - どうしても必要なときだけ、コマンドの末尾に `# 承認が必要: <理由>` のコメントを付ける。フックは判定せず通常の許可判定（承認画面）に回す。理由は人間が承認画面で読むので具体的に書く
+  - どうしても必要なときだけ、コマンドの末尾に `# 承認が必要: <理由>` のコメントを付ける。フックは判定せず通常の許可判定に回す（許可リストにあるコマンドや `sleep` のように確認なしで通るコマンドはそのまま実行され、それ以外は承認画面が出る）。理由は人間が承認画面で読むので具体的に書く
 - **別のブランチの作業は `EnterWorktree` / `ExitWorktree` ツールで行う**（`git worktree` を手で使うより承認が少ない）
   - 新しいブランチ: `EnterWorktree`（`name` に短い名前）で repo ルートの `.claude/worktrees/<名前>/` に `origin/main` から作られる。ブランチ名は自動で付くので、作った直後に `git branch -m feature/issue-{番号}-{内容}` で命名規則に合わせる。作業が終わって push したら `ExitWorktree`（`action: remove`）で片付ける（未 push の変更があると拒否される）
   - 既存のブランチ（作業中の PR など）: `git worktree add ../.claude/worktrees/<名前> <ブランチ名>` で作り、`EnterWorktree` の `path` で入る。この worktree は `ExitWorktree` では消えないので、`ExitWorktree`（`action: keep`）で戻ってから `git worktree remove ../.claude/worktrees/<名前>` で片付ける

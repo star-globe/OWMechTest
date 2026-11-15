@@ -16,6 +16,8 @@ Claude Code の作業中に出る承認画面を減らすため、手元のセ�
 
 PowerShell 7 で、リポジトリのルートから次を実行する。読み取りだけで、何も書き換えない。
 
+PowerShell 7 は通常版（`winget install --id Microsoft.PowerShell --installer-type wix --source winget`）を入れる。Microsoft Store 版を入れると、Claude Code の PowerShell ツールが実行前の構文チェックで「コマンド ラインが長すぎます」と失敗し、コマンドが実行されなくなる（PR #150 のマシン B の検証）。
+
 ```
 pwsh -NoProfile -File tools/claude/survey-permission-prompts.ps1
 ```
@@ -144,7 +146,7 @@ pwsh -NoProfile -File tools/claude/survey-permission-prompts.ps1
      - PowerShell のパイプ（A #8、B #5）
      - シェルでのファイル書き込み（A #7、B #8）
      - `sleep` / `Start-Sleep` での待機（A #5、B #10）
-   - 逃げ道: コマンドの末尾に `# 承認が必要: <理由>` があれば判定せず、通常の許可判定（承認画面）に回す
+   - 逃げ道: コマンドの末尾に `# 承認が必要: <理由>` があれば判定せず、通常の許可判定に回す。許可リストにあるコマンドや `sleep` のように確認なしで通るコマンドはそのまま実行され、それ以外は承認画面が出る（PR #150 のマシン B の検証）
 2. **待機用のスクリプトを追加する**: `unity/.claude/scripts/wait-unity-ready.ps1`
    - Unity が起動していなければ起動し、`ready` まで待つ。Blender が起動中なら起動しない
    - 許可リストに追加し、CLAUDE.md と `/unity-verify` から案内する

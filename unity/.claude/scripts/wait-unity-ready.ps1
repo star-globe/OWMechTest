@@ -10,6 +10,13 @@ $ErrorActionPreference = 'Continue'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $projectPath = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 
+# worktree の中のスクリプトを実行すると、worktree 側の unity/ を開いて Library を作り直してしまうため、起動しない
+# （CLAUDE.md「作業上のルール」: worktree の中で Unity Editor を開く作業はしない）
+if ($projectPath -match '[\\/]\.claude[\\/]worktrees[\\/]') {
+    Write-Output "[wait] worktree の中のプロジェクト（$projectPath）なので Unity Editor を起動しません。本体の unity/ から実行してください。"
+    exit 1
+}
+
 if (-not (Get-Command unity -ErrorAction SilentlyContinue)) {
     Write-Output '[wait] unity CLI が見つかりません。'
     exit 1

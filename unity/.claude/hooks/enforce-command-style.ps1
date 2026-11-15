@@ -1,7 +1,9 @@
 ﻿# PreToolUse hook（Bash / PowerShell）: 承認画面の原因になる書き方を、承認画面を出さずに拒否する。
 # 拒否の理由（代わりのやり方）を AI に返して書き直させる（CLAUDE.md「作業上のルール」、docs/permission-prompt-survey.md）。
 # 対象外のコマンドは何も出力せずに終了し、通常の許可判定に任せる。
-# 逃げ道: コマンドの末尾に「# 承認が必要: <理由>」のコメントがあれば判定せず、通常の許可判定（承認画面）に回す。
+# 逃げ道: コマンドの末尾に「# 承認が必要: <理由>」のコメントがあれば判定せず、通常の許可判定に回す
+# （許可リストにあるコマンドや sleep など確認なしで通るコマンドはそのまま実行され、それ以外は承認画面が出る）。
+# このフックは書き方を正すためのもので、安全のための制限ではない。
 $ErrorActionPreference = 'SilentlyContinue'
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -74,7 +76,7 @@ $result = @{
     hookSpecificOutput = @{
         hookEventName            = 'PreToolUse'
         permissionDecision       = 'deny'
-        permissionDecisionReason = "[enforce-command-style] $reason 必要な場合だけ、末尾に「# 承認が必要: <理由>」を付けると承認画面に回ります。"
+        permissionDecisionReason = "[enforce-command-style] $reason 必要な場合だけ、末尾に「# 承認が必要: <理由>」を付けると通常の許可判定に回ります（許可リストに無ければ承認画面が出ます）。"
     }
 }
 $result | ConvertTo-Json -Depth 3 -Compress
