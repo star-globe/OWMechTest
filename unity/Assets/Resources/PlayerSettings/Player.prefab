@@ -471,6 +471,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connector: {fileID: 4832289263045881268}
+  side: 1
 --- !u!1 &2451759917519366351
 GameObject:
   m_ObjectHideFlags: 0
@@ -1517,6 +1518,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connector: {fileID: 8635473170615921929}
+  side: 0
 --- !u!1001 &117315683719540106
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -46,7 +46,7 @@ unity/Assets/
 | 脚 | `leg_{left/right}_{バリアント名}.fbx` | `leg_left_standard.fbx` |
 | 頭部 | `head_{バリアント名}.fbx` | `head_sensor.fbx` |
 | ブースター | `booster_{バリアント名}.fbx` | `booster_standard.fbx` |
-| 武装 | `weapon_{バリアント名}.fbx` | `weapon_rifle.fbx` |
+| 武装 | `weapon_{left/right}_{バリアント名}.fbx` | `weapon_left_rifle.fbx` |
 | 共通リグ・アニメーション | `rig_{名前}.fbx` | `rig_mech.fbx` |
 | 建物（環境） | `env_building_{small/medium/large}_{バリアント名}.fbx` | `env_building_small_a.fbx` |
 | 小物（環境） | `env_prop_{名前}.fbx` | `env_prop_car.fbx` |
