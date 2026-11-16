@@ -10,6 +10,10 @@ namespace AdvancedGears
         [SerializeField]
         PartConnector connector;
 
+        [SerializeField]
+        [Tooltip("この取り付け位置で銃を持つ側（左右で鏡像のモデルを使い分ける）")]
+        GunSide side = GunSide.Right;
+
         GunPart gun = null;
 
         private void Awake()
@@ -25,6 +29,7 @@ namespace AdvancedGears
             if (instGun != null)
             {
                 this.gun = instGun;
+                this.gun.SetSide(side);
                 prefabObject = this.gun.gameObject;
             }
             else
