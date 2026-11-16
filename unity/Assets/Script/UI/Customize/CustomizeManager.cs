@@ -67,14 +67,11 @@ namespace AdvancedGears
         {
             // MainScene を通らずに Play したときはデバッグモードにし、必要な初期化（マスタの読み込み）をここで行う。
             // 他のコンポーネントの Start がマスタを使えるよう、Start より前（Awake）に読み込む
-            // シングルトンの置き場（SingletonMonoObject）は MainScene にしか無いので、無ければマスタも読み込まれていない
-            var isMasterLoaded = SingletonMonoObject.Instance != null && MasterManager.Instance.IsLoaded;
-            isDebugMode = CustomizeDebugMode.IsDebugMode(isMasterLoaded);
+            isDebugMode = CustomizeDebugMode.IsDebugMode(DebugBootstrap.IsInitialized);
             if (isDebugMode)
             {
                 Debug.Log("[CustomizeManager] MainScene を通らずに起動したため、デバッグモードで開きます。");
-                SingletonMonoObject.EnsureExists();
-                MasterManager.Instance.LoadAll();
+                DebugBootstrap.EnsureInitialized();
             }
         }
 

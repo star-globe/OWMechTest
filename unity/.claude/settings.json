@@ -119,6 +119,8 @@
       "mcp__unity-mcp__editor_pause",
       "mcp__unity-mcp__capture_game_view",
       "mcp__unity-mcp__save_scene",
+      "mcp__unity-mcp__open_scene",
+      "mcp__unity-mcp__editor_play",
       "Bash(git push -u origin docs/*)",
       "Bash(gh issue edit *)",
       "Bash(gh pr edit *)",

@@ -64,7 +64,7 @@ WarGameProject
 | `Tests/EditMode/` | EditMode テスト（asmdef: `AdvancedGears.Tests.EditMode`） |
 | `Resources/` | マスタ ScriptableObject（`EffectSettings/`, `MissionSettings/`, `PlayerSettings/`, `UnitSettings/`, `GlobalParamSettings`, `PlayerControllerConstSettings`） |
 | `Prefabs/` | プレハブ。`Prefabs/UI/` は画面ごとのフォルダ（UI 実装ポリシー参照）。`Bullets/Resources/`, `Effect/Resources/`, `Parts/Resources/` にもマスタがある |
-| `Scenes/` | ビルド対象は `MainScene`（起動シーン）, `SelectMenu`, `Briefing`, `Customize`, `Battle`, `Result`, `License` と `Fields/Field_XXX/*.unity`（`FieldSettings` は `Scenes/Fields/Resources/`） |
+| `Scenes/` | ビルド対象は `MainScene`（起動シーン）, `SelectMenu`, `Briefing`, `Customize`, `Battle`, `Result`, `License` と `Fields/Field_XXX/*.unity`（`FieldSettings` は `Scenes/Fields/Resources/`）。`Debug/` はデバッグ用のシーン（ビルド対象外。`EffectCheck`: パーツのエフェクト確認） |
 | `Models/`, `Textures/`, `Shader/`, `Fonts/`, `Terrain/`, `ProBuilder Data/` | アセット |
 | `Plugins/UniRx/` | UniRx（サードパーティ。編集しない） |
 | `UnityTechnologies/ParticlePack/`, `CleanFlatIcon/` | Asset Store の外部アセット（git 管理外。下記「注意事項」参照） |
@@ -83,6 +83,7 @@ WarGameProject
 | `Unit/` | 戦車・ドローン・砲台などのユニット |
 | `Bullet/`, `HitReceiver/`, `Target/` | 弾、被弾・撃破処理、目標オブジェクト |
 | `Effect/` | エフェクトのプール管理と再生 |
+| `EffectCheck/` | エフェクト確認シーンのパーツ呼び出しと操作（`PartEffectTester` を種類ごとに継承する。初期化は `Utils/DebugBootstrap`） |
 | `Graphics/` | URP の Renderer Feature（アウトライン、ラジアルブラー）とグラフィック設定 |
 | `Input/` | 入力管理（`PlayerInputManager`）。`Input/Generated/MainControls.cs` は自動生成コード |
 | `UI/` | 画面ごとの UI（`Battle/`, `Briefing/`, `Customize/`, `MissionSelect/`, `FieldSelect/`, `License/`） |
@@ -177,6 +178,10 @@ Unity Editor の操作には **Unity CLI の MCP**（`unity mcp`、MCP サーバ
 - Play 開始後に MCP コマンドがタイムアウトし続ける場合は、モーダルダイアログで止まっていることを疑う。人間に Editor の画面確認を依頼する
 - 実行後は `editor_status` で Play 中であることを確認し、ログは `console` で確認する。停止は `editor_stop` で行う
 - 例外: 特定シーン単体の検証を人間が明示的に指示した場合のみ、直接 Play してよい
+- 直接 Play してよいシーン（MainScene を通らずに起動する前提で作ったデバッグ用のシーン。確認なしで使ってよい）
+  - `Scenes/Customize.unity`: カスタマイズ画面のデバッグモード（モデルの結合の確認）
+  - `Scenes/Debug/EffectCheck.unity`: パーツのエフェクト確認
+  - 手順: 上の保存状態の確認をしてから `open_scene` で開き、`editor_play` で Play する。終わったら `editor_stop` で止め、Play 中に dirty になったシーンは保存せずに開き直して破棄する
 
 ## 作業上のルール
 
