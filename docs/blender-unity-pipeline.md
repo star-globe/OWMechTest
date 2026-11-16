@@ -71,6 +71,17 @@ unity/Assets/
   - `Model`（FBX のインスタンス）: 回転 (-90, 0, 0) で FBX の +Z をパーツの +Y（コネクターの規約での噴射の向き）に合わせる。スケール 0.5 で、コネクターのスケール 2 を打ち消して実寸（1 単位 = 1 m）にする
   - `EffectorPos`（噴射のエフェクト）: `nozzle_exit_*` の子に置き、位置・回転は 0、スケール 2（エフェクトはコネクターのスケール 2 の下で調整してあるため）。ノズルが大きいものはスケールを大きくする（heavy は 2.6）
 
+### 手持ちの銃（#154）
+
+- `.blend` は `blender/weapon.blend`、メッシュは `tools/blender/weapon_parts.py` で作る（リグは使わない）。今あるのは `rifle`（ライフル、全長 2.6 m）、`smg`（短機関銃、1.6 m）、`cannon`（大口径砲、3.4 m）の左用・右用
+- 原点がグリップ（手で握る位置）、Blender の **-Y が銃口の向き**、+Z が上。左用は弾倉やセンサーを外側（+X）に寄せ、右用は `mirror()` で X を反転して作る（`PARTS` の `weapon_right_*` は左用の定義を反転したもの）
+- 銃口に空オブジェクト `muzzle_{left/right}_{バリアント名}` をメッシュの子として置く。`wp.measure(名前)` で大きさ・銃口の位置・面の向き（体積が正なら外向き）を数値で確かめる
+- 取り込んだ FBX では、ルートに回転 (270, 0, 0) が付き、銃口の向きがパーツの +Z、上が +Y になる（機体の左は Unity では -X なので、左用の外側も -X になる）。インポート設定はブースターと同じく Import Animation を OFF、Animation Type を None にする
+- Unity 側のプレハブ（`Prefabs/Parts/Gun/Gun_XXX_part.prefab`）の構成
+  - ルートに `GunPart`。子に左用・右用の FBX のインスタンスを位置 0・スケール 1 で置き、`leftModel` / `rightModel` に入れる
+  - 発射位置の `leftMuzzle` / `rightMuzzle` には、FBX の中の `muzzle_*` をそのまま指定する（+Z が銃口の向き）
+  - 持つ側は `GunAttach` の `side` で決まり、`GunPart.SetSide()` が使う側のモデルを表示して発射位置を切り替える
+
 ### 環境オブジェクト（#124）
 
 - `.blend` は `blender/environment.blend`、メッシュは `tools/blender/environment_parts.py` で作る（リグは使わない）。原点が地面での中心、+Z が上、正面は -Y。マテリアルは `Mat_Body` / `Mat_Detail` の単色だけ
