@@ -2,18 +2,13 @@
 
 ターミナルアプリが自動で更新される問題を避けるため、作業マシンでは PowerShell から直接 Claude Code を起動する。起動の手間を省くためのスクリプトのひな形をここに置く。
 
-セッション名はマシンごとに変えるので、スクリプト本体はリポジトリにコミットしない。各マシンでこのひな形から作る。
+セッション名はマシンごとに変えるので、スクリプト本体はリポジトリにコミットしない（`.gitignore` で `unity/start_remote_claude.ps1` を除外している）。各マシンでこのひな形から作る。
 
 ## 作り方
 
 1. 下のスクリプトを `unity/start_remote_claude.ps1` として保存する
    - 日本語のコメントを含むため、PowerShell 5.1 で使う場合は「UTF-8（BOM 付き）」で保存する
 2. `$sessionName` をそのマシンの名前に書き換える（例: `OWMechTest-Logic`、`OWMechTest-Design`）
-3. `git status` に未追跡のファイルとして出ないよう、`.git/info/exclude` に次の 1 行を追加する（共有の `.gitignore` は変えない）
-
-```
-unity/start_remote_claude.ps1
-```
 
 ## スクリプト
 
