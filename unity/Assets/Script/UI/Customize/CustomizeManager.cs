@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +9,7 @@ namespace AdvancedGears
     /// <summary>
     /// カスタマイズ画面の全体制御。
     /// スロット選択パネルとパーツ選択パネルを管理し、変更を PlayerPrefs へ保存する。
+    /// MainScene を通らずに起動したときはデバッグモードになり、保存データを読み書きしない（CustomizeDebugMode）。
     /// </summary>
     public class CustomizeManager : MonoBehaviour
     {
@@ -37,6 +39,12 @@ namespace AdvancedGears
         // 編集中の組み合わせ（スロット→パーツID）
         readonly Dictionary<PartsAttachType, int> editingDic = new Dictionary<PartsAttachType, int>();
 
+        /// <summary>編集中の組み合わせが変わったとき（最初の読み込みを含む）に呼ぶ。プレビューの組み直しに使う</summary>
+        public event Action<IReadOnlyDictionary<PartsAttachType, int>> AssemblyChanged;
+
+        // MainScene の初期化を通らずに起動したか（CustomizeDebugMode 参照）
+        bool isDebugMode;
+
         // 保存データがマスタの調整で組めなくなっているか（組める組み合わせを保存すると false に戻る）
         bool isSavedDataInvalid;
 
@@ -55,6 +63,18 @@ namespace AdvancedGears
             PartsAttachType.Weapon_Sub,
         };
 
+        private void Awake()
+        {
+            // MainScene を通らずに Play したときはデバッグモードにし、必要な初期化（マスタの読み込み）をここで行う。
+            // 他のコンポーネントの Start がマスタを使えるよう、Start より前（Awake）に読み込む
+            isDebugMode = CustomizeDebugMode.IsDebugMode(DebugBootstrap.IsInitialized);
+            if (isDebugMode)
+            {
+                Debug.Log("[CustomizeManager] MainScene を通らずに起動したため、デバッグモードで開きます。");
+                DebugBootstrap.EnsureInitialized();
+            }
+        }
+
         private void Start()
         {
             slotPool.Initialize();
@@ -63,22 +83,42 @@ namespace AdvancedGears
             saveButton?.onClick.AddListener(OnClickSave);
             backButton?.onClick.AddListener(OnClickBack);
 
+            if (backButton != null)
+                backButton.interactable = CustomizeDebugMode.CanGoBack(isDebugMode);
+
             LoadCurrentData();
             ShowSlots();
+            NotifyAssemblyChanged();
         }
 
         private void LoadCurrentData()
         {
-            // 組めない保存データもそのまま編集できるようにし、警告だけ出す（Battle では初期の組み合わせを使う）
-            isSavedDataInvalid = assembleDataAsset.Load() && !assembleDataAsset.IsAssemblable();
-            if (isSavedDataInvalid)
-                Debug.LogWarning("[CustomizeManager] 保存済みの組み合わせが組めない状態になっています。");
+            // デバッグモードでは保存データ（PlayerPrefs）を読まず、アセットの初期値から始める
+            if (isDebugMode)
+            {
+                isSavedDataInvalid = false;
+            }
+            else
+            {
+                // 組めない保存データもそのまま編集できるようにし、警告だけ出す（Battle では初期の組み合わせを使う）
+                isSavedDataInvalid = assembleDataAsset.Load() && !assembleDataAsset.IsAssemblable();
+                if (isSavedDataInvalid)
+                    Debug.LogWarning("[CustomizeManager] 保存済みの組み合わせが組めない状態になっています。");
+            }
 
             editingDic.Clear();
 
-            // 機体本体のスロットは、保存データに無ければ初期値のパーツを表示する（Battle と同じ組み合わせになる）
-            foreach (var slot in AllSlots)
-                editingDic[slot] = assembleDataAsset.GetEquippedPartId(slot);
+            // 通常は、機体本体のスロットが保存データに無ければ初期値のパーツを表示する（Battle と同じ組み合わせになる）
+            var initial = CustomizeDebugMode.BuildInitialAssembly(AllSlots, isDebugMode,
+                                                                  assembleDataAsset.GetEquippedPartId,
+                                                                  assembleDataAsset.GetDefaultPartId);
+            foreach (var kvp in initial)
+                editingDic[kvp.Key] = kvp.Value;
+        }
+
+        private void NotifyAssemblyChanged()
+        {
+            AssemblyChanged?.Invoke(editingDic);
         }
 
         private void ShowSlots()
@@ -108,20 +148,24 @@ namespace AdvancedGears
                     : CustomizeEnergyText.FormatUnresolvedPerformance());
             }
 
+            // デバッグモードでも組めない組み合わせは組み立てられるようにし、理由を警告として出すだけにする
             var messages = CustomizeEnergyText.GetInvalidReasons(resolved, performance);
             if (isSavedDataInvalid)
                 messages.Add(CustomizeEnergyText.SavedDataInvalidWarning);
+            if (isDebugMode)
+                messages.Insert(0, CustomizeDebugMode.Notice);
 
             if (assembleMessageText != null)
                 assembleMessageText.SetText(string.Join("\n", messages));
 
             if (saveButton != null)
-                saveButton.interactable = resolved && performance.IsValid;
+                saveButton.interactable = CustomizeDebugMode.CanSave(isDebugMode, resolved && performance.IsValid);
         }
 
         private bool CanSave()
         {
-            return EnergyPerformanceResolver.TryResolve(GetEditingPartId, out var performance) && performance.IsValid;
+            var isAssemblable = EnergyPerformanceResolver.TryResolve(GetEditingPartId, out var performance) && performance.IsValid;
+            return CustomizeDebugMode.CanSave(isDebugMode, isAssemblable);
         }
 
         /// <summary>編集中のジェネレーターの総出力。TryResolve が true なら必ずマスタにある</summary>
@@ -153,6 +197,8 @@ namespace AdvancedGears
             foreach (var kvp in allParts)
             {
                 if (kvp.Value.CategoryType != category) continue;
+                // パーツの保持情報（どのパーツを持っているか）を追加したら、ここで持っていないパーツを除く。
+                // ただしデバッグモードでは保持情報を使わず、マスタにある全パーツを選べるようにする
                 var btn = partsPool.Borrow();
                 btn.SetData(kvp.Value, OnSelectPart);
             }
@@ -163,13 +209,16 @@ namespace AdvancedGears
             if (selectedSlot == PartsAttachType.None) return;
             editingDic[selectedSlot] = partId;
             ShowSlots();
+            NotifyAssemblyChanged();
         }
 
         private void OnClickSave()
         {
             if (!CanSave())
             {
-                Debug.LogWarning("[CustomizeManager] 組めない組み合わせのため保存しません。");
+                Debug.LogWarning(isDebugMode
+                    ? "[CustomizeManager] デバッグモードのため保存しません。"
+                    : "[CustomizeManager] 組めない組み合わせのため保存しません。");
                 return;
             }
 
@@ -183,6 +232,9 @@ namespace AdvancedGears
 
         private void OnClickBack()
         {
+            if (!CustomizeDebugMode.CanGoBack(isDebugMode))
+                return;
+
             StateManager.Instance?.GoToState(returnState);
         }
 

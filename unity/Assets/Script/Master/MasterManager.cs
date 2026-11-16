@@ -6,6 +6,9 @@ namespace AdvancedGears
 {
     public class MasterManager : SingletonMonoBehaviour<MasterManager>
     {
+        /// <summary>LoadAll を済ませたか。MainScene の初期化を通らずにシーンを Play したかの判定に使う</summary>
+        public bool IsLoaded { get; private set; }
+
         public void LoadAll()
         {
             FieldMaster.Instance.Load();
@@ -24,6 +27,8 @@ namespace AdvancedGears
             UnitMovePatternMaster.Instance.Load();
             UnitMaster.Instance.Load();
             MissionMaster.Instance.Load();
+
+            IsLoaded = true;
         }
     }
 
