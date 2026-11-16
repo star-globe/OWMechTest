@@ -7,13 +7,18 @@
 #   - 1 ファイルの追加行数が MAX_ADDITIONS 以下
 # 条件を満たさないときはマージせず、理由を PR にコメントしてジョブを失敗させる。
 #
-# pull_request_target を使うので、このワークフローは常に main 側の定義で動く。
-# PR の中でこのファイルを書き換えても判定は変わらない。
+# トリガーは pull_request。以前は pull_request_target（常に main 側の定義で動く）を使っていたが、
+# 公開リポジトリでの pull_request_target の既定の扱いが変わり、個人アカウントのリポジトリの
+# 設定画面に許可する項目が見当たらないため切り替えた。
+# pull_request では PR のブランチ側のワークフロー定義で動くので、PR の中でこのファイルを書き換えると
+# 判定も変わる。ブランチを push できるのは書き込み権限を持つ人だけで、許可している作者も
+# リポジトリの所有者だけなので、この前提で受け入れている。
+# フォークからの PR では GITHUB_TOKEN が読み取り専用になり、マージできない（判定でも対象外にしている）。
 # PR のコードは checkout せず、変更ファイルの一覧は API で取得する（PR の内容を実行しない）。
 name: 作業ログの PR を自動マージ
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, synchronize, labeled, ready_for_review]
 
 permissions:
