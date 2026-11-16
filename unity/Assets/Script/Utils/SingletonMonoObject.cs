@@ -8,6 +8,16 @@ namespace AdvancedGears
     {
         public static SingletonMonoObject Instance { get; private set;}
 
+        /// <summary>
+        /// MainScene を通らずに起動したシーン（デバッグ用）で、シングルトンの置き場が無ければ作る。
+        /// AddComponent の時点で Awake が呼ばれ、Instance が設定される
+        /// </summary>
+        public static void EnsureExists()
+        {
+            if (Instance == null)
+                new GameObject(nameof(SingletonMonoObject)).AddComponent<SingletonMonoObject>();
+        }
+
         private void Awake()
         {
             if (Instance == null)

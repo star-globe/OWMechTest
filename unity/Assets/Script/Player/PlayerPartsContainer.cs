@@ -56,33 +56,9 @@ namespace AdvancedGears
 
         private void Load()
         {
-            if (mechRig != null)
-                LoadFrame();
-
-            if (boosterContainer != null)
-                boosterContainer.SetBoosters(assembleDataAsset.GetPartId(PartsAttachType.Booster));
-
-            if (rightGunAttach != null)
-                rightGunAttach.SetGun(assembleDataAsset.GetPartId(PartsAttachType.Weapon_Right));
-
-            if (leftGunAttach != null)
-                leftGunAttach.SetGun(assembleDataAsset.GetPartId(PartsAttachType.Weapon_Left));
-
-            if (subGunAttach != null)
-                subGunAttach.SetGun(assembleDataAsset.GetPartId(PartsAttachType.Weapon_Sub));
-        }
-
-        private void LoadFrame()
-        {
-            foreach (var slot in MechFrameSlots.All)
-            {
-                var partId = assembleDataAsset.GetEquippedPartId(slot);
-                var part = PartMaster.Instance.GetSettings(partId)?.InstantiatePart<MechFramePart>();
-                if (part == null)
-                    Debug.LogErrorFormat("[PlayerPartsContainer] {0} のパーツ（ID: {1}）を読み込めませんでした", slot, partId);
-
-                mechRig.Attach(slot, part);
-            }
+            // 機体本体は未設定なら初期値を使い、それ以外のスロットは未設定なら外す（GetEquippedPartId）
+            new MechPartsAssembler(mechRig, boosterContainer, rightGunAttach, leftGunAttach, subGunAttach)
+                .AssembleAll(assembleDataAsset.GetEquippedPartId);
         }
 
         /// <summary>移動の状態をアニメーションに反映する</summary>
