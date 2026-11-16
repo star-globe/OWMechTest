@@ -33,3 +33,6 @@ __pycache__/
 
 # Claude Code の EnterWorktree が作る worktree
 .claude/worktrees/
+
+# Remote Control で Claude Code を起動するスクリプト（セッション名がマシンごとに違う。ひな形: docs/remote-claude-launch.md）
+unity/start_remote_claude.ps1
