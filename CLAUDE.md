@@ -42,6 +42,7 @@ WarGameProject
 - ユニット全般: docs/spec/ユニット全般.md
 - 武装: docs/spec/武装.md
 - 撃破と任務の結果: docs/spec/撃破と任務の結果.md
+- アートディレクション: docs/spec/アートディレクション.md
 - プロトタイプの方針: docs/spec/プロトタイプの方針.md
 
 その他のドキュメント（リポジトリルートの `docs/`）
