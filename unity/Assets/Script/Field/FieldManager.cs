@@ -70,14 +70,27 @@ namespace AdvancedGears
             StartCoroutine(LoadField(sceneName));
         }
 
+        int loadingFieldCount = 0;
+
+        /// <summary>フィールドシーンを読み込み中か</summary>
+        public bool IsLoadingField => loadingFieldCount > 0;
+
         IEnumerator LoadField(string sceneName)
         {
             var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
             if (op == null)
                 yield break;
 
-            while (op.isDone == false)
-                yield return null;
+            loadingFieldCount++;
+            try
+            {
+                while (op.isDone == false)
+                    yield return null;
+            }
+            finally
+            {
+                loadingFieldCount--;
+            }
         }
 
         public void ClearFields()
