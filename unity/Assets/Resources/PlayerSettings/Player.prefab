@@ -380,9 +380,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   center: {fileID: 5940345344510896108}
   target: {fileID: 335652087689478720}
+  lookHeight: 4
   targetLength: 30
+  cameraDistance: 13.6
+  cameraElevation: 10
   moveTime: 0.1
-  cameraDiffMin: 0.3
+  deadZoneAngle: 20
   camDeltaRadius: 3
   powerRate: 2
   forwardDiffMin: 0.005
