@@ -18,9 +18,16 @@ namespace AdvancedGears
             }
         }
 
+        // 装甲の基準値。装甲値がこの値と同じとき、ダメージは半分になる（DamageCalculator）
+        [SerializeField, Min(1)]
+        [Tooltip("装甲の基準値。ダメージ = 攻撃力 × 基準値 ÷ (基準値 + 装甲値)。装甲値がこの値と同じとき、ダメージは半分になる")]
+        int armorReferenceValue = 1000;
+        public int ArmorReferenceValue => armorReferenceValue;
+
         private void OnValidate()
         {
             Assert.IsTrue(worldSizeRate > 0.0f);
+            Assert.IsTrue(armorReferenceValue > 0);
         }
     }
 
@@ -42,6 +49,8 @@ namespace AdvancedGears
         }
 
         public float WorldSizeRate => Settings.WorldSizeRate;
+
+        public int ArmorReferenceValue => Settings.ArmorReferenceValue;
 
         public void Load()
         {

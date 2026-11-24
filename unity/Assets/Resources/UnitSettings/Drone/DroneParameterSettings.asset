@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: DroneParameterSettings
   m_EditorClassIdentifier: 
   maxAp: 300
+  hasArmor: 1
+  physicalArmor: 50
+  energyArmor: 50
   bulletId: 1
   fireInterval: 1.5
   secondaryLockTime: 1.5

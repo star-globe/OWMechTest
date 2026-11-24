@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: GlobalParamSettings
   m_EditorClassIdentifier: 
   worldSizeRate: 1
+  armorReferenceValue: 1000
