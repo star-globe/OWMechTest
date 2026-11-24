@@ -62,6 +62,7 @@ CATEGORY_MAP = {
     "head":   "Parts/Head",
     "booster": "Parts/Booster",
     "weapon": "Weapons",
+    "bullet": "Weapons/Bullets",
     "rig":    "Rig",
     # 環境オブジェクト（#124）。カテゴリは名前の先頭 2 語
     "env_building": "Environment/Buildings",
@@ -80,7 +81,8 @@ NAME_PATTERNS = {
     "head":   re.compile(rf"^head_{_VARIANT}$"),
     "booster": re.compile(rf"^booster_{_VARIANT}$"),
     "weapon": re.compile(rf"^weapon_(?:left|right)_{_VARIANT}$"),
-    "rig":    re.compile(rf"^rig_{_VARIANT}$"),
+    "bullet": re.compile(rf"^bullet_{_VARIANT}$"),
+    "rig":   re.compile(rf"^rig_{_VARIANT}$"),
     "env_building": re.compile(rf"^env_building_(?:small|medium|large)_{_VARIANT}$"),
     "env_prop":     re.compile(rf"^env_prop_{_VARIANT}$"),
 }

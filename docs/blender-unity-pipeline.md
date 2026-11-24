@@ -47,6 +47,7 @@ unity/Assets/
 | 頭部 | `head_{バリアント名}.fbx` | `head_sensor.fbx` |
 | ブースター | `booster_{バリアント名}.fbx` | `booster_standard.fbx` |
 | 武装 | `weapon_{left/right}_{バリアント名}.fbx` | `weapon_left_rifle.fbx` |
+| 弾（ミサイルなど見た目のある弾） | `bullet_{バリアント名}.fbx`（`Models/Weapons/Bullets/`） | `bullet_missile.fbx` |
 | 共通リグ・アニメーション | `rig_{名前}.fbx` | `rig_mech.fbx` |
 | 建物（環境） | `env_building_{small/medium/large}_{バリアント名}.fbx` | `env_building_small_a.fbx` |
 | 小物（環境） | `env_prop_{名前}.fbx` | `env_prop_car.fbx` |
@@ -81,6 +82,12 @@ unity/Assets/
   - ルートに `GunPart`。子に左用・右用の FBX のインスタンスを位置 0・スケール 1 で置き、`leftModel` / `rightModel` に入れる
   - 発射位置の `leftMuzzle` / `rightMuzzle` には、FBX の中の `muzzle_*` をそのまま指定する（+Z が銃口の向き）
   - 持つ側は `GunAttach` の `side` で決まり、`GunPart.SetSide()` が使う側のモデルを表示して発射位置を切り替える
+
+### 肩のミサイルランチャーとミサイル（#183）
+
+- `.blend` は手持ちの銃と同じ `blender/weapon.blend`、メッシュも `tools/blender/weapon_parts.py` で作る。ランチャーは `weapon_right_missilepod`（右肩に 1 基）、ミサイルは `bullet_missile`
+- ランチャーは原点が箱の中心（Unity の `Core/SubAttach` の位置）で、発射口が 4 つある。空オブジェクト `muzzle_right_missilepod_1`〜`_4` を置き、Unity のプレハブ（`Prefabs/Parts/Sub/MissileLauncher_001_part.prefab`）の `Muzzle_1`〜`Muzzle_4`（`GunPart.burstMuzzles`）をその位置に合わせる
+- ミサイルは原点が中心で、Blender の -Y が進む向き（Unity の +Z）。弾のプレハブ（`Prefabs/Bullets/Missile/Missile.prefab`）の子 `Model` として置く
 
 ### 環境オブジェクト（#124）
 
