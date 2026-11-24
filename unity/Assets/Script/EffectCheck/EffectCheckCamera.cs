@@ -23,6 +23,13 @@ namespace AdvancedGears
         [SerializeField] float yaw = 150.0f;
         [SerializeField] float pitch = 15.0f;
 
+        /// <summary>回り込む目標を切り替える（テスターが複数あるとき、見るテスターを選ぶ）</summary>
+        public void SetTarget(Transform target, float distance)
+        {
+            this.target = target;
+            this.distance = Mathf.Clamp(distance, minDistance, maxDistance);
+        }
+
         private void LateUpdate()
         {
             if (target == null)

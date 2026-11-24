@@ -8,6 +8,8 @@
 mirror() で X に反転して作る（腕と同じく左右で鏡像）。
 銃口に空オブジェクト muzzle_{left|right}_{種類} をメッシュの子として置き、
 Unity ではこの位置に GunPart の発射位置（muzzle）を置く。
+肩のミサイルランチャー（weapon_right_missilepod）は発射口が 4 つあり、muzzle_right_missilepod_1〜4 を置く。
+ミサイル本体（bullet_missile）は弾のプレハブの見た目で、銃口は無い（#183）。
 
 使い方（Blender MCP の execute_blender_code など）:
   import sys, importlib
@@ -110,10 +112,51 @@ def _cannon():
     }
 
 
+def _missilepod():
+    """
+    肩のミサイルランチャー（#183。右肩に 1 基）: 幅 0.8 m・全長 1.3 m・高さ 0.6 m の箱に、2×2 の発射筒（φ0.24）。
+    原点が箱の中心（Unity の SubAttach の位置）。右肩用なので外側は -X（Unity では +X）。
+    発射口は muzzles の順に Unity の Muzzle_1〜4（左上・右上・左下・右下。Unity から見た左右）に対応する
+    """
+    tubes = [(0.2, 0.15), (-0.2, 0.15), (0.2, -0.15), (-0.2, -0.15)]
+    return {
+        "shapes": [
+            box((0, 0, 0), (0.8, 1.3, 0.6), top=(0.92, 0.96)),                 # 本体
+            box((0, -0.68, 0), (0.84, 0.06, 0.64), "Mat_Detail"),               # 前面の枠
+            box((0, 0.68, 0), (0.66, 0.06, 0.46), "Mat_Detail"),                # 後ろの排気口
+            box((-0.43, 0.0, 0.0), (0.06, 1.1, 0.5)),                           # 外側の装甲板
+            box((0.1, 0.1, -0.38), (0.3, 0.5, 0.16), "Mat_Detail"),             # 取り付けの支柱（内側寄り）
+            box((-0.3, -0.5, 0.31), (0.12, 0.12, 0.04), "Mat_Visor"),           # 外側のセンサー
+        ] + [barrel(-0.64, -0.74, 0.12, 0.12, x=x, z=z) for x, z in tubes],     # 発射筒
+        "muzzles": [(x, -0.74, z) for x, z in tubes],
+    }
+
+
+def _missile():
+    """
+    ミサイル本体（#183）: 全長 1.2 m・胴体 φ0.2、尾翼の幅 0.42 m。原点が中心、-Y が進む向き（Unity では +Z）
+    """
+    return {
+        "shapes": [
+            barrel(-0.42, -0.6, 0.1, 0.02, mat="Mat_Body"),                     # 弾頭
+            barrel(0.45, -0.42, 0.1, 0.1, mat="Mat_Body"),                      # 胴体
+            barrel(-0.30, -0.36, 0.104, 0.104),                                 # 帯
+            barrel(0.6, 0.45, 0.075, 0.09),                                     # ノズル
+            box((0, 0.36, 0), (0.42, 0.18, 0.02), "Mat_Detail"),                # 尾翼（横）
+            box((0, 0.36, 0), (0.02, 0.18, 0.42), "Mat_Detail"),                # 尾翼（縦）
+            box((0, -0.12, 0), (0.3, 0.1, 0.015), "Mat_Detail"),                # 前翼（横）
+            box((0, -0.12, 0), (0.015, 0.1, 0.3), "Mat_Detail"),                # 前翼（縦）
+        ],
+        "muzzles": [],
+    }
+
+
 PARTS = {}
 for _variant, _left in (("rifle", _rifle), ("smg", _smg), ("cannon", _cannon)):
     PARTS[f"weapon_left_{_variant}"] = _left
     PARTS[f"weapon_right_{_variant}"] = (lambda f: lambda: mirror(f()))(_left)
+PARTS["weapon_right_missilepod"] = _missilepod
+PARTS["bullet_missile"] = _missile
 
 
 # ── 作成 ───────────────────────────────────────
@@ -191,12 +234,20 @@ def muzzle_name(part_name):
     return MUZZLE_PREFIX + part_name[len("weapon_"):]
 
 
+def muzzle_names(name, definition):
+    """銃口の空オブジェクトの名前と位置の組。発射口が複数ある定義（muzzles）は muzzle_..._1 から番号を付ける"""
+    if "muzzles" in definition:
+        return [(f"{muzzle_name(name)}_{i + 1}", pos) for i, pos in enumerate(definition["muzzles"])]
+    return [(muzzle_name(name), definition["muzzle"])]
+
+
 def build_part(name):
     """PARTS[name] のメッシュと銃口の空オブジェクトを作る（同じ名前のオブジェクトがあれば作り直す）"""
     definition = PARTS[name]()
-    m_name = muzzle_name(name)
+    muzzles = muzzle_names(name, definition)
 
-    _remove_object(m_name)
+    for m_name, _ in muzzles:
+        _remove_object(m_name)
     _remove_object(name)
 
     verts, faces, face_mats, mat_names = [], [], [], []
@@ -219,13 +270,14 @@ def build_part(name):
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.scene.collection.objects.link(obj)
 
-    muzzle = bpy.data.objects.new(m_name, None)
-    muzzle.empty_display_type = 'SINGLE_ARROW'
-    muzzle.empty_display_size = 0.3
-    muzzle.location = definition["muzzle"]
-    muzzle.rotation_euler = (math.radians(90), 0, 0)  # 矢印（+Z）を銃口の向き（-Y）に向ける
-    muzzle.parent = obj
-    bpy.context.scene.collection.objects.link(muzzle)
+    for m_name, pos in muzzles:
+        muzzle = bpy.data.objects.new(m_name, None)
+        muzzle.empty_display_type = 'SINGLE_ARROW'
+        muzzle.empty_display_size = 0.3
+        muzzle.location = pos
+        muzzle.rotation_euler = (math.radians(90), 0, 0)  # 矢印（+Z）を銃口の向き（-Y）に向ける
+        muzzle.parent = obj
+        bpy.context.scene.collection.objects.link(muzzle)
     return obj
 
 
@@ -242,7 +294,8 @@ def measure(name):
     for p in me.polygons:
         m = me.materials[p.material_index].name
         counts[m] = counts.get(m, 0) + 1
-    muzzle = bpy.data.objects.get(muzzle_name(name))
+    muzzles = [c for c in obj.children if c.type == 'EMPTY' and c.name.startswith(MUZZLE_PREFIX)]
+    muzzles.sort(key=lambda c: c.name)
     # 体積が正なら面の向きがそろって外向き（閉じた形の和）
     volume = 0.0
     for p in me.polygons:
@@ -254,6 +307,6 @@ def measure(name):
         "max": [round(max(xs), 3), round(max(ys), 3), round(max(zs), 3)],
         "size": [round(max(xs) - min(xs), 3), round(max(ys) - min(ys), 3), round(max(zs) - min(zs), 3)],
         "faces": counts,
-        "muzzle": [round(c, 3) for c in muzzle.location] if muzzle else None,
+        "muzzles": {m.name: [round(c, 3) for c in m.location] for m in muzzles},
         "volume": round(volume, 4),
     }

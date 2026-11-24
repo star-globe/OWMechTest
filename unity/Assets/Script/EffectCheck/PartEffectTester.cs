@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UI;
 using TMPro;
 
 namespace AdvancedGears
@@ -8,7 +9,7 @@ namespace AdvancedGears
     /// <summary>
     /// エフェクト確認シーンで、パーツ単体をマスタから選んで台に呼び出す処理の基底クラス。
     /// パーツの一覧の表示・生成・差し替えを受け持ち、操作（噴射・発射など）は種類ごとの派生クラスで行う。
-    /// 武器に広げるときは GunEffectTester のような派生クラスを足す
+    /// 武器に広げるときは MissileEffectTester のような派生クラスを足す
     /// </summary>
     public abstract class PartEffectTester : MonoBehaviour
     {
@@ -19,6 +20,12 @@ namespace AdvancedGears
         [Header("UI")]
         [SerializeField] ObjectPool<PartsSelectButton> partsPool;
         [SerializeField] TextMeshProUGUI statusText;
+
+        [Header("カメラ（テスターが複数あるとき、ボタンでこのテスターを見る）")]
+        [SerializeField] EffectCheckCamera checkCamera;
+        [SerializeField] Transform cameraTarget;
+        [SerializeField] float cameraDistance = 4.0f;
+        [SerializeField] Button focusButton;
 
         PartComponent currentPart;
         int currentPartId = -1;
@@ -41,6 +48,15 @@ namespace AdvancedGears
 
             // MainScene の初期化を通らずに Play するシーンなので、マスタの読み込みなどをここで行う
             DebugBootstrap.EnsureInitialized();
+
+            focusButton?.onClick.AddListener(Focus);
+        }
+
+        /// <summary>カメラをこのテスターに向ける</summary>
+        public void Focus()
+        {
+            if (checkCamera != null && cameraTarget != null)
+                checkCamera.SetTarget(cameraTarget, cameraDistance);
         }
 
         protected virtual void Start()
