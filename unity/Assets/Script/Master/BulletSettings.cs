@@ -37,6 +37,14 @@ namespace AdvancedGears
         public int Attack => attack;
 
         [SerializeField]
+        [Tooltip("攻撃の属性（実弾 / EN）")]
+        AttackAttribute attackAttribute = AttackAttribute.Physical;
+        public AttackAttribute AttackAttribute => attackAttribute;
+
+        /// <summary>命中したときに被弾側へ渡す攻撃の情報</summary>
+        public AttackInfo AttackInfo => new AttackInfo(attack, attackAttribute);
+
+        [SerializeField]
         int muzzleEffectId;
         public int MuzzleEffectId => muzzleEffectId;
 

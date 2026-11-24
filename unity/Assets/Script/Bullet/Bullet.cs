@@ -102,6 +102,7 @@ namespace AdvancedGears
         public float VecSpeed => Settings == null ? 0.0f : Settings.Speed;
         public float LifeTime => Settings == null ? 0.0f : Settings.LifeTime;
         public int Attack => Settings == null ? 0 : Settings.Attack;
+        public AttackInfo AttackInfo => Settings == null ? default : Settings.AttackInfo;
 
         /// <summary>
         /// 発射する。初速は「direction × 弾速 + inheritVelocity（撃った側の速度）」
@@ -287,7 +288,7 @@ namespace AdvancedGears
                 // コライダーが子のオブジェクトに付いていることがあるため、親までさかのぼって探す
                 var receiver = hit.collider.GetComponentInParent<HitReceiver>();
                 if (receiver != null)
-                    receiver.Damage(Attack);
+                    receiver.Damage(AttackInfo);
             }
 
             var settings = Settings;
