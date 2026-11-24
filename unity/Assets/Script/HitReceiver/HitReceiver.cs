@@ -19,12 +19,16 @@ namespace AdvancedGears
             isDead = false;
         }
 
-        public void Damage(int damage)
+        /// <summary>攻撃を受ける。攻撃の属性は、属性ごとの装甲とダメージ計算（#115 / #116）で使う</summary>
+        public void Damage(AttackInfo attack)
         {
             // 撃破した後に当たっても、爆発のエフェクトや撃破の処理を繰り返さない
             // （機体は撃破の演出が終わるまで消えないため。CharacterDeadComponent）
             if (isDead)
                 return;
+
+            // 今は攻撃力をそのままダメージにする（装甲によるダメージ計算は #116）
+            var damage = attack.Power;
 
             hitPoint -= damage;
             OnDamaged(damage);
