@@ -11,6 +11,9 @@ namespace AdvancedGears
         public int Ap { get; private set; }
         public int MaxAp { get; private set; }
 
+        /// <summary>属性ごとの装甲値。装甲を持たないユニットは null</summary>
+        public ArmorValues? Armor { get; private set; }
+
         // ── 射撃共通 ────────────────────────────────────
         public int BulletId { get; private set; }
         public float FireInterval { get; private set; }
@@ -45,7 +48,8 @@ namespace AdvancedGears
         {
             Ap    = param.MaxAp;
             MaxAp = param.MaxAp;
-            BulletId     = param.BulletId;
+            Armor = param.HasArmor ? param.Armor : (ArmorValues?) null;
+            BulletId    = param.BulletId;
             FireInterval = param.FireInterval;
             fireTimer    = 0f;
             SecondaryLockTime = param.SecondaryLockTime;

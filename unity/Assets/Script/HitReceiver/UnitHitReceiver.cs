@@ -21,6 +21,9 @@ namespace AdvancedGears
                 SetInitHitPoint(unit.MaxAp);
         }
 
+        /// <summary>ユニットの装甲値（ユニットのパラメーター）。装甲を持たないユニットと初期化前は装甲なし</summary>
+        public override ArmorValues? Armor => unit != null && unit.UnitParam != null ? unit.UnitParam.Armor : null;
+
         protected override void OnDamaged(int damage)
         {
             if (unit != null)

@@ -12,6 +12,23 @@ namespace AdvancedGears
         int maxAp = 500;
         public int MaxAp => maxAp;
 
+        [Header("装甲")]
+        [SerializeField]
+        [Tooltip("装甲を持つか。持たないユニットは、装甲値ではなく「装甲なし」としてダメージを計算する（装甲値 0 とは区別する）")]
+        bool hasArmor = true;
+        public bool HasArmor => hasArmor;
+
+        [SerializeField, Min(0)]
+        [Tooltip("実弾装甲")]
+        int physicalArmor = 0;
+
+        [SerializeField, Min(0)]
+        [Tooltip("EN 装甲")]
+        int energyArmor = 0;
+
+        /// <summary>属性ごとの装甲値（HasArmor が false なら使わない）</summary>
+        public ArmorValues Armor => new ArmorValues(physicalArmor, energyArmor);
+
         [SerializeField]
         int bulletId = 1;
         public int BulletId => bulletId;

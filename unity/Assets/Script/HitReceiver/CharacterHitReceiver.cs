@@ -21,6 +21,11 @@ namespace AdvancedGears
                 SetInitHitPoint(character.MaxAp);
         }
 
+        /// <summary>機体の装甲値（フレームのパーツの合計）。初期化前は装甲なし</summary>
+        public override ArmorValues? Armor => character != null && character.CharacterParam != null
+            ? character.CharacterParam.Armor
+            : (ArmorValues?) null;
+
         protected override void OnDamaged(int damage)
         {
             if (character != null && character.CharacterParam != null)
