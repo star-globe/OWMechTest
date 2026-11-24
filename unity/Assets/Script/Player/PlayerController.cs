@@ -76,6 +76,7 @@ namespace AdvancedGears
         private void Start()
         {
             ApplyEnergyPerformance();
+            playerCharacter.CharacterParam.SetArmor(partsContainer.GetArmor());
             SyncParam();
             AttachGroundSpark();
         }

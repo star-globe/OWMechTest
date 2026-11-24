@@ -9,6 +9,9 @@ namespace AdvancedGears
         public int Ap { get; private set; }
         public int MaxAp { get; private set; }
 
+        /// <summary>属性ごとの装甲値。装備しているフレームのパーツの合計を SetArmor で設定する（それまでは 0）</summary>
+        public ArmorValues Armor { get; private set; } = ArmorValues.Zero;
+
         /// <summary>
         /// エネルギーの残量。毎フレームの回復・消費は 1 未満になることがあるため、内部では小数で持ち、
         /// 切り捨てた値を返す（int で毎フレーム切り捨てると、フレームレートが高いほど回復・消費が少なくなる）
@@ -81,6 +84,11 @@ namespace AdvancedGears
             energy = performance.MaxEnergy;
             IsOverheat = false;
             OverheatElapsed = 0f;
+        }
+
+        public void SetArmor(ArmorValues armor)
+        {
+            Armor = armor;
         }
 
         public void SetDamage(int damage)

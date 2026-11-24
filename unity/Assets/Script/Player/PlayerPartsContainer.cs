@@ -56,6 +56,12 @@ namespace AdvancedGears
             return EnergyPerformanceResolver.TryResolve(assembleDataAsset.GetEquippedPartId, out performance);
         }
 
+        /// <summary>装備しているフレームのパーツから機体の装甲値を計算する</summary>
+        public ArmorValues GetArmor()
+        {
+            return ArmorResolver.Resolve(assembleDataAsset.GetEquippedPartId);
+        }
+
         private void Load()
         {
             // 機体本体は未設定なら初期値を使い、それ以外のスロットは未設定なら外す（GetEquippedPartId）

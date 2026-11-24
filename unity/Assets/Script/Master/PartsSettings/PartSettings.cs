@@ -44,6 +44,17 @@ namespace AdvancedGears
         int constantEnergyConsumption = 0;
         public int ConstantEnergyConsumption => constantEnergyConsumption;
 
+        [SerializeField, Min(0)]
+        [Tooltip("実弾装甲。フレームのパーツ（頭・胴・腕・脚）だけが機体の装甲値に数えられる（ArmorResolver）")]
+        int physicalArmor = 0;
+
+        [SerializeField, Min(0)]
+        [Tooltip("EN 装甲。フレームのパーツ（頭・胴・腕・脚）だけが機体の装甲値に数えられる（ArmorResolver）")]
+        int energyArmor = 0;
+
+        /// <summary>属性ごとの装甲値</summary>
+        public ArmorValues Armor => new ArmorValues(physicalArmor, energyArmor);
+
         public int ID => PartID;
 
         public PartComponent InstantiatePart()

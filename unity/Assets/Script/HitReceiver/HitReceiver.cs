@@ -19,6 +19,12 @@ namespace AdvancedGears
             isDead = false;
         }
 
+        /// <summary>
+        /// 属性ごとの装甲値。装甲を持たない対象（目標オブジェクトなど）は null。
+        /// 装甲値 0 とは区別する（ダメージ計算 #116 で扱いを分けられるようにする）
+        /// </summary>
+        public virtual ArmorValues? Armor => null;
+
         /// <summary>攻撃を受ける。攻撃の属性は、属性ごとの装甲とダメージ計算（#115 / #116）で使う</summary>
         public void Damage(AttackInfo attack)
         {
