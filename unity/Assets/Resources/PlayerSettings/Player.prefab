@@ -301,7 +301,7 @@ MonoBehaviour:
   boosterContainer: {fileID: 3433187757557556468}
   rightGunAttach: {fileID: 3081360461234624602}
   leftGunAttach: {fileID: 5522040938239828618}
-  subGunAttach: {fileID: 0}
+  subPartAttach: {fileID: 6560872397338702192}
   mechRig: {fileID: 4518786747614641969}
   assembleDataAsset: {fileID: 11400000, guid: 148528af726d2c04887206388178c008, type: 2}
 --- !u!114 &1726856069593307166
@@ -496,3 +496,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dafc65711f3f0954398180321b2eb911, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6560872397338702192 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9010615493707022431, guid: 95fbe6067cca7454780e7e1532354440, type: 3}
+  m_PrefabInstance: {fileID: 2738405873721291055}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70fc9c5e71c95364a8fbf2784b5dca72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AdvancedGears.Runtime::AdvancedGears.SubPartAttach

@@ -19,6 +19,11 @@ namespace AdvancedGears
         public const int Explosion    = 12; // 爆発（機体破壊・大爆発）
         public const int ExplosionSmall = 13; // 小爆発（パーツ破損）
 
+        // ミサイル（#183 で EffectSettings を作る。作るまではミサイルの弾のマスタで設定せず、既存のエフェクトで代用する）
+        public const int MissileLaunch   = 14; // ミサイルの発射（弾のマスタの muzzleEffectId）
+        public const int MissileHit      = 15; // ミサイルの命中（弾のマスタの hitEffectId）
+        public const int MissileShotDown = 16; // ミサイルが撃ち落とされた（弾のマスタの shootDownEffectId）
+
         // 環境・UI補助
         public const int LandingDust  = 20; // 着地砂煙
         public const int GroundBoostSpark = 21; // 接地ブースト中の足元の火花（機体に付けてループ再生する）

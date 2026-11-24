@@ -43,7 +43,7 @@ namespace AdvancedGears
             callback?.Invoke(slot);
         }
 
-        private static string SlotDisplayName(PartsAttachType slot)
+        public static string SlotDisplayName(PartsAttachType slot)
         {
             switch (slot)
             {

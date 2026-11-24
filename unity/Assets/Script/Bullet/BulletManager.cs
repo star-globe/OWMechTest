@@ -62,6 +62,12 @@ namespace AdvancedGears
         /// shooter（撃った側）には当たらない
         /// </summary>
         public void Fire(int bulletId, Vector3 position, Vector3 direction, Vector3 inheritVelocity, BaseObject shooter = null)
+            => Fire(bulletId, position, direction, inheritVelocity, shooter, BulletGuidance.None);
+
+        /// <summary>
+        /// position から direction へ撃つ。誘導する弾（弾のマスタで誘導のパラメーターを設定したもの）は guidance の目標を追う
+        /// </summary>
+        public void Fire(int bulletId, Vector3 position, Vector3 direction, Vector3 inheritVelocity, BaseObject shooter, in BulletGuidance guidance)
         {
             var bullet = bulletQueue.DequeueBullet(bulletId);
             if (bullet == null)
@@ -76,7 +82,7 @@ namespace AdvancedGears
 
             instanceId++;
 
-            bullet.Fire(direction, position, inheritVelocity, instanceId, shooter);
+            bullet.Fire(direction, position, inheritVelocity, instanceId, shooter, guidance);
 
             currentBullets[instanceId] = bullet;
 

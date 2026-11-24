@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36d003706b0e0ec4daf235ba94ea0619, type: 3}
+  m_Name: MissileLauncher_001
+  m_EditorClassIdentifier: AdvancedGears.Runtime::AdvancedGears.GunSettings
+  partId: 311001
+  categoryType: 311
+  partComponent: {fileID: 6349942983159484561, guid: 29242079f7951db45bcb28747139ca86, type: 3}
+  constantEnergyConsumption: 300
+  gunCategoryType: 2
+  bulletId: 2
+  reloadInter: 300
+  secondaryLockTime: 1.5
+  burstCount: 4
+  burstInterval: 0.2

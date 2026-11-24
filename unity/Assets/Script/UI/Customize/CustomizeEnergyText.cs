@@ -51,6 +51,12 @@ namespace AdvancedGears
             return reasons;
         }
 
+        /// <summary>付けられないカテゴリのパーツが入っているスロットの理由（腕にミサイル、サブにライフルなど）</summary>
+        public static string FormatInvalidSlotReason(string slotName)
+        {
+            return $"{slotName}に付けられないパーツが装備されています";
+        }
+
         /// <summary>パーツの選択肢に出す、エネルギーの値</summary>
         /// <param name="constantConsumption">常時消費（1 秒あたり）</param>
         /// <param name="generator">ジェネレーターなら総容量と総出力</param>

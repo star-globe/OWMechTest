@@ -47,6 +47,42 @@ namespace AdvancedGears
             => muzzleEffectId > 0 ? muzzleEffectId : EffectID.MuzzleFlash;
 
         [SerializeField]
+        [Tooltip("命中したときに再生するエフェクトの ID（未設定なら標準の被弾スパーク）")]
+        int hitEffectId;
+
+        /// <summary>命中したときに再生するエフェクトの ID</summary>
+        public int ResolvedHitEffectId => ResolveEffectId(hitEffectId, EffectID.HitSpark);
+
+        [SerializeField]
+        [Tooltip("撃ち落とされたときに再生するエフェクトの ID（未設定なら小爆発）。撃ち落とせる弾（Missile レイヤー）だけが使う")]
+        int shootDownEffectId;
+
+        /// <summary>撃ち落とされたときに再生するエフェクトの ID</summary>
+        public int ResolvedShootDownEffectId => ResolveEffectId(shootDownEffectId, EffectID.ExplosionSmall);
+
+        public static int ResolveEffectId(int effectId, int fallbackId)
+            => effectId > 0 ? effectId : fallbackId;
+
+        [Header("誘導（ミサイル）。旋回性能か誘導時間が 0 なら誘導しない")]
+        [SerializeField, Min(0f)]
+        [Tooltip("発射してから誘導が始まるまでの時間（秒）。その間はまっすぐ飛ぶ")]
+        float guidanceDelay;
+        public float GuidanceDelay => guidanceDelay;
+
+        [SerializeField, Min(0f)]
+        [Tooltip("誘導する時間（秒）。過ぎたらそのまま直進する")]
+        float guidanceTime;
+        public float GuidanceTime => guidanceTime;
+
+        [SerializeField, Min(0f)]
+        [Tooltip("旋回性能（1 秒あたりに曲がれる角度、度）")]
+        float turnRate;
+        public float TurnRate => turnRate;
+
+        /// <summary>誘導する弾か</summary>
+        public bool IsHoming => MissileGuidance.IsHoming(turnRate, guidanceTime);
+
+        [SerializeField]
         Bullet bulletComp;
 
         public Bullet InstantiateBullet()

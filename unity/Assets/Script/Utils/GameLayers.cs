@@ -10,6 +10,14 @@ namespace AdvancedGears
         public const string Unit         = "Unit";
         public const string TargetableObject = "TargetableObject";
         public const string HitableObject = "HitableObject";
+        /// <summary>ミサイル（弾で撃ち落とせるが、ロックの対象にはならない。物理の衝突はどのレイヤーとも起こさない）</summary>
+        public const string Missile      = "Missile";
+
+        private static int? _missileLayer;
+        public static int MissileLayer => _missileLayer ??= LayerMask.NameToLayer(Missile);
+
+        private static int? _missileLayerMask;
+        public static int MissileLayerMask => _missileLayerMask ??= LayerMask.GetMask(Missile);
 
         /// <summary>弾がダメージを与えるレイヤー（撃った本人には当たらない。Bullet で除外する）</summary>
         private static int? _hitLayerMask;
@@ -22,7 +30,7 @@ namespace AdvancedGears
 
         private static int? _raycastObstacleMask;
         public static int RaycastObstacleMask =>
-            _raycastObstacleMask ??= ~LayerMask.GetMask(MyPlayer, OtherPlayer, NonPlayer, Unit, TargetableObject, HitableObject);
+            _raycastObstacleMask ??= ~LayerMask.GetMask(MyPlayer, OtherPlayer, NonPlayer, Unit, TargetableObject, HitableObject, Missile);
 
         private static int? _enemyLayerMask;
         public static int EnemyLayerMask =>

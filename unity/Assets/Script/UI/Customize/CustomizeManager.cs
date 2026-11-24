@@ -150,6 +150,9 @@ namespace AdvancedGears
 
             // デバッグモードでも組めない組み合わせは組み立てられるようにし、理由を警告として出すだけにする
             var messages = CustomizeEnergyText.GetInvalidReasons(resolved, performance);
+            var invalidSlots = FindInvalidSlots();
+            foreach (var slot in invalidSlots)
+                messages.Add(CustomizeEnergyText.FormatInvalidSlotReason(PartsSlotButton.SlotDisplayName(slot)));
             if (isSavedDataInvalid)
                 messages.Add(CustomizeEnergyText.SavedDataInvalidWarning);
             if (isDebugMode)
@@ -159,13 +162,20 @@ namespace AdvancedGears
                 assembleMessageText.SetText(string.Join("\n", messages));
 
             if (saveButton != null)
-                saveButton.interactable = CustomizeDebugMode.CanSave(isDebugMode, resolved && performance.IsValid);
+                saveButton.interactable = CustomizeDebugMode.CanSave(isDebugMode, resolved && performance.IsValid && invalidSlots.Count == 0);
         }
 
         private bool CanSave()
         {
-            var isAssemblable = EnergyPerformanceResolver.TryResolve(GetEditingPartId, out var performance) && performance.IsValid;
+            var isAssemblable = EnergyPerformanceResolver.TryResolve(GetEditingPartId, out var performance) && performance.IsValid
+                                && FindInvalidSlots().Count == 0;
             return CustomizeDebugMode.CanSave(isDebugMode, isAssemblable);
+        }
+
+        /// <summary>編集中の組み合わせで、付けられないカテゴリのパーツが入っているスロット</summary>
+        private List<PartsAttachType> FindInvalidSlots()
+        {
+            return PartSlotRule.FindInvalidSlots(PartSlotRule.WeaponSlots, GetEditingPartId, PartSlotRule.GetMasterCategory);
         }
 
         /// <summary>編集中のジェネレーターの総出力。TryResolve が true なら必ずマスタにある</summary>
@@ -191,12 +201,11 @@ namespace AdvancedGears
         {
             partsPool.ReturnAll();
 
-            var category = SlotToCategory(slot);
             var allParts = PartMaster.Instance.GetDictionary();
 
             foreach (var kvp in allParts)
             {
-                if (kvp.Value.CategoryType != category) continue;
+                if (!PartSlotRule.CanEquip(slot, kvp.Value.CategoryType)) continue;
                 // パーツの保持情報（どのパーツを持っているか）を追加したら、ここで持っていないパーツを除く。
                 // ただしデバッグモードでは保持情報を使わず、マスタにある全パーツを選べるようにする
                 var btn = partsPool.Borrow();
@@ -236,23 +245,6 @@ namespace AdvancedGears
                 return;
 
             StateManager.Instance?.GoToState(returnState);
-        }
-
-        private static PartCategoryType SlotToCategory(PartsAttachType slot)
-        {
-            switch (slot)
-            {
-                case PartsAttachType.Head:         return PartCategoryType.Head;
-                case PartsAttachType.Core:         return PartCategoryType.Core;
-                case PartsAttachType.Arm:          return PartCategoryType.Arm;
-                case PartsAttachType.Leg:          return PartCategoryType.Leg;
-                case PartsAttachType.Generator:    return PartCategoryType.Generator;
-                case PartsAttachType.Booster:      return PartCategoryType.Booster;
-                case PartsAttachType.Weapon_Right:
-                case PartsAttachType.Weapon_Left:
-                case PartsAttachType.Weapon_Sub:   return PartCategoryType.Gun;
-                default:                           return PartCategoryType.None;
-            }
         }
     }
 }

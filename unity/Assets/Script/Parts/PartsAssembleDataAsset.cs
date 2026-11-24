@@ -55,10 +55,14 @@ namespace AdvancedGears
             return MechFrameSlots.ResolvePartId(partId, GetDefaultPartId(type));
         }
 
-        /// <summary>組める組み合わせか（ジェネレーターがあり、ブースト OFF / ON のどちらでも回復力が 0 より大きい）</summary>
+        /// <summary>
+        /// 組める組み合わせか（ジェネレーターがあり、ブースト OFF / ON のどちらでも回復力が 0 より大きく、
+        /// 武器とサブ装備がそれぞれ付けられるスロットに入っている）
+        /// </summary>
         public bool IsAssemblable()
         {
-            return EnergyPerformanceResolver.TryResolve(GetEquippedPartId, out var performance) && performance.IsValid;
+            return EnergyPerformanceResolver.TryResolve(GetEquippedPartId, out var performance) && performance.IsValid
+                && PartSlotRule.FindInvalidSlots(PartSlotRule.WeaponSlots, GetEquippedPartId, PartSlotRule.GetMasterCategory).Count == 0;
         }
 
         public Dictionary<PartsAttachType, int> GetPartId_All()
