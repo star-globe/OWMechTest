@@ -10,7 +10,7 @@
 - 単発のものは `EffectManager.PlayEffect` で再生する（プールで使い回す）。続けて出すもの（ブースターの炎、接地移動の火花）は、機体側にループする ParticleSystem を持たせ、`PlayerEffectPresenter` から再生と停止を切り替える
 - 見た目をすぐに確認できないことがあるため、大きさ・色・持続時間は数値で確かめ、根拠を PR に書く
 
-## 進捗（2026-11-16 時点。#158 の PR で更新）
+## 進捗（2026-11-25 時点。#183 の PR で更新）
 
 状態: 未着手 / 進行中 / PR レビュー待ち / 完了 / 保留
 
@@ -23,6 +23,10 @@
 | 着地の砂煙（LandingDust） | 20 | `TouchChecker` が `None` → `Ground` に変わったとき | 不要 | 中 | 完了 | #136 / PR #142 |
 | 接地ブースト中の足元の火花（GroundBoostSpark） | 21 | 地上でのブースト移動中（`IsBoost && !isFloating`）。ループ | 不要 | 中 | 完了 | #135 / PR #143 |
 | 壁を蹴って上るときのエフェクト（WallKick） | 22 | `PlayerController.StartJump` で `TouchState.Wall` のとき | 不要 | 中 | 完了 | #134 / PR #155 |
+| ミサイルの発射（MissileLaunch） | 14 | 発射（`BulletManager.Fire`。弾 `Missile_001` の `muzzleEffectId`） | 実弾（オレンジ） | 中 | PR レビュー待ち | #183 |
+| ミサイルの飛行中の噴射（Exhaust） | - | `Missile.prefab` の子のループする ParticleSystem と、煙の軌跡（`TrailRenderer`） | 実弾（オレンジ） | 中 | PR レビュー待ち | #183 |
+| ミサイルの命中（MissileHit） | 15 | 命中（`Bullet.OnHit`。`hitEffectId`） | 実弾（オレンジ） | 中 | PR レビュー待ち | #183 |
+| ミサイルの撃墜（MissileShotDown） | 16 | 撃ち落とされたとき（`Bullet` の撃墜。`shootDownEffectId`） | 実弾（オレンジ） | 中 | PR レビュー待ち | #183 |
 | 実弾 / EN 弾の色分け（命中・マズル・軌跡） | 新規 | 弾の属性で切り替える | - | 中 | 保留（#114・#117・#132 待ち） | #133 |
 | ジャンプの足元の噴射 | 4 | `StartJump`（今はクイックのブースター炎で代用） | 不要 | 低 | 未着手 | #137 |
 | ハイパーブースト開始時の衝撃波（HyperBoostShockwave） | 5 | ハイパーブーストに入った瞬間（ラジアルブラーと併用） | 不要 | 低 | PR レビュー待ち | #158 |

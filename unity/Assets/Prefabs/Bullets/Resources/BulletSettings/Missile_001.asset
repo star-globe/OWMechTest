@@ -17,9 +17,9 @@ MonoBehaviour:
   speed: 120
   lifeTime: 6
   attack: 5
-  muzzleEffectId: 0
-  hitEffectId: 0
-  shootDownEffectId: 0
+  muzzleEffectId: 14
+  hitEffectId: 15
+  shootDownEffectId: 16
   guidanceDelay: 0.25
   guidanceTime: 3
   turnRate: 90
