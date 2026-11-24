@@ -67,7 +67,8 @@ namespace AdvancedGears
             if (param.CanShoot == false || param.CanFire == false)
                 return;
 
-            BulletManager.Instance.Fire(param.BulletId, muzzlePos, dir, shooterVelocity, unit);
+            // 弾 ID にミサイル弾を指定したユニットは、ロックしている目標を追うミサイルを 1 発ずつ撃つ（一斉発射はしない）
+            BulletManager.Instance.Fire(param.BulletId, muzzlePos, dir, shooterVelocity, unit, BulletGuidance.From(request));
             param.ResetFireTimer();
         }
 

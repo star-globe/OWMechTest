@@ -30,3 +30,5 @@ MonoBehaviour:
       partId: 104001
     - attachType: 401
       partId: 401001
+    - attachType: 303
+      partId: 311001

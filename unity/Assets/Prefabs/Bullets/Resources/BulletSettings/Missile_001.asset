@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f6cc66c95c034745804ba4bc9b60fcb, type: 3}
+  m_Name: Missile_001
+  m_EditorClassIdentifier: AdvancedGears.Runtime::AdvancedGears.BulletSettings
+  bulletId: 2
+  bulletCategoryType: 1
+  speed: 120
+  lifeTime: 6
+  attack: 5
+  muzzleEffectId: 0
+  hitEffectId: 0
+  shootDownEffectId: 0
+  guidanceDelay: 0.25
+  guidanceTime: 3
+  turnRate: 90
+  bulletComp: {fileID: 191979003775756445, guid: ae47f6ba92b52e240b4e91a9df9a0ae0, type: 3}

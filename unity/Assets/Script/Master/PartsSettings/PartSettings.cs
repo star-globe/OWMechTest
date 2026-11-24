@@ -16,7 +16,12 @@ namespace AdvancedGears
 
         Booster = 201,
 
+        // 腕の武器（手に持つ）
         Gun = 301,
+
+        // サブ装備（肩）。射出するもの・しないもの（一時的に性能を上げる装備など）をここに足す。
+        // 付けられるスロットは PartSlotRule で決める
+        Missile = 311,
 
         Generator = 401,
     }

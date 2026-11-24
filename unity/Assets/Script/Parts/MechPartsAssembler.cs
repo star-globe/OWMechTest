@@ -4,7 +4,7 @@ using UnityEngine;
 namespace AdvancedGears
 {
     /// <summary>
-    /// パーツの取り付け先（基準リグ・ブースター・銃の取り付け位置）をまとめ、スロットごとにパーツを組み付ける。
+    /// パーツの取り付け先（基準リグ・ブースター・銃とサブ装備の取り付け位置）をまとめ、スロットごとにパーツを組み付ける。
     /// バトルの機体（PlayerPartsContainer）とカスタマイズ画面のプレビュー（MechPreview）で共通に使う。
     /// 取り付け先が null のスロットは何もしない
     /// </summary>
@@ -14,15 +14,15 @@ namespace AdvancedGears
         readonly BoosterContainer booster;
         readonly GunAttach rightGun;
         readonly GunAttach leftGun;
-        readonly GunAttach subGun;
+        readonly SubPartAttach subPart;
 
-        public MechPartsAssembler(MechRig rig, BoosterContainer booster, GunAttach rightGun, GunAttach leftGun, GunAttach subGun)
+        public MechPartsAssembler(MechRig rig, BoosterContainer booster, GunAttach rightGun, GunAttach leftGun, SubPartAttach subPart)
         {
             this.rig = rig;
             this.booster = booster;
             this.rightGun = rightGun;
             this.leftGun = leftGun;
-            this.subGun = subGun;
+            this.subPart = subPart;
         }
 
         /// <summary>見た目のあるすべてのスロットに組み付ける（ジェネレーターは見た目が無いので扱わない）</summary>
@@ -62,8 +62,8 @@ namespace AdvancedGears
                         leftGun.SetGun(partId);
                     break;
                 case PartsAttachType.Weapon_Sub:
-                    if (subGun != null)
-                        subGun.SetGun(partId);
+                    if (subPart != null)
+                        subPart.SetPart(partId);
                     break;
             }
         }

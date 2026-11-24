@@ -21,17 +21,22 @@ namespace AdvancedGears
         [SerializeField]
         GunAttach leftGunAttach = null;
 
+        [SerializeField]
+        [Tooltip("サブ（肩）の取り付け位置")]
+        SubPartAttach subPartAttach = null;
+
         private void Awake()
         {
             Assert.IsNotNull(mechRig);
             Assert.IsNotNull(boosterContainer);
             Assert.IsNotNull(rightGunAttach);
             Assert.IsNotNull(leftGunAttach);
+            Assert.IsNotNull(subPartAttach);
         }
 
         public MechRig Rig => mechRig;
 
-        /// <summary>パーツを組み付ける。サブ武装は取り付け位置が無いので扱わない</summary>
-        public MechPartsAssembler Assembler => new MechPartsAssembler(mechRig, boosterContainer, rightGunAttach, leftGunAttach, null);
+        /// <summary>パーツを組み付ける</summary>
+        public MechPartsAssembler Assembler => new MechPartsAssembler(mechRig, boosterContainer, rightGunAttach, leftGunAttach, subPartAttach);
     }
 }
