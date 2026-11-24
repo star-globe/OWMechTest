@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: DroneParameterSettings_NoFire
   m_EditorClassIdentifier: AdvancedGears.Runtime::AdvancedGears.DroneParameterSettings
   maxAp: 300
+  hasArmor: 1
+  physicalArmor: 50
+  energyArmor: 50
   bulletId: 1
   fireInterval: 0
   secondaryLockTime: 1.5

@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: TankParameterSettings
   m_EditorClassIdentifier: 
   maxAp: 2000
+  hasArmor: 1
+  physicalArmor: 300
+  energyArmor: 150
   bulletId: 1
   fireInterval: 2
   secondaryLockTime: 1.5

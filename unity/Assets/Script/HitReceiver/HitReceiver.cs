@@ -25,7 +25,7 @@ namespace AdvancedGears
         /// </summary>
         public virtual ArmorValues? Armor => null;
 
-        /// <summary>攻撃を受ける。攻撃の属性は、属性ごとの装甲とダメージ計算（#115 / #116）で使う</summary>
+        /// <summary>攻撃を受ける。ダメージは攻撃と同じ属性の装甲値で減る（DamageCalculator）</summary>
         public void Damage(AttackInfo attack)
         {
             // 撃破した後に当たっても、爆発のエフェクトや撃破の処理を繰り返さない
@@ -33,8 +33,7 @@ namespace AdvancedGears
             if (isDead)
                 return;
 
-            // 今は攻撃力をそのままダメージにする（装甲によるダメージ計算は #116）
-            var damage = attack.Power;
+            var damage = DamageCalculator.Calculate(attack, Armor, GlobalParamMaster.Instance.ArmorReferenceValue);
 
             hitPoint -= damage;
             OnDamaged(damage);

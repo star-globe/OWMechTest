@@ -16,3 +16,5 @@ MonoBehaviour:
   categoryType: 103
   partComponent: {fileID: 6309932097572507730, guid: 781b221b21b6d454191e033e453caf0e, type: 3}
   constantEnergyConsumption: 300
+  physicalArmor: 90
+  energyArmor: 90

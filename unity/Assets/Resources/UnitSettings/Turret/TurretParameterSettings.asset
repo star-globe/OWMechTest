@@ -11,12 +11,16 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1feae125bea7f246a8f7504252946e1, type: 3}
   m_Name: TurretParameterSettings
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   maxAp: 1000
+  hasArmor: 1
+  physicalArmor: 400
+  energyArmor: 200
   bulletId: 1
   fireInterval: 3
+  secondaryLockTime: 1.5
+  searchRadius: 50
   turretRotationSpeedX: 30
   turretRotationSpeedY: 45
   elevationMin: -10
   elevationMax: 45
-  searchRadius: 50

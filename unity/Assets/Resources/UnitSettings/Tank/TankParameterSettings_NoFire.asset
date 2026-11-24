@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: TankParameterSettings_NoFire
   m_EditorClassIdentifier: AdvancedGears.Runtime::AdvancedGears.TankParameterSettings
   maxAp: 2000
+  hasArmor: 1
+  physicalArmor: 300
+  energyArmor: 150
   bulletId: 1
   fireInterval: 0
   secondaryLockTime: 1.5

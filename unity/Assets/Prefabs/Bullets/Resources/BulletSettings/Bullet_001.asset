@@ -16,6 +16,12 @@ MonoBehaviour:
   bulletCategoryType: 1
   speed: 300
   lifeTime: 5
-  attack: 1
+  attack: 100
+  attackAttribute: 0
   muzzleEffectId: 0
+  hitEffectId: 0
+  shootDownEffectId: 0
+  guidanceDelay: 0
+  guidanceTime: 0
+  turnRate: 0
   bulletComp: {fileID: 3872802672286413590, guid: 7bec132d9f693194abf3bf4b4af907a4, type: 3}
