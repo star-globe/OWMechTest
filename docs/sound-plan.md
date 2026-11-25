@@ -4,7 +4,7 @@
 > 進捗が変わったら（Issue の作成、PR の作成・マージ、方針の変更）、その PR か、管理用セッションでこの表を更新する。
 
 ## 方針
-- 2026-11-25 時点で、サウンドの仕組み（`AudioSource` / `AudioClip` の利用）はまだ無い。BGM の仕組みは #203 で作る。SE を再生する仕組みは別の Issue にする（下の「次の作業」）
+- 2026-11-25 時点で、サウンドの仕組み（`AudioSource` / `AudioClip` の利用）はまだ無い。BGM の仕組みは #203、SE を再生する仕組みは #208 で作る（下の「次の作業」）
 - 音量は BGM / SE を分けて調整できるよう、Audio Mixer に BGM / SE のグループを作る（#203）
 - 戦闘中の音は 3D（距離で減衰する）、メニューや HUD の音は 2D で鳴らす
 - エフェクトと同じタイミングで鳴らすものは、エフェクトの再生（`EffectManager.PlayEffect` / `PlayerEffectPresenter`）と同じ場所から鳴らす。「エフェクト」の列は `EffectID` の値（[docs/effects-plan.md](effects-plan.md)）
@@ -110,7 +110,7 @@
 
 ## 次の作業
 1. #203: BGM の切り替えと Audio Mixer（BGM / SE のグループ）を作る
-2. SE を再生する仕組み（ID とマスタ、プール、同時に鳴る数の上限、3D の設定）の Issue を作る。`EffectManager` / `EffectSettings` の作りに合わせる
+2. #208: SE を再生する仕組み（ID とマスタ、プール、同時に鳴る数の上限、3D の設定）を作る。`EffectManager` / `EffectSettings` の作りに合わせる
 3. 優先度「高」の SE から、分類ごとに Issue を作る（素材の用意と、鳴らす場所の実装）
 4. 素材を用意する（作成・購入）。ライセンスの表記が要るものは `License` 画面に足す
 
@@ -122,6 +122,7 @@
 ## 関連
 - #203: シーンごとに BGM を切り替える
 - #204: 必要な SE の洗い出し（この表）
+- #208: SE を再生する仕組みを作る
 - [docs/effects-plan.md](effects-plan.md): エフェクトの対応一覧（同じタイミングで鳴らす SE が多い）
 - #117: EN 射撃武器（EN 武器の音）
 - #159: 撃破後の煙と炎
