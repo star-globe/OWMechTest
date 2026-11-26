@@ -52,6 +52,7 @@ WarGameProject
 - RenderGraph ラジアルブラー: docs/rendergraph-radial-blur-guide.md
 - 管理用セッションのトークン節約ポリシー: docs/management-session-policy.md
 - クラウドセッションの基本方針: docs/cloud-session-policy.md
+- Issue の実行順序の管理ポリシー: docs/issue-order-policy.md（順番の表: docs/issue-order.md）
 - Remote Control での起動バッチファイル（ひな形）: docs/remote-claude-launch.md
 - エフェクトの対応一覧（進捗の管理）: docs/effects-plan.md
 - サウンドの対応一覧（SE・BGM の進捗の管理）: docs/sound-plan.md
@@ -244,6 +245,7 @@ Issueに着手する際は必ず以下のフローに従うこと。
 ### 1. 着手前の確認
 - `/issue-start <番号>` スキルでこの手順を実行できる
 - 就寝前などに作業を中断するときは `/suspend-work`、再開するときは `/resume-work` を使う（引き継ぎの要約を Issue にコメントするので、セッションが再開できなくても新しいセッションで続けられる）
+- **Issue の順番は `docs/issue-order.md`（main の最新）だけを正とする**。着手前に、依存先がクローズしていることと、`InProgress` ラベルが付いていない（別のセッションが着手していない）ことを確かめ、着手したらラベルとコメントを付ける。表を変えるのは管理用セッションだけ（`docs/issue-order-policy.md`）
 - Issueの内容を読み、実装方針を提示する
 - 他のオープンなIssueとの競合・依存関係を予測して報告する
 - 人間の承認を得てから実装に進む
@@ -264,7 +266,7 @@ Issueに着手する際は必ず以下のフローに従うこと。
 ### 4. マージ後の記録・クローズ
 - マージ完了後、以下の形式で `docs/logs/issue-{番号}-log.md` を作成する
 - ログの PR は `docs/logs/issue-{番号}-log.md` だけを変更し、`WorkLog` ラベルを付ける。条件を満たせば GitHub Actions（`.github/workflows/auto-merge-worklog.yml`）が自動でマージする。条件は、作者が許可リストに含まれる、このリポジトリのブランチから出された PR、作業ログのファイルの追加か変更だけ、1 ファイル 200 行以内。満たさないときは理由が PR にコメントされるので、人が確認してマージする
-- Issueをクローズする
+- Issueをクローズし、`InProgress` ラベルを外す
 
 #### ログのフォーマット
 ---
