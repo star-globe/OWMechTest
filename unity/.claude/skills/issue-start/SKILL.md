@@ -19,16 +19,28 @@ argument-hint: <Issue番号>
    - 仕様書は `docs/spec/`（wiki の原本）にある。Issue で仕様が変わる場合は、`docs/spec/` の変更も実装方針に含める
    - CLAUDE.md の「仕様書の索引」「ディレクトリマップ」「アーキテクチャ要約」から関係する箇所を特定し、既存コードのパターンを読む
 
-3. **他の Issue・PR との競合を調べる**
+3. **順番と着手状況を確かめる**（`docs/issue-order-policy.md`）
+   - `git fetch origin main` の後、`git show origin/main:docs/issue-order.md` で main の最新の順番を読む（作業ブランチのファイルは古いことがある）
+   - この Issue の「先に終わっている必要がある Issue」がすべてクローズしているか確かめる。終わっていなければ、着手してよいか人間に尋ねる
+   - Issue に `InProgress` ラベルが付いていたら、別のセッションが着手している。着手のコメントを示して人間に尋ね、勝手に進めない
+   - 表に無い Issue なら、表のどこに入れるかの案を方針と一緒に示す（表は管理用セッションが変える）
+
+4. **他の Issue・PR との競合を調べる**
    - `gh issue list --repo star-globe/OWMechTest --state open` と `gh pr list --repo star-globe/OWMechTest --state open`
    - 同じファイル・同じ仕組みを触るもの、先に終わっている必要があるもの（依存）を洗い出す
 
-4. **実装方針を提示して承認を得る**
+5. **実装方針を提示して承認を得る**
    - 変更するファイル、方針、検証方法（Unity でのコンパイル・Play 確認が要るか）、競合・依存をまとめて提示する
    - 分野ラベルが付いていなければ、付けるラベルも提案する（CLAUDE.md の「ラベル」参照）
    - AskUserQuestion で承認を取る。承認されるまで実装・ブランチ作成はしない
 
-5. **ブランチを作る**
+6. **着手を記録する**（承認の後、ブランチを作る前）
+   - Issue をもう一度読み、`InProgress` ラベルがまだ付いていないことを確かめる
+   - `gh api repos/star-globe/OWMechTest/issues/{番号}/labels -f "labels[]=InProgress"` でラベルを付ける
+   - Issue にコメントする: `着手: <セッション名または ID> / ブランチ <ブランチ名>`
+   - 直前に別のセッションが着手していたら（自分より先の着手コメントがある）、先に書いたほうが担当する。手を引いて人間に報告する
+
+7. **ブランチを作る**
    - 未コミットの変更があれば内容を確認する（Unity が自動で変更した `unity/ProjectSettings/` は作業と無関係なら残してよい）
    - `git switch main && git pull` で最新化してから `git switch -c feature/issue-{番号}-{内容を表す短い英語}`
    - 例: `feature/issue-7-squad-ai`
