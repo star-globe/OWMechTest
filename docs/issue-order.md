@@ -23,6 +23,7 @@
 | 1 | #218 本体のスピードをパーツの構成から決める | GameLogic | Logic | #221 | 着手時に計算式などの仕様を決める（クラウドで相談できる） |
 | 2 | #213 歩行の向きとカニ歩き・後ろ歩き | GameLogic, Design | Logic / Design | #212 | |
 | 3 | #214 ブースト移動時の傾き | GameLogic | Logic | #212 | |
+| 4 | #169 弾のモデルの作り直し | Design | Design | - | #212 の後、#217 までの Design のマシンの作業。#154（銃のモデル）はクローズ済み |
 
 ### 段階 3
 
@@ -31,26 +32,29 @@
 | 1 | #216 近接武装の仕組み・マスタ | GameLogic | Logic | #211, #218 | |
 | 2 | #217 レーザーブレードの見た目 | Design | Design | #212 | #216 と並行できる |
 
+### 段階 4: 近接武装まわりの後
+
+| 順 | Issue | 分野 | 環境 | 先に終わっている必要がある Issue | 備考 |
+|---|---|---|---|---|---|
+| 1 | #156 NPC・ユニットが射線上の味方を撃たない | GameLogic | Logic | - | 味方の弾で AP が減る不具合に近い |
+| 2 | #202 戦闘中のメニューからミッションを中断する | GameLogic | Logic | - | |
+| 3 | #117 EN 射撃武器のカテゴリ | GameLogic | Logic | - | #133 の前提 |
+| 4 | #159 撃破後の残骸の煙と炎 | Design | Design | - | #137 の前提（`docs/effects-plan.md`） |
+| 5 | #203 シーンごとに BGM を切り替える | Sound | Logic | - | `docs/sound-plan.md` |
+| 6 | #208 SE を再生する仕組み | Sound | Logic | #203 | `docs/sound-plan.md` |
+| 7 | #168 SessionStart フックで main の遅れを確認する | Management | Logic | - | Windows の PowerShell でフックを確かめるため手元のマシンで行う |
+
 ### 後回し・保留
 
 | Issue | 分野 | 理由・再開の条件 |
 |---|---|---|
 | #219 両手攻撃のモーション | GameLogic | #216・#217 の後 |
 | #133 実弾と EN 弾のエフェクトの色分け | Design | #117 の後（`docs/effects-plan.md`） |
-| #137 優先度の低い演出用のエフェクト | Design | `docs/effects-plan.md` の「進め方」 |
+| #137 優先度の低い演出用のエフェクト | Design | #159 の後（`docs/effects-plan.md` の「進め方」） |
 | #54 GameCI での自動実行 | Management | 保留中 |
 
 ### 未整理（順番を人間に決めてもらう）
 
-| Issue | 分野 | 環境 | メモ |
-|---|---|---|---|
-| #117 EN 射撃武器のカテゴリ | GameLogic | Logic | #133 の前提 |
-| #156 NPC・ユニットが射線上の味方を撃たない | GameLogic | Logic | |
-| #159 撃破後の残骸の煙と炎 | Design | Design | `docs/effects-plan.md` |
-| #169 弾のモデルの作り直し | Design | Design | |
-| #202 戦闘中のメニューからミッションを中断する | GameLogic | Logic | |
-| #203 シーンごとに BGM を切り替える | Sound | Logic | `docs/sound-plan.md` |
-| #208 SE を再生する仕組み | Sound | Logic | `docs/sound-plan.md` |
-| #168 SessionStart フックで main の遅れを確認する | Management | クラウド可 | |
+（なし）
 
 #66（小さなタスクのチェックリスト）は順番の管理の対象外。
