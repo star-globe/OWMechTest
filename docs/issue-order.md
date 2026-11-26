@@ -23,7 +23,8 @@
 | 1 | #218 本体のスピードをパーツの構成から決める | GameLogic | Logic | #221 | 着手時に計算式などの仕様を決める（クラウドで相談できる） |
 | 2 | #213 歩行の向きとカニ歩き・後ろ歩き | GameLogic, Design | Logic / Design | #212 | |
 | 3 | #214 ブースト移動時の傾き | GameLogic | Logic | #212 | |
-| 4 | #169 弾のモデルの作り直し | Design | Design | - | #212 の後、#217 までの Design のマシンの作業。#154（銃のモデル）はクローズ済み |
+| 4 | #225 起伏のある砂漠と傾いた建造物のフィールド | Design | Design | - | 斜面での動作の確認用。#213・#214 の確認に使えるよう早めに置く |
+| 5 | #169 弾のモデルの作り直し | Design | Design | - | #212 の後、#217 までの Design のマシンの作業。#154（銃のモデル）はクローズ済み |
 
 ### 段階 3
 
@@ -40,9 +41,11 @@
 | 2 | #202 戦闘中のメニューからミッションを中断する | GameLogic | Logic | - | |
 | 3 | #117 EN 射撃武器のカテゴリ | GameLogic | Logic | - | #133 の前提 |
 | 4 | #159 撃破後の残骸の煙と炎 | Design | Design | - | #137 の前提（`docs/effects-plan.md`） |
-| 5 | #203 シーンごとに BGM を切り替える | Sound | Logic | - | `docs/sound-plan.md` |
-| 6 | #208 SE を再生する仕組み | Sound | Logic | #203 | `docs/sound-plan.md` |
-| 7 | #168 SessionStart フックで main の遅れを確認する | Management | Logic | - | Windows の PowerShell でフックを確かめるため手元のマシンで行う |
+| 5 | #226 頂上に拠点がある山岳のフィールド | Design | Design | - | 斜面での動作の確認用 |
+| 6 | #227 見晴らしのよい丘と丘を迂回する道路のフィールド | Design | Design | - | 斜面での動作の確認用 |
+| 7 | #203 シーンごとに BGM を切り替える | Sound | Logic | - | `docs/sound-plan.md` |
+| 8 | #208 SE を再生する仕組み | Sound | Logic | #203 | `docs/sound-plan.md` |
+| 9 | #168 SessionStart フックで main の遅れを確認する | Management | Logic | - | Windows の PowerShell でフックを確かめるため手元のマシンで行う |
 
 ### 後回し・保留
 
