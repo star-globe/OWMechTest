@@ -3,7 +3,7 @@
 > 運用のルールは `docs/issue-order-policy.md`。この表は「何をどの順に」だけを持ち、着手中・完了の状態は GitHub の Issue（`InProgress` ラベル、クローズ）で見る。
 > この表を変えるのは管理用セッションだけ。順番を決めるのは人間。
 
-## 順番（2026-11-26 時点）
+## 順番（2026-11-27 時点）
 
 環境: Logic = ロジック担当のマシン / Design = デザイン担当のマシン / クラウド可 = クラウドセッションでも作業できる
 
@@ -23,8 +23,9 @@
 | 1 | #218 本体のスピードをパーツの構成から決める | GameLogic | Logic | #221 | 着手時に計算式などの仕様を決める（クラウドで相談できる） |
 | 2 | #213 歩行の向きとカニ歩き・後ろ歩き | GameLogic, Design | Logic / Design | #212 | |
 | 3 | #214 ブースト移動時の傾き | GameLogic | Logic | #212 | |
-| 4 | #225 起伏のある砂漠と傾いた建造物のフィールド | Design | Design | - | 斜面での動作の確認用。#213・#214 の確認に使えるよう早めに置く |
-| 5 | #169 弾のモデルの作り直し | Design | Design | - | #212 の後、#217 までの Design のマシンの作業。#154（銃のモデル）はクローズ済み |
+| 4 | #229 パーツのマテリアルを Main・Sub・Light に揃える | Design | Design | - | #230 の前提。この後に作るモデル（#225・#169・#217 など）はこの種類で作る |
+| 5 | #225 起伏のある砂漠と傾いた建造物のフィールド | Design | Design | - | 斜面での動作の確認用。#213・#214 の確認に使えるよう早めに置く |
+| 6 | #169 弾のモデルの作り直し | Design | Design | - | #212 の後、#217 までの Design のマシンの作業。#154（銃のモデル）はクローズ済み |
 
 ### 段階 3
 
@@ -40,12 +41,13 @@
 | 1 | #156 NPC・ユニットが射線上の味方を撃たない | GameLogic | Logic | - | 味方の弾で AP が減る不具合に近い |
 | 2 | #202 戦闘中のメニューからミッションを中断する | GameLogic | Logic | - | |
 | 3 | #117 EN 射撃武器のカテゴリ | GameLogic | Logic | - | #133 の前提 |
-| 4 | #159 撃破後の残骸の煙と炎 | Design | Design | - | #137 の前提（`docs/effects-plan.md`） |
-| 5 | #226 頂上に拠点がある山岳のフィールド | Design | Design | - | 斜面での動作の確認用 |
-| 6 | #227 見晴らしのよい丘と丘を迂回する道路のフィールド | Design | Design | - | 斜面での動作の確認用 |
-| 7 | #203 シーンごとに BGM を切り替える | Sound | Logic | - | `docs/sound-plan.md` |
-| 8 | #208 SE を再生する仕組み | Sound | Logic | #203 | `docs/sound-plan.md` |
-| 9 | #168 SessionStart フックで main の遅れを確認する | Management | Logic | - | Windows の PowerShell でフックを確かめるため手元のマシンで行う |
+| 4 | #230 カスタマイズ画面でマテリアルの色と材質を編集する | GameLogic | Logic | #229 | |
+| 5 | #159 撃破後の残骸の煙と炎 | Design | Design | - | #137 の前提（`docs/effects-plan.md`） |
+| 6 | #226 頂上に拠点がある山岳のフィールド | Design | Design | - | 斜面での動作の確認用 |
+| 7 | #227 見晴らしのよい丘と丘を迂回する道路のフィールド | Design | Design | - | 斜面での動作の確認用 |
+| 8 | #203 シーンごとに BGM を切り替える | Sound | Logic | - | `docs/sound-plan.md` |
+| 9 | #208 SE を再生する仕組み | Sound | Logic | #203 | `docs/sound-plan.md` |
+| 10 | #168 SessionStart フックで main の遅れを確認する | Management | Logic | - | Windows の PowerShell でフックを確かめるため手元のマシンで行う |
 
 ### 後回し・保留
 
