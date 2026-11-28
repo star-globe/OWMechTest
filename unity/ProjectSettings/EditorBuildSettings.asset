@@ -44,6 +44,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Fields/Field_002/Field_002_2.unity
     guid: 8a7ba3b69de64c44c8bd21d82e02a99e
+  - enabled: 1
+    path: Assets/Scenes/Fields/Field_003/Field_003_1.unity
+    guid: 1dcf8f7344b8ae44980f55812bbbdc00
+  - enabled: 1
+    path: Assets/Scenes/Fields/Field_003/Field_003_2.unity
+    guid: 5d21498a5b4889f47a969a913895f068
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 8236c8f1656f46e41bcb3aec5e2173e6, type: 2}
