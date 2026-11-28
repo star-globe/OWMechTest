@@ -94,6 +94,7 @@ unity/Assets/
 
 - `.blend` は `blender/environment.blend`、メッシュは `tools/blender/environment_parts.py` で作る（リグは使わない）。原点が地面での中心、+Z が上、正面は -Y。マテリアルは `Mat_Main` / `Mat_Sub` の単色だけ
 - 建物の大きさは `small`（屋上 8 m 程度。機体と同じくらい）、`medium`（20〜30 m）、`large`（100 m 程度のランドマーク）。廃墟ビルは `ruined_building()` の引数（大きさ・階数・`seed`・崩れる階数・壁の抜ける割合など）でバリアントを増やす。今あるのは `env_building_{small,medium,large}_a` と `env_prop_{car,truck,sign}`
+- 砂漠のフィールド（#225）用に、傾けて置く前提のモデルがある: `env_building_medium_tower_a`（細長い 10 階建ての塔。屋上 40 m。下を砂に埋めて傾ける）、`env_prop_slab_a`（崩れ落ちた床の板。32 × 16 m、上面の高さ 2 m。10〜40° に傾けて機体を乗せる）、`env_prop_pillar_a`（倒れた柱。長さ 28 m、太さ 3.3 m）。モデルは傾けずに作り、傾きはシーンでの配置の回転で付ける（当たり判定の箱も一緒に傾く）
 - 当たり判定の箱は、空オブジェクト `col_{名前から env_ を除いたもの}_{番号}`（立方体の表示。位置が箱の中心、スケールが箱の大きさの半分）としてメッシュの子に置く。建物は区画ごとの箱（屋上の床の上面まで）で、がれき・突き出た柱・手すり壁は含めない
 - 取り込んだ FBX では、ルートに回転 (270, 0, 0) が付き、Unity の Y が上になる。Blender の -Y（正面）は Unity の +Z。インポート設定は Animation Type を None、Import Animation を OFF にする
 - Unity 側のプレハブ（`Prefabs/Environment/{Buildings,Props}/Building_{Small,Medium,Large}_X.prefab`、`Prop_{名前}.prefab`）は FBX のプレハブバリアント。`col_*` に BoxCollider（中心 0、size 2）を付け、全体を Static（Contribute GI 以外）にする
