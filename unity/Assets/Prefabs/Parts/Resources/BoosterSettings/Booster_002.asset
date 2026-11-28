@@ -16,6 +16,13 @@ MonoBehaviour:
   categoryType: 201
   partComponent: {fileID: 6475338893502676558, guid: 01a6b338c4de02d408396eb604765c4f, type: 3}
   constantEnergyConsumption: 0
-  boostPower: 120
+  physicalArmor: 0
+  energyArmor: 0
+  boostSpeedRate: 2.2
+  quickBoostSpeed: 17
+  quickBoostTime: 0.1
+  quickBoostEnergy: 3000
+  hyperBoostSpeed: 33
+  hyperBoostEnergy: 4800
   boostOnEnergyConsumption: 2000
   baseColor: {r: 2, g: 0.9, b: 0.3, a: 1}

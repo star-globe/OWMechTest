@@ -86,6 +86,13 @@ namespace AdvancedGears
             OverheatElapsed = 0f;
         }
 
+        /// <summary>装備したブースターの消費エネルギー（クイックブースト・ハイパーブースト）を設定する</summary>
+        public void SetBoostPerformance(in BoostPerformance performance)
+        {
+            QuickBoostEnergy = performance.QuickBoostEnergy;
+            HyperBoostEnergy = performance.HyperBoostEnergy;
+        }
+
         public void SetArmor(ArmorValues armor)
         {
             Armor = armor;

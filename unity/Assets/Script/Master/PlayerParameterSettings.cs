@@ -43,10 +43,12 @@ namespace AdvancedGears
         public int JumpEnergy => jumpEnergy;
 
         [SerializeField]
+        [Tooltip("ブースターを読み込めないときのクイックブーストの消費エネルギー（1 回あたり。通常はブースターの値を使う）")]
         int quickBoostEnergy = 3000;
         public int QuickBoostEnergy => quickBoostEnergy;
 
         [SerializeField]
+        [Tooltip("ブースターを読み込めないときのハイパーブーストの消費エネルギー（1 秒あたり。通常はブースターの値を使う）")]
         int hyperBoostEnergy = 2000;
         public int HyperBoostEnergy => hyperBoostEnergy;
 

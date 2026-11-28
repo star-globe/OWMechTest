@@ -8,9 +8,35 @@ namespace AdvancedGears
     [CreateAssetMenu(menuName = "TestProject/Parts/BoosterSettings", order = 0)]
     public class BoosterSettings : PartSettings
     {
-        [SerializeField]
-        int boostPower;
-        public int BoostPower => boostPower;
+        /// <summary>ブースト出力。ブースト ON の間、通常の水平の移動スピードに掛ける倍率（暫定。本体のスピードとの関係は #218 で決める）</summary>
+        [SerializeField, Min(0f)]
+        float boostSpeedRate = 2.0f;
+        public float BoostSpeedRate => boostSpeedRate;
+
+        /// <summary>クイックブーストの出力（移動の速さ）</summary>
+        [SerializeField, Min(0f)]
+        float quickBoostSpeed = 15.0f;
+        public float QuickBoostSpeed => quickBoostSpeed;
+
+        /// <summary>クイックブーストの噴射時間（秒）</summary>
+        [SerializeField, Min(0f)]
+        float quickBoostTime = 0.1f;
+        public float QuickBoostTime => quickBoostTime;
+
+        /// <summary>クイックブーストの消費エネルギー（1 回あたり）</summary>
+        [SerializeField, Min(0)]
+        int quickBoostEnergy = 2500;
+        public int QuickBoostEnergy => quickBoostEnergy;
+
+        /// <summary>ハイパーブーストの出力（移動の速さ）</summary>
+        [SerializeField, Min(0f)]
+        float hyperBoostSpeed = 30.0f;
+        public float HyperBoostSpeed => hyperBoostSpeed;
+
+        /// <summary>ハイパーブーストの消費エネルギー（1 秒あたり）</summary>
+        [SerializeField, Min(0)]
+        int hyperBoostEnergy = 4000;
+        public int HyperBoostEnergy => hyperBoostEnergy;
 
         /// <summary>ブーストが ON の間、常時消費に加えて消費するエネルギー（1 秒あたり。地上でも空中でも）</summary>
         [SerializeField, Min(0)]

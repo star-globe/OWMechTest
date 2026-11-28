@@ -31,6 +31,24 @@ namespace AdvancedGears
         public float TouchBrakeRateAdd;
         public float QuickYDelta;
 
+        /// <summary>ブーストの性能（倍率・クイックブーストの速さと噴射時間・ハイパーブーストの速さ）は、装備したブースターの値で上書きする</summary>
+        public static PlayerMoveParams From(PlayerControllerSettings settings, PlayerControllerConst constants, in BoostPerformance boost)
+        {
+            return From(settings, constants).WithBoost(boost);
+        }
+
+        /// <summary>ブーストの性能を差し替えたコピーを返す（ほかの値はそのまま）</summary>
+        public PlayerMoveParams WithBoost(in BoostPerformance boost)
+        {
+            var p = this;
+            p.HorizontalBoostRate = boost.BoostSpeedRate;
+            p.QuickSpeed = boost.QuickBoostSpeed;
+            p.QuickTime = boost.QuickBoostTime;
+            p.HyperBoostSpeed = boost.HyperBoostSpeed;
+            return p;
+        }
+
+        /// <summary>ブーストの性能も PlayerControllerSettings の値（ブースターを読み込めないときの値）を使う</summary>
         public static PlayerMoveParams From(PlayerControllerSettings settings, PlayerControllerConst constants)
         {
             return new PlayerMoveParams
