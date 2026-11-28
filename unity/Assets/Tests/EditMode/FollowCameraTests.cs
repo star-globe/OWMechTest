@@ -55,6 +55,39 @@ namespace AdvancedGears.Tests
         }
 
         [Test]
+        public void 遮蔽物に当たった距離の点にカメラを寄せる()
+        {
+            var pos = FollowCamera.CalcObstructedPosition(Vector3.zero, new Vector3(0f, 0f, -10f), 4f, 0.5f);
+            Assert.AreEqual(-4f, pos.z, 1e-4f);
+            Assert.AreEqual(0f, pos.x, 1e-6f);
+            Assert.AreEqual(0f, pos.y, 1e-6f);
+        }
+
+        [Test]
+        public void 寄せる距離は最小の距離より近くならない()
+        {
+            var pos = FollowCamera.CalcObstructedPosition(Vector3.zero, new Vector3(0f, 0f, -10f), 0f, 0.5f);
+            Assert.AreEqual(-0.5f, pos.z, 1e-4f);
+        }
+
+        [Test]
+        public void 寄せる位置は予定の位置より遠くならない()
+        {
+            var desired = new Vector3(0f, 3f, -4f);
+            Assert.AreEqual(desired, FollowCamera.CalcObstructedPosition(Vector3.zero, desired, 8f, 0.5f));
+            // 予定の位置が最小の距離より近いときも、予定の位置を超えない
+            var near = new Vector3(0f, 0f, -0.2f);
+            Assert.AreEqual(near, FollowCamera.CalcObstructedPosition(Vector3.zero, near, 0f, 0.5f));
+        }
+
+        [Test]
+        public void 始点と予定の位置が同じならそのまま返す()
+        {
+            var p = new Vector3(1f, 2f, 3f);
+            Assert.AreEqual(p, FollowCamera.CalcObstructedPosition(p, p, 0f, 0.5f));
+        }
+
+        [Test]
         public void 負の角度や距離では遊びは0になる()
         {
             Assert.AreEqual(0f, FollowCamera.CalcDeadZoneDistance(10f, -5f), 1e-6f);

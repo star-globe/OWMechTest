@@ -48,6 +48,13 @@ namespace AdvancedGears
         [SerializeField]
         float forwardDiffMin = 0.01f;
 
+        [Header("めり込み防止")]
+        [SerializeField, Min(0.01f), Tooltip("遮蔽物の判定に使う球の半径（m）。カメラは遮蔽物からこの分だけ手前に置く。ニアクリップより大きくする")]
+        float collisionRadius = 0.5f;
+
+        [SerializeField, Min(0.0f), Tooltip("遮蔽物に寄せるときの、判定の始点（機体の中心）からカメラまでの最小の距離（m）")]
+        float minCollisionDistance = 0.5f;
+
         [SerializeField]
         PlayerControllerSettings controllerSettings;
 
@@ -114,7 +121,7 @@ namespace AdvancedGears
                 return;
 
             var camTrans = cam.transform;
-            camTrans.position = this.transform.position;
+            camTrans.position = GetUnobstructedPosition(this.transform.position);
             var look = target.position - camTrans.position;
             if (look.sqrMagnitude > 0.0f)
                 camTrans.forward = look.normalized;
@@ -137,6 +144,22 @@ namespace AdvancedGears
             return Mathf.Max(distance, 0.0f) * Mathf.Tan(angle * Mathf.Deg2Rad);
         }
 
+        /// <summary>
+        /// 遮蔽物に当たったときのカメラの位置。origin から desired への直線上で、hitDistance（球の中心が進めた距離）の点に置く。
+        /// 始点に近すぎるときは minDistance まで離す（desired より遠くにはしない）
+        /// </summary>
+        public static Vector3 CalcObstructedPosition(Vector3 origin, Vector3 desired, float hitDistance, float minDistance)
+        {
+            var dir = desired - origin;
+            var length = dir.magnitude;
+            if (length <= Mathf.Epsilon)
+                return desired;
+
+            var min = Mathf.Clamp(minDistance, 0.0f, length);
+            var distance = Mathf.Clamp(hitDistance, min, length);
+            return origin + dir * (distance / length);
+        }
+
         void FixedUpdate()
         {
             cam = cam ?? Camera.main;
@@ -148,10 +171,37 @@ namespace AdvancedGears
             UpdateTarget();
         }
 
+        /// <summary>
+        /// 機体の中心（注視点の基準）から position への直線上に遮蔽物があれば、その手前の位置を返す。無ければ position をそのまま返す
+        /// </summary>
+        Vector3 GetUnobstructedPosition(Vector3 position)
+        {
+            var origin = GetLookBase();
+            var dir = position - origin;
+            var length = dir.magnitude;
+            if (length <= Mathf.Epsilon)
+                return position;
+
+            if (!Physics.SphereCast(origin, collisionRadius, dir / length, out var hit, length,
+                    GameLayers.CameraObstacleMask, QueryTriggerInteraction.Ignore))
+                return position;
+
+            return CalcObstructedPosition(origin, position, hit.distance, minCollisionDistance);
+        }
+
         private void UpdateCameraPos(Transform cam)
         {
+            // 予定の位置が遮られていれば、その手前を目標にする（遮蔽が無くなれば元の位置へ補間で戻る）
+            var target = GetUnobstructedPosition(this.transform.position);
+            MoveCameraToward(cam, target);
+
+            // 補間で遅れた位置が遮蔽物の向こうに残らないよう、補間を待たずにすぐ手前へ寄せる
+            cam.position = GetUnobstructedPosition(cam.position);
+        }
+
+        private void MoveCameraToward(Transform cam, Vector3 target)
+        {
             var current = cam.position;
-            var target = this.transform.position;
 
             var diff = target - current;
             var diffMin = DeadZoneDistance;

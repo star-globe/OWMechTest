@@ -32,6 +32,14 @@ namespace AdvancedGears
         public static int RaycastObstacleMask =>
             _raycastObstacleMask ??= ~LayerMask.GetMask(MyPlayer, OtherPlayer, NonPlayer, Unit, TargetableObject, HitableObject, Missile);
 
+        /// <summary>
+        /// カメラのめり込みを防ぐ判定の対象（地形・障害物と、被弾可能なマップ上のオブジェクト）。
+        /// 自機・他の機体・ユニット・ミサイルは除く。トリガーは判定側で QueryTriggerInteraction.Ignore にする
+        /// </summary>
+        private static int? _cameraObstacleMask;
+        public static int CameraObstacleMask =>
+            _cameraObstacleMask ??= RaycastObstacleMask | LayerMask.GetMask(HitableObject);
+
         private static int? _enemyLayerMask;
         public static int EnemyLayerMask =>
             _enemyLayerMask ??= LayerMask.GetMask(MyPlayer, OtherPlayer, NonPlayer, Unit);
