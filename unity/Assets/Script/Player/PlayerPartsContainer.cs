@@ -56,6 +56,12 @@ namespace AdvancedGears
             return EnergyPerformanceResolver.TryResolve(assembleDataAsset.GetEquippedPartId, out performance);
         }
 
+        /// <summary>装備しているブースターからブーストの性能を決める。未装備・読み込めなければ fallback</summary>
+        public BoostPerformance GetBoostPerformance(in BoostPerformance fallback)
+        {
+            return BoostPerformanceResolver.Resolve(assembleDataAsset.GetEquippedPartId, fallback);
+        }
+
         /// <summary>装備しているフレームのパーツから機体の装甲値を計算する</summary>
         public ArmorValues GetArmor()
         {

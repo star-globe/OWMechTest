@@ -26,7 +26,12 @@ namespace AdvancedGears
 
         PlayerEffectPresenter effectPresenter;
 
-        PlayerMoveParams MoveParams => PlayerMoveParams.From(controllerSettings, PlayerControllerConst.Instance);
+        /// <summary>装備したブースターから決めたブーストの性能。Start で決めるまでは null（機体の設定の値を使う）</summary>
+        BoostPerformance? boostPerformance;
+
+        PlayerMoveParams MoveParams => boostPerformance.HasValue
+            ? PlayerMoveParams.From(controllerSettings, PlayerControllerConst.Instance, boostPerformance.Value)
+            : PlayerMoveParams.From(controllerSettings, PlayerControllerConst.Instance);
 
         protected CharacterParam CharacterParam => playerCharacter.CharacterParam;
 
@@ -76,6 +81,7 @@ namespace AdvancedGears
         private void Start()
         {
             ApplyEnergyPerformance();
+            ApplyBoostPerformance();
             playerCharacter.CharacterParam.SetArmor(partsContainer.GetArmor());
             SyncParam();
             AttachGroundSpark();
@@ -111,6 +117,21 @@ namespace AdvancedGears
             }
 
             playerCharacter.CharacterParam.SetEnergyPerformance(performance);
+        }
+
+        /// <summary>
+        /// 装備したブースターからブーストの性能を決めて、移動の計算と機体の消費エネルギーに使う。
+        /// ブースターが未装備・読み込めなければ、機体の設定の値（PlayerControllerSettings / PlayerParameterSettings）を使う
+        /// </summary>
+        private void ApplyBoostPerformance()
+        {
+            var param = playerCharacter.CharacterParam;
+            var fallback = new BoostPerformance(controllerSettings.HorizontalBoostRate, controllerSettings.QuickSpeed,
+                                                controllerSettings.QuickTime, param.QuickBoostEnergy,
+                                                controllerSettings.HyperBoostSpeed, param.HyperBoostEnergy);
+            var performance = partsContainer.GetBoostPerformance(fallback);
+            boostPerformance = performance;
+            param.SetBoostPerformance(performance);
         }
 
         private void SyncParam()
