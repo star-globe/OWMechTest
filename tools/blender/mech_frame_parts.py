@@ -20,14 +20,14 @@ import bpy
 RIG_NAME = "rig_mech"
 
 MATERIAL_COLORS = {
-    "Mat_Body":     ((0.42, 0.45, 0.48, 1.0), None),
-    "Mat_Detail":   ((0.12, 0.13, 0.15, 1.0), None),
-    "Mat_Visor":    ((0.10, 0.80, 1.00, 1.0), 3.0),
+    "Mat_Main":     ((0.42, 0.45, 0.48, 1.0), None),
+    "Mat_Sub":   ((0.12, 0.13, 0.15, 1.0), None),
+    "Mat_Light":    ((0.10, 0.80, 1.00, 1.0), 3.0),
     "Mat_Thruster": ((1.00, 0.45, 0.10, 1.0), 3.0),
 }
 
 
-def box(center, size, bone, mat="Mat_Body", top=(1.0, 1.0)):
+def box(center, size, bone, mat="Mat_Main", top=(1.0, 1.0)):
     """箱 1 つ。top は上面（+Z 側）の X・Y の縮尺（台形にしてデザインに差をつける）"""
     return dict(center=center, size=size, bone=bone, mat=mat, top=top)
 
@@ -46,34 +46,34 @@ def mirror(boxes):
 def _head_standard():
     return [
         box((0, 0, 7.35), (0.7, 0.8, 0.6), "Head", top=(0.9, 0.9)),
-        box((0, -0.41, 7.4), (0.55, 0.04, 0.15), "Head", "Mat_Visor"),
-        box((0.25, 0.1, 7.85), (0.05, 0.05, 0.4), "Head", "Mat_Detail"),
+        box((0, -0.41, 7.4), (0.55, 0.04, 0.15), "Head", "Mat_Light"),
+        box((0.25, 0.1, 7.85), (0.05, 0.05, 0.4), "Head", "Mat_Sub"),
     ]
 
 
 def _body_standard():
     return [
-        box((0, 0, 6.8), (0.35, 0.35, 0.4), "Neck", "Mat_Detail"),
+        box((0, 0, 6.8), (0.35, 0.35, 0.4), "Neck", "Mat_Sub"),
         box((0, 0, 6.0), (1.6, 1.1, 1.2), "Chest", top=(1.1, 1.0)),
-        box((0, -0.56, 5.8), (0.6, 0.04, 0.3), "Chest", "Mat_Detail"),
-        box((0, 0, 5.0), (0.8, 0.7, 0.8), "Spine", "Mat_Detail"),
+        box((0, -0.56, 5.8), (0.6, 0.04, 0.3), "Chest", "Mat_Sub"),
+        box((0, 0, 5.0), (0.8, 0.7, 0.8), "Spine", "Mat_Sub"),
         box((0, 0, 4.25), (1.3, 0.9, 0.7), "Hips", top=(1.1, 1.0)),
     ]
 
 
 def _arm_left_standard():
     return [
-        box((0.85, 0, 6.3), (0.5, 0.4, 0.4), "Shoulder_L", "Mat_Detail"),
+        box((0.85, 0, 6.3), (0.5, 0.4, 0.4), "Shoulder_L", "Mat_Sub"),
         box((1.25, 0, 6.35), (0.7, 0.8, 0.6), "Shoulder_L", top=(0.8, 0.9)),
-        box((1.3, 0, 5.6), (0.4, 0.4, 1.2), "UpperArm_L", "Mat_Detail"),
+        box((1.3, 0, 5.6), (0.4, 0.4, 1.2), "UpperArm_L", "Mat_Sub"),
         box((1.3, 0, 4.25), (0.5, 0.55, 1.2), "LowerArm_L", top=(1.1, 1.1)),
-        box((1.3, 0, 3.35), (0.35, 0.3, 0.45), "Hand_L", "Mat_Detail"),
+        box((1.3, 0, 3.35), (0.35, 0.3, 0.45), "Hand_L", "Mat_Sub"),
     ]
 
 
 def _leg_left_standard():
     return [
-        box((0.55, 0, 3.1), (0.55, 0.6, 1.7), "UpperLeg_L", "Mat_Detail"),
+        box((0.55, 0, 3.1), (0.55, 0.6, 1.7), "UpperLeg_L", "Mat_Sub"),
         box((0.55, -0.32, 2.2), (0.45, 0.2, 0.5), "LowerLeg_L"),
         box((0.55, 0, 1.35), (0.65, 0.75, 1.6), "LowerLeg_L", top=(1.1, 1.1)),
         box((0.55, -0.25, 0.15), (0.6, 1.3, 0.3), "Foot_L", top=(0.8, 0.9)),
@@ -86,9 +86,9 @@ def _head_light():
     # 細く縦長の頭部に、正面の単眼センサーと左右に開いたアンテナ
     return [
         box((0, 0, 7.4), (0.55, 0.7, 0.7), "Head", top=(0.7, 0.8)),
-        box((0, -0.36, 7.42), (0.2, 0.06, 0.2), "Head", "Mat_Visor"),
-        box((0.22, 0.05, 7.95), (0.04, 0.04, 0.5), "Head", "Mat_Detail", top=(0.5, 0.5)),
-        box((-0.22, 0.05, 7.95), (0.04, 0.04, 0.5), "Head", "Mat_Detail", top=(0.5, 0.5)),
+        box((0, -0.36, 7.42), (0.2, 0.06, 0.2), "Head", "Mat_Light"),
+        box((0.22, 0.05, 7.95), (0.04, 0.04, 0.5), "Head", "Mat_Sub", top=(0.5, 0.5)),
+        box((-0.22, 0.05, 7.95), (0.04, 0.04, 0.5), "Head", "Mat_Sub", top=(0.5, 0.5)),
     ]
 
 
@@ -96,29 +96,29 @@ def _head_heavy():
     # 幅広で平たい頭部に、横長のバイザーと頬の装甲
     return [
         box((0, 0, 7.3), (0.9, 0.9, 0.5), "Head", top=(0.8, 0.85)),
-        box((0, -0.46, 7.33), (0.75, 0.04, 0.1), "Head", "Mat_Visor"),
-        box((0.5, -0.1, 7.2), (0.15, 0.6, 0.35), "Head", "Mat_Detail"),
-        box((-0.5, -0.1, 7.2), (0.15, 0.6, 0.35), "Head", "Mat_Detail"),
+        box((0, -0.46, 7.33), (0.75, 0.04, 0.1), "Head", "Mat_Light"),
+        box((0.5, -0.1, 7.2), (0.15, 0.6, 0.35), "Head", "Mat_Sub"),
+        box((-0.5, -0.1, 7.2), (0.15, 0.6, 0.35), "Head", "Mat_Sub"),
     ]
 
 
 def _body_light():
     return [
-        box((0, 0, 6.8), (0.3, 0.3, 0.4), "Neck", "Mat_Detail"),
+        box((0, 0, 6.8), (0.3, 0.3, 0.4), "Neck", "Mat_Sub"),
         box((0, 0, 6.05), (1.25, 0.85, 1.0), "Chest", top=(1.2, 1.05)),
-        box((0, -0.45, 6.25), (0.9, 0.06, 0.15), "Chest", "Mat_Detail"),
-        box((0, 0, 5.0), (0.55, 0.5, 0.8), "Spine", "Mat_Detail"),
+        box((0, -0.45, 6.25), (0.9, 0.06, 0.15), "Chest", "Mat_Sub"),
+        box((0, 0, 5.0), (0.55, 0.5, 0.8), "Spine", "Mat_Sub"),
         box((0, 0, 4.3), (1.05, 0.75, 0.55), "Hips", top=(1.1, 1.0)),
     ]
 
 
 def _body_heavy():
     return [
-        box((0, 0, 6.8), (0.45, 0.45, 0.4), "Neck", "Mat_Detail"),
+        box((0, 0, 6.8), (0.45, 0.45, 0.4), "Neck", "Mat_Sub"),
         box((0, 0, 5.95), (1.95, 1.35, 1.35), "Chest", top=(0.9, 0.9)),
         box((0, -0.7, 5.9), (1.2, 0.08, 0.7), "Chest", top=(1.1, 1.0)),
-        box((0, 0.85, 6.0), (1.1, 0.4, 1.0), "Chest", "Mat_Detail"),
-        box((0, 0, 5.0), (1.0, 0.9, 0.8), "Spine", "Mat_Detail"),
+        box((0, 0.85, 6.0), (1.1, 0.4, 1.0), "Chest", "Mat_Sub"),
+        box((0, 0, 5.0), (1.0, 0.9, 0.8), "Spine", "Mat_Sub"),
         box((0, 0, 4.2), (1.5, 1.05, 0.8), "Hips", top=(1.1, 1.0)),
     ]
 
@@ -126,28 +126,28 @@ def _body_heavy():
 def _arm_left_light():
     # 肩アーマーなし。上腕・前腕とも細い
     return [
-        box((0.9, 0, 6.3), (0.6, 0.35, 0.35), "Shoulder_L", "Mat_Detail"),
+        box((0.9, 0, 6.3), (0.6, 0.35, 0.35), "Shoulder_L", "Mat_Sub"),
         box((1.3, 0, 6.3), (0.4, 0.4, 0.4), "Shoulder_L"),
-        box((1.3, 0, 5.6), (0.28, 0.28, 1.2), "UpperArm_L", "Mat_Detail"),
+        box((1.3, 0, 5.6), (0.28, 0.28, 1.2), "UpperArm_L", "Mat_Sub"),
         box((1.3, 0, 4.25), (0.36, 0.38, 1.2), "LowerArm_L", top=(1.2, 1.2)),
-        box((1.3, 0, 3.35), (0.28, 0.25, 0.4), "Hand_L", "Mat_Detail"),
+        box((1.3, 0, 3.35), (0.28, 0.25, 0.4), "Hand_L", "Mat_Sub"),
     ]
 
 
 def _arm_left_heavy():
     # 大きな肩アーマーと太い前腕
     return [
-        box((0.85, 0, 6.3), (0.5, 0.5, 0.5), "Shoulder_L", "Mat_Detail"),
+        box((0.85, 0, 6.3), (0.5, 0.5, 0.5), "Shoulder_L", "Mat_Sub"),
         box((1.35, 0, 6.4), (1.0, 1.05, 0.8), "Shoulder_L", top=(0.7, 0.85)),
-        box((1.3, 0, 5.55), (0.5, 0.5, 1.1), "UpperArm_L", "Mat_Detail"),
+        box((1.3, 0, 5.55), (0.5, 0.5, 1.1), "UpperArm_L", "Mat_Sub"),
         box((1.3, 0, 4.25), (0.75, 0.8, 1.3), "LowerArm_L", top=(1.15, 1.1)),
-        box((1.3, 0, 3.35), (0.45, 0.4, 0.5), "Hand_L", "Mat_Detail"),
+        box((1.3, 0, 3.35), (0.45, 0.4, 0.5), "Hand_L", "Mat_Sub"),
     ]
 
 
 def _leg_left_light():
     return [
-        box((0.55, 0, 3.1), (0.42, 0.45, 1.7), "UpperLeg_L", "Mat_Detail"),
+        box((0.55, 0, 3.1), (0.42, 0.45, 1.7), "UpperLeg_L", "Mat_Sub"),
         box((0.55, -0.26, 2.2), (0.32, 0.15, 0.4), "LowerLeg_L"),
         box((0.55, 0, 1.35), (0.48, 0.55, 1.6), "LowerLeg_L", top=(1.25, 1.15)),
         box((0.55, -0.2, 0.125), (0.45, 1.1, 0.25), "Foot_L", top=(0.8, 0.9)),
@@ -157,10 +157,10 @@ def _leg_left_light():
 def _leg_left_heavy():
     # 太いスネと足首の装甲、大きな足
     return [
-        box((0.55, 0, 3.1), (0.7, 0.75, 1.7), "UpperLeg_L", "Mat_Detail"),
+        box((0.55, 0, 3.1), (0.7, 0.75, 1.7), "UpperLeg_L", "Mat_Sub"),
         box((0.55, -0.42, 2.2), (0.6, 0.25, 0.6), "LowerLeg_L"),
         box((0.55, 0, 1.4), (0.95, 1.05, 1.5), "LowerLeg_L", top=(0.8, 0.85)),
-        box((0.55, 0, 0.6), (0.85, 0.9, 0.3), "Foot_L", "Mat_Detail"),
+        box((0.55, 0, 0.6), (0.85, 0.9, 0.3), "Foot_L", "Mat_Sub"),
         box((0.55, -0.25, 0.175), (0.85, 1.5, 0.35), "Foot_L", top=(0.85, 0.9)),
     ]
 

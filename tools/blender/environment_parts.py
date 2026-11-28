@@ -2,7 +2,7 @@
 フィールドの環境オブジェクト（廃墟ビルと小物）のメッシュを作るスクリプト（#124）
 
 座標は Blender の単位（m）。原点が地面での中心、+Z が上、正面は -Y。
-1 つのモデルを 1 つのメッシュにまとめ、マテリアルは Mat_Body / Mat_Detail の単色だけを使う。
+1 つのモデルを 1 つのメッシュにまとめ、マテリアルは Mat_Main / Mat_Sub の単色だけを使う。
 
 当たり判定の箱は空オブジェクト col_{名前から env_ を除いたもの}_{番号} としてメッシュの子に置く。
 空オブジェクトは立方体の表示（-1〜+1）で、位置が箱の中心、スケールが箱の大きさの半分。
@@ -31,8 +31,8 @@ import random
 import bpy
 
 MATERIAL_COLORS = {
-    "Mat_Body":   (0.50, 0.49, 0.46, 1.0),
-    "Mat_Detail": (0.20, 0.20, 0.21, 1.0),
+    "Mat_Main":   (0.50, 0.49, 0.46, 1.0),
+    "Mat_Sub": (0.20, 0.20, 0.21, 1.0),
 }
 
 COLLIDER_PREFIX = "col_"
@@ -49,7 +49,7 @@ PARAPET = 1.0   # 崩れていない区画の屋上の手すり壁の高さ
 
 # ── 形の定義 ─────────────────────────────────────
 
-def box(center, size, mat="Mat_Body", top=(1.0, 1.0), rot=0.0):
+def box(center, size, mat="Mat_Main", top=(1.0, 1.0), rot=0.0):
     """箱。top は上面（+Z 側）の X・Y の縮尺、rot は Z 軸まわりの回転（ラジアン）"""
     return {"center": center, "size": size, "mat": mat, "top": top, "rot": rot}
 
@@ -82,7 +82,7 @@ def ruined_building(width, depth, floors, floor_h=3.6, bay=6.0, seed=0,
         for j in range(ny):
             for k in range(1, top[i][j] + 1):
                 shapes.append(box((x0 + (i + 0.5) * bx, y0 + (j + 0.5) * by, k * floor_h - SLAB / 2),
-                                  (bx + COLUMN, by + COLUMN, SLAB), "Mat_Body"))
+                                  (bx + COLUMN, by + COLUMN, SLAB), "Mat_Main"))
 
     # 柱。隣り合う区画のうち最も高いものまで立て、低い区画に面していれば上に突き出す
     for i in range(nx + 1):
@@ -91,7 +91,7 @@ def ruined_building(width, depth, floors, floor_h=3.6, bay=6.0, seed=0,
             h = max(tops) * floor_h
             if min(tops) < floors:
                 h += rng.uniform(0.3, 1.0) * spike
-            shapes.append(box((x0 + i * bx, y0 + j * by, h / 2), (COLUMN, COLUMN, h), "Mat_Detail"))
+            shapes.append(box((x0 + i * bx, y0 + j * by, h / 2), (COLUMN, COLUMN, h), "Mat_Sub"))
 
     # 外壁（外周の区画の辺ごと、階ごとの板）
     edges = []  # (中心 x, 中心 y, 長さ, X に沿うか, 区画の残る階数)
@@ -119,13 +119,13 @@ def ruined_building(width, depth, floors, floor_h=3.6, bay=6.0, seed=0,
                 parts.append(((span - pier) / 2, pier, z0 + SILL + win_h / 2, win_h))
             for offset, w, zc, h in parts:
                 if along_x:
-                    shapes.append(box((ex + offset, ey, zc), (w, WALL, h), "Mat_Body"))
+                    shapes.append(box((ex + offset, ey, zc), (w, WALL, h), "Mat_Main"))
                 else:
-                    shapes.append(box((ex, ey + offset, zc), (WALL, w, h), "Mat_Body"))
+                    shapes.append(box((ex, ey + offset, zc), (WALL, w, h), "Mat_Main"))
         if t == floors:  # 崩れていない区画の屋上の手すり壁
             zc = floors * floor_h + PARAPET / 2
             size = (span, WALL, PARAPET) if along_x else (WALL, span, PARAPET)
-            shapes.append(box((ex, ey, zc), size, "Mat_Body"))
+            shapes.append(box((ex, ey, zc), size, "Mat_Main"))
 
     # がれき（足元の低い箱。当たり判定なし）
     for _ in range(rubble):
@@ -138,7 +138,7 @@ def ruined_building(width, depth, floors, floor_h=3.6, bay=6.0, seed=0,
             px, py = (width / 2 + out) * (1 if side == 2 else -1), u * depth
         s = rng.uniform(1.0, 3.0)
         h = rng.uniform(0.4, 1.2)
-        shapes.append(box((px, py, h / 2), (s, s * rng.uniform(0.5, 1.0), h), "Mat_Detail",
+        shapes.append(box((px, py, h / 2), (s, s * rng.uniform(0.5, 1.0), h), "Mat_Sub",
                           top=(0.6, 0.6), rot=rng.uniform(0, math.pi)))
 
     # 当たり判定: 区画ごとの箱を、X 方向に同じ高さが続く分だけまとめる
@@ -159,25 +159,25 @@ def ruined_building(width, depth, floors, floor_h=3.6, bay=6.0, seed=0,
 def _car():
     """廃車（乗用車）: 全長 4.5 m、全幅 1.8 m、全高 1.5 m"""
     shapes = [
-        box((0, 0, 0.65), (1.8, 4.5, 0.6), "Mat_Body"),
-        box((0, 0.2, 1.225), (1.6, 2.4, 0.55), "Mat_Detail", top=(0.85, 0.7)),
+        box((0, 0, 0.65), (1.8, 4.5, 0.6), "Mat_Main"),
+        box((0, 0.2, 1.225), (1.6, 2.4, 0.55), "Mat_Sub", top=(0.85, 0.7)),
     ]
     for x in (-0.8, 0.8):
         for y in (-1.4, 1.4):
-            shapes.append(box((x, y, 0.35), (0.25, 0.7, 0.7), "Mat_Detail"))
+            shapes.append(box((x, y, 0.35), (0.25, 0.7, 0.7), "Mat_Sub"))
     return {"shapes": shapes, "colliders": [((0, 0, 0.75), (1.8, 4.5, 1.5))]}
 
 
 def _truck():
     """トラック: 全長 9 m、全幅 2.5 m、全高 3 m（運転台と荷台）"""
     shapes = [
-        box((0, -3.5, 1.7), (2.4, 2.0, 2.4), "Mat_Body", top=(1.0, 0.8)),     # 運転台 z 0.5〜2.9
-        box((0, 1.1, 2.0), (2.5, 6.8, 2.0), "Mat_Body"),                      # 荷台 z 1.0〜3.0
-        box((0, 0, 0.75), (1.6, 8.6, 0.5), "Mat_Detail"),                     # 車台
+        box((0, -3.5, 1.7), (2.4, 2.0, 2.4), "Mat_Main", top=(1.0, 0.8)),     # 運転台 z 0.5〜2.9
+        box((0, 1.1, 2.0), (2.5, 6.8, 2.0), "Mat_Main"),                      # 荷台 z 1.0〜3.0
+        box((0, 0, 0.75), (1.6, 8.6, 0.5), "Mat_Sub"),                     # 車台
     ]
     for x in (-1.05, 1.05):
         for y in (-3.4, 1.6, 3.1):
-            shapes.append(box((x, y, 0.5), (0.35, 1.0, 1.0), "Mat_Detail"))
+            shapes.append(box((x, y, 0.5), (0.35, 1.0, 1.0), "Mat_Sub"))
     colliders = [
         ((0, -3.5, 1.45), (2.4, 2.0, 2.9)),
         ((0, 1.1, 1.5), (2.5, 6.8, 3.0)),
@@ -188,8 +188,8 @@ def _truck():
 def _sign():
     """標識: 高さ 3 m の支柱と、0.9 × 0.7 m の板"""
     shapes = [
-        box((0, 0, 1.5), (0.12, 0.12, 3.0), "Mat_Detail"),
-        box((0, -0.08, 2.55), (0.9, 0.04, 0.7), "Mat_Body"),
+        box((0, 0, 1.5), (0.12, 0.12, 3.0), "Mat_Sub"),
+        box((0, -0.08, 2.55), (0.9, 0.04, 0.7), "Mat_Main"),
     ]
     colliders = [
         ((0, 0, 1.5), (0.2, 0.2, 3.0)),
