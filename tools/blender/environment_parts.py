@@ -198,6 +198,44 @@ def _sign():
     return {"shapes": shapes, "colliders": colliders}
 
 
+def _slab(width=32.0, depth=16.0, thick=1.0, beam=1.0):
+    """崩れ落ちた床の板（#225）: width × depth、厚さ thick の板と、下の梁（高さ beam）
+
+    フィールドで 10〜40° に傾けて置き、機体が乗って歩行・ブーストの着地を確かめる。
+    上面の高さは beam + thick。当たり判定は板と梁をまとめた 1 つの箱（上面まで）。
+    """
+    top = beam + thick
+    shapes = [box((0, 0, beam + thick / 2), (width, depth, thick), "Mat_Main")]
+    # 梁: 長辺に沿って 3 本、短辺に沿って両端と中央の 3 本
+    for y in (-depth / 2 + 0.6, 0.0, depth / 2 - 0.6):
+        shapes.append(box((0, y, beam / 2), (width - 0.4, 0.8, beam), "Mat_Sub"))
+    for x in (-width / 2 + 0.6, 0.0, width / 2 - 0.6):
+        shapes.append(box((x, 0, beam / 2), (0.8, depth - 0.4, beam), "Mat_Sub"))
+    # 折れた縁: 片側の短辺に、鉄筋の見える低い段差（当たり判定なし）
+    for k in range(5):
+        y = -depth / 2 + (k + 0.5) * depth / 5
+        shapes.append(box((width / 2 + 0.4, y, beam + thick * 0.4), (0.8, depth / 5 - 0.5, thick * 0.8),
+                          "Mat_Sub", top=(0.5, 0.8)))
+    return {"shapes": shapes, "colliders": [((0, 0, top / 2), (width, depth, top))]}
+
+
+def _pillar(length=28.0, size=3.0, bands=6):
+    """倒れた柱（#225）: 断面 size 角、長さ length（Y に沿って寝かせた形）と、帯（Mat_Sub）
+
+    原点は地面での中心。高さは帯を含めて size + 0.3。フィールドで半分埋めたり、斜めに立て掛けたりする。
+    """
+    outer = size + 0.3  # 帯の太さ
+    zc = outer / 2
+    shapes = [box((0, 0, zc), (size, length, size), "Mat_Main")]
+    for k in range(bands):
+        y = -length / 2 + (k + 0.5) * length / bands
+        shapes.append(box((0, y, zc), (outer, 0.6, outer), "Mat_Sub"))
+    # 折れた端: 一回り細い芯が突き出る（当たり判定なし）
+    shapes.append(box((0, length / 2 + 0.8, zc), (size * 0.5, 1.6, size * 0.5), "Mat_Sub",
+                      top=(0.7, 0.7)))
+    return {"shapes": shapes, "colliders": [((0, 0, zc), (outer, length, outer))]}
+
+
 BUILDINGS = {
     # 小: 2 階建て。崩れていない区画の屋上 8 m（機体と同じくらい）
     "env_building_small_a": lambda: ruined_building(12, 10, 2, floor_h=4.0, bay=6.0, seed=11,
@@ -208,12 +246,17 @@ BUILDINGS = {
     # 大: 26 階建て。屋上 98.8 m のランドマーク
     "env_building_large_a": lambda: ruined_building(36, 28.8, 26, floor_h=3.8, bay=7.2, seed=37,
                                                     collapse=4, wall_loss=0.25, spike=2.5, rubble=12),
+    # 塔（#225）: 細長い 10 階建て。屋上 40 m。砂漠のフィールドで傾けて下を砂に埋めて置く
+    "env_building_medium_tower_a": lambda: ruined_building(12, 12, 10, floor_h=4.0, bay=6.0, seed=225,
+                                                           collapse=3, wall_loss=0.35, spike=1.5, rubble=0),
 }
 
 PROPS = {
     "env_prop_car": _car,
     "env_prop_truck": _truck,
     "env_prop_sign": _sign,
+    "env_prop_slab_a": _slab,      # 崩れ落ちた床の板（#225）
+    "env_prop_pillar_a": _pillar,  # 倒れた柱（#225）
 }
 
 MODELS = {**BUILDINGS, **PROPS}
