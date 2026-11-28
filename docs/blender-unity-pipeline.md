@@ -59,6 +59,7 @@ unity/Assets/
 - パーツのメッシュは **アーマチュアの子にせず、Armature モディファイアだけで `rig_mech` を参照する**（子にすると `rig_mech.fbx` にパーツのメッシュが入る）。エクスポートスクリプトは、モディファイアが参照するアーマチュアをパーツの FBX に自動で含める
 - サイズを変えるときもボーンの位置（関節の位置）は変えず、メッシュの形で差をつける
 - アニメーション（アクション `idle` / `walk` / `aim_right` / `aim_left`）は `rig_mech` に作る。FBX に書き出すのは `rig_` の FBX だけで、パーツの FBX には入れない
+  - 待機（`idle`）は `tools/blender/mech_animations.py` の `build_idle()` で作る（#212）。肘・膝を 150 度に曲げ、正面から腕と脚が八の字に見える準備姿勢の静止ポーズ。足の高さが休止姿勢と同じになるよう腰（`Hips`）を下げる。ボーンの回転軸と向きの関係もスクリプトの冒頭に書いてある
 - Unity 側では `Prefabs/Mech/MechRig.prefab`（`rig_mech.fbx` のバリアント。Animator と `MechRig` を持つ）が、パーツの `SkinnedMeshRenderer` のボーンを名前で自分のボーンに付け替える
 
 ### ブースターパーツ（#70）
