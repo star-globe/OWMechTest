@@ -16,6 +16,11 @@ MonoBehaviour:
   categoryType: 311
   partComponent: {fileID: 6349942983159484561, guid: 29242079f7951db45bcb28747139ca86, type: 3}
   constantEnergyConsumption: 300
+  physicalArmor: 0
+  energyArmor: 0
+  weight: 450
+  walkSpeed: 0
+  loadCapacity: 0
   gunCategoryType: 2
   bulletId: 2
   reloadInter: 300

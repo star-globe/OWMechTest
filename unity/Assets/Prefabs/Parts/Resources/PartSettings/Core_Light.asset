@@ -18,3 +18,6 @@ MonoBehaviour:
   constantEnergyConsumption: 400
   physicalArmor: 96
   energyArmor: 120
+  weight: 900
+  walkSpeed: 0
+  loadCapacity: 0

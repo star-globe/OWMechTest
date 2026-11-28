@@ -29,9 +29,25 @@ namespace AdvancedGears
         /// <summary>装備したブースターから決めたブーストの性能。Start で決めるまでは null（機体の設定の値を使う）</summary>
         BoostPerformance? boostPerformance;
 
-        PlayerMoveParams MoveParams => boostPerformance.HasValue
-            ? PlayerMoveParams.From(controllerSettings, PlayerControllerConst.Instance, boostPerformance.Value)
-            : PlayerMoveParams.From(controllerSettings, PlayerControllerConst.Instance);
+        /// <summary>装備から決めた本体のスピードの性能。脚部を読み込めないときと Start の前は null（機体の設定の速さを使う）</summary>
+        MobilityPerformance? mobilityPerformance;
+
+        PlayerMoveParams MoveParams
+        {
+            get
+            {
+                var p = boostPerformance.HasValue
+                    ? PlayerMoveParams.From(controllerSettings, PlayerControllerConst.Instance, boostPerformance.Value)
+                    : PlayerMoveParams.From(controllerSettings, PlayerControllerConst.Instance);
+                return mobilityPerformance.HasValue ? p.WithMobility(mobilityPerformance.Value) : p;
+            }
+        }
+
+        /// <summary>
+        /// 本体のスピード（ブースト OFF の移動の速さ）。装備の重量と脚部で決まる。
+        /// 近接武装の攻撃中の移動などに使う（#216）
+        /// </summary>
+        public float BodySpeed => MoveParams.VecSpeed;
 
         protected CharacterParam CharacterParam => playerCharacter.CharacterParam;
 
@@ -82,6 +98,7 @@ namespace AdvancedGears
         {
             ApplyEnergyPerformance();
             ApplyBoostPerformance();
+            ApplyMobilityPerformance();
             playerCharacter.CharacterParam.SetArmor(partsContainer.GetArmor());
             SyncParam();
             AttachGroundSpark();
@@ -132,6 +149,28 @@ namespace AdvancedGears
             var performance = partsContainer.GetBoostPerformance(fallback);
             boostPerformance = performance;
             param.SetBoostPerformance(performance);
+        }
+
+        /// <summary>
+        /// 装備の重量と脚部から本体のスピードを決めて、移動の計算に使う。
+        /// 脚部を読み込めなければ、機体の設定の速さ（PlayerControllerSettings）のまま
+        /// </summary>
+        private void ApplyMobilityPerformance()
+        {
+            if (!partsContainer.TryGetMobilityPerformance(PlayerControllerConst.Instance.Mobility, out var performance))
+            {
+                Debug.LogWarningFormat(this, "[PlayerController] {0}: 脚部を読み込めないため、機体の設定の移動の速さを使います", name);
+                mobilityPerformance = null;
+                return;
+            }
+
+            if (performance.IsOverweight)
+            {
+                Debug.LogFormat(this, "[PlayerController] {0}: 積載量を超えています（{1} / {2}）。移動の速さ ×{3:0.00}",
+                                name, performance.TotalWeight, performance.LoadCapacity, performance.WeightRate);
+            }
+
+            mobilityPerformance = performance;
         }
 
         private void SyncParam()

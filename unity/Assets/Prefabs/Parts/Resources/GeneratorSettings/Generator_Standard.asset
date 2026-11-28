@@ -16,6 +16,11 @@ MonoBehaviour:
   categoryType: 401
   partComponent: {fileID: 0}
   constantEnergyConsumption: 0
+  physicalArmor: 0
+  energyArmor: 0
+  weight: 600
+  walkSpeed: 0
+  loadCapacity: 0
   energyCapacity: 10000
   energyOutput: 5000
   overheatTime: 3

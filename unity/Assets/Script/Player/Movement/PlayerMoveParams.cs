@@ -48,6 +48,20 @@ namespace AdvancedGears
             return p;
         }
 
+        /// <summary>
+        /// 本体のスピードを差し替えたコピーを返す。通常の移動の速さ（VecSpeed）を本体のスピードにし、
+        /// クイックブーストとハイパーブーストの出力に重量補正を掛ける（ブースト ON の速さは VecSpeed × 倍率なので補正済みになる）。
+        /// ブーストの性能を決めた後（WithBoost の後）に呼ぶ
+        /// </summary>
+        public PlayerMoveParams WithMobility(in MobilityPerformance mobility)
+        {
+            var p = this;
+            p.VecSpeed = mobility.Speed;
+            p.QuickSpeed *= mobility.WeightRate;
+            p.HyperBoostSpeed *= mobility.WeightRate;
+            return p;
+        }
+
         /// <summary>ブーストの性能も PlayerControllerSettings の値（ブースターを読み込めないときの値）を使う</summary>
         public static PlayerMoveParams From(PlayerControllerSettings settings, PlayerControllerConst constants)
         {

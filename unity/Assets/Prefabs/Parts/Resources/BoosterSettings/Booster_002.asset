@@ -18,6 +18,9 @@ MonoBehaviour:
   constantEnergyConsumption: 0
   physicalArmor: 0
   energyArmor: 0
+  weight: 350
+  walkSpeed: 0
+  loadCapacity: 0
   boostSpeedRate: 2.2
   quickBoostSpeed: 17
   quickBoostTime: 0.1

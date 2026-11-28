@@ -62,6 +62,12 @@ namespace AdvancedGears
             return BoostPerformanceResolver.Resolve(assembleDataAsset.GetEquippedPartId, fallback);
         }
 
+        /// <summary>装備の重量と脚部から本体のスピードの性能を計算する。脚部を読み込めなければ false</summary>
+        public bool TryGetMobilityPerformance(in MobilityConst constants, out MobilityPerformance performance)
+        {
+            return MobilityPerformanceResolver.TryResolve(assembleDataAsset.GetEquippedPartId, constants, out performance);
+        }
+
         /// <summary>装備しているフレームのパーツから機体の装甲値を計算する</summary>
         public ArmorValues GetArmor()
         {

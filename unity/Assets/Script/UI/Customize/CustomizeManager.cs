@@ -141,15 +141,26 @@ namespace AdvancedGears
         {
             var resolved = EnergyPerformanceResolver.TryResolve(GetEditingPartId, out var performance);
 
+            var mobilityResolved = MobilityPerformanceResolver.TryResolve(GetEditingPartId, PlayerControllerConst.Instance.Mobility, out var mobility);
+
             if (energyPerformanceText != null)
             {
-                energyPerformanceText.SetText(resolved
+                var energyText = resolved
                     ? CustomizeEnergyText.FormatPerformance(performance, GetEditingGeneratorOutput())
-                    : CustomizeEnergyText.FormatUnresolvedPerformance());
+                    : CustomizeEnergyText.FormatUnresolvedPerformance();
+                var mobilityText = mobilityResolved
+                    ? CustomizeMobilityText.FormatPerformance(mobility, GetEditingBoostSpeedRate())
+                    : CustomizeMobilityText.UnresolvedText;
+                energyPerformanceText.SetText(energyText + "\n\n" + mobilityText);
             }
 
             // デバッグモードでも組めない組み合わせは組み立てられるようにし、理由を警告として出すだけにする
             var messages = CustomizeEnergyText.GetInvalidReasons(resolved, performance);
+
+            // 積載量の超過は組めない理由ではない（遅くなるだけ）ので、保存の可否には使わない
+            var overweightWarning = mobilityResolved ? CustomizeMobilityText.GetOverweightWarning(mobility) : null;
+            if (overweightWarning != null)
+                messages.Add(overweightWarning);
             var invalidSlots = FindInvalidSlots();
             foreach (var slot in invalidSlots)
                 messages.Add(CustomizeEnergyText.FormatInvalidSlotReason(PartsSlotButton.SlotDisplayName(slot)));
@@ -184,6 +195,15 @@ namespace AdvancedGears
             return GeneratorMaster.Instance.GetDictionary().TryGetValue(GetEditingPartId(PartsAttachType.Generator), out var generator) && generator != null
                 ? generator.EnergyOutput
                 : 0;
+        }
+
+        /// <summary>編集中のブースターのブースト出力。ブースターが無い・マスタに無ければ null</summary>
+        private float? GetEditingBoostSpeedRate()
+        {
+            var boosterId = GetEditingPartId(PartsAttachType.Booster);
+            return boosterId >= 0 && BoosterMaster.Instance.GetDictionary().TryGetValue(boosterId, out var booster) && booster != null
+                ? booster.BoostSpeedRate
+                : (float?) null;
         }
 
         private int GetEditingPartId(PartsAttachType slot)
