@@ -92,7 +92,7 @@ unity/Assets/
 
 ### 環境オブジェクト（#124）
 
-- `.blend` は `blender/environment.blend`、メッシュは `tools/blender/environment_parts.py` で作る（リグは使わない）。原点が地面での中心、+Z が上、正面は -Y。マテリアルは `Mat_Body` / `Mat_Detail` の単色だけ
+- `.blend` は `blender/environment.blend`、メッシュは `tools/blender/environment_parts.py` で作る（リグは使わない）。原点が地面での中心、+Z が上、正面は -Y。マテリアルは `Mat_Main` / `Mat_Sub` の単色だけ
 - 建物の大きさは `small`（屋上 8 m 程度。機体と同じくらい）、`medium`（20〜30 m）、`large`（100 m 程度のランドマーク）。廃墟ビルは `ruined_building()` の引数（大きさ・階数・`seed`・崩れる階数・壁の抜ける割合など）でバリアントを増やす。今あるのは `env_building_{small,medium,large}_a` と `env_prop_{car,truck,sign}`
 - 当たり判定の箱は、空オブジェクト `col_{名前から env_ を除いたもの}_{番号}`（立方体の表示。位置が箱の中心、スケールが箱の大きさの半分）としてメッシュの子に置く。建物は区画ごとの箱（屋上の床の上面まで）で、がれき・突き出た柱・手すり壁は含めない
 - 取り込んだ FBX では、ルートに回転 (270, 0, 0) が付き、Unity の Y が上になる。Blender の -Y（正面）は Unity の +Z。インポート設定は Animation Type を None、Import Animation を OFF にする
@@ -102,14 +102,19 @@ unity/Assets/
 
 ### マテリアルスロット名（Blender側）
 
-Blenderのマテリアルスロット名をUnityの`StylizedRealLit.shader`プロパティに対応させます。
+マテリアルは Main・Sub・Light の 3 種類と、ブースター専用の Thruster を使います（使い分けは `docs/spec/アートディレクション.md` の「塗装とマーキング」）。これ以外の名前は `validate_objects()` / `export.sh --validate-only` でエラーになります。
 
-| Blenderスロット名 | Unity対応プロパティ | 用途 |
-|-----------------|-------------------|------|
-| `Mat_Body` | `_BaseMap` | 胴体メイン |
-| `Mat_Detail` | `_BaseMap` | ディテール・パネルライン |
-| `Mat_Visor` | `_EmissionColor` | バイザー・発光部位 |
-| `Mat_Thruster` | `_EmissionColor` | スラスター・排熱部位 |
+| Blenderスロット名 | 用途 | Unity の既定のマテリアル |
+|-----------------|------|------|
+| `Mat_Main` | パーツの主な面 | `Prefabs/Parts/Materials/Mat_Main.mat` |
+| `Mat_Sub` | ディテール・パネルライン・関節など、Main と色を分けたい面 | `Prefabs/Parts/Materials/Mat_Sub.mat` |
+| `Mat_Light` | 光らせたい箇所（カメラアイ・バイザー・ライトなど）。光らせる箇所が無いパーツには付けない | `Prefabs/Parts/Materials/Mat_Light.mat`（`_EMISSION` 有効） |
+| `Mat_Thruster` | ブースターのノズルの内側（ブースターだけ） | `Prefabs/Parts/Materials/Mat_Thruster.mat`（`_EMISSION` 有効。`_EmissionColor` は `BoosterPart.SetBaseColor` が上書きする） |
+
+- 既定のマテリアルのシェーダーは URP/Lit（`_BaseColor` / `_Metallic` / `_Smoothness` / `_EmissionColor`）
+- 機体パーツ（`Models/Parts/`）と武装（`Models/Weapons/`）の FBX は、インポート設定の Remap（Inspector > Materials > Remapped Materials）でスロット名を上の `.mat` に割り当てる。新しい FBX を追加したら同じ Remap を設定する
+- 環境モデル（`Models/Environment/`）は `Mat_Main` / `Mat_Sub` だけを使い、FBX に埋め込まれたマテリアルのまま使う（Remap しない）
+- コードでは `PartMaterialSlots.GetKind(material.name)` で種類を見分ける（名前の先頭で判定する）
 
 ### テクスチャファイル名
 
@@ -271,12 +276,12 @@ tools/blender/export.sh model.blend --all --base-path /c/temp/Models   # 別の�
 
 1. Blenderで編集・エクスポート（`unity/Assets/Models/` 以下にFBX上書き）
 2. Unityが自動検出して再インポート
-3. マテリアルスロット名が一致していれば既存マテリアルが自動適用される
+3. マテリアルスロット名が Remap に一致していれば既定のマテリアル（`Prefabs/Parts/Materials/`）が適用される
 
 ### マテリアルが外れた場合の復旧
 
-モデルの Inspector > Materials タブ > 「Extract Materials」で
-マテリアルをAssets以下に実体化してから手動で `StylizedRealLit` マテリアルを割り当てる。
+モデルの Inspector > Materials タブ > Remapped Materials で、スロット名ごとに `Prefabs/Parts/Materials/` の `.mat` を割り当てる。
+外れる原因はたいていスロット名の違い（Blender が付ける `.001` などの連番）なので、先に `export.sh --validate-only` で確かめる。
 
 ---
 

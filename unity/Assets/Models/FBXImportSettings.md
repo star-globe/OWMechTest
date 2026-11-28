@@ -21,4 +21,4 @@
 - Naming: By Base Texture Name
 - Search: Recursive Up
 
-インポート後、MaterialsタブでStylizedRealLit / GreyboxMaterialを手動アサインしてください。
+機体パーツ（`Parts/`）と武装（`Weapons/`）は、Materials タブの Remapped Materials で `Mat_Main` / `Mat_Sub` / `Mat_Light` / `Mat_Thruster` を `Prefabs/Parts/Materials/` の同じ名前の `.mat` に割り当ててください（`docs/blender-unity-pipeline.md` の「マテリアルスロット名」）。環境モデル（`Environment/`）は FBX に埋め込まれたマテリアルのまま使います。

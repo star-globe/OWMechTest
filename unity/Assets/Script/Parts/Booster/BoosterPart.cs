@@ -150,9 +150,6 @@ namespace AdvancedGears
         static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 
-        /// <summary>ノズルの発光に使うマテリアルスロット（docs/blender-unity-pipeline.md の命名規約）</summary>
-        const string ThrusterMaterialPrefix = "Mat_Thruster";
-
         [SerializeField]
         BoosterParticleSystem normal;
 
@@ -193,7 +190,7 @@ namespace AdvancedGears
                 for (var i = 0; i < materials.Length; i++)
                 {
                     var material = materials[i];
-                    if (material == null || !material.name.StartsWith(ThrusterMaterialPrefix, StringComparison.Ordinal))
+                    if (material == null || PartMaterialSlots.GetKind(material.name) != PartMaterialKind.Thruster)
                         continue;
 
                     renderer.GetPropertyBlock(block, i);

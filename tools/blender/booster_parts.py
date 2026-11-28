@@ -23,8 +23,8 @@ import bpy
 
 # 色は Unity に取り込んだときの初期値。Mat_Thruster の発光色は Unity 側で基本色に置き換わる
 MATERIAL_COLORS = {
-    "Mat_Body":     ((0.42, 0.45, 0.48, 1.0), None),
-    "Mat_Detail":   ((0.12, 0.13, 0.15, 1.0), None),
+    "Mat_Main":     ((0.42, 0.45, 0.48, 1.0), None),
+    "Mat_Sub":   ((0.12, 0.13, 0.15, 1.0), None),
     "Mat_Thruster": ((1.00, 1.00, 1.00, 1.0), 1.0),
 }
 
@@ -35,30 +35,30 @@ SEGMENTS = 16
 
 # ── 形の定義 ─────────────────────────────────────
 
-def box(center, size, mat="Mat_Body", top=(1.0, 1.0)):
+def box(center, size, mat="Mat_Main", top=(1.0, 1.0)):
     """箱。top は上面（+Z 側）の X・Y の縮尺"""
     return {"kind": "box", "center": center, "size": size, "mat": mat, "top": top}
 
 
-def tube(z0, z1, r0, r1, mat="Mat_Body", cap0=True, cap1=True, inside=False):
+def tube(z0, z1, r0, r1, mat="Mat_Main", cap0=True, cap1=True, inside=False):
     """Z 軸に沿った円すい台。inside=True なら面を内向きにする（ノズルの内側）"""
     return {"kind": "tube", "z": (z0, z1), "r": (r0, r1), "mat": mat,
             "caps": (cap0, cap1), "inside": inside}
 
 
-def ring(z, r_in, r_out, mat="Mat_Detail"):
+def ring(z, r_in, r_out, mat="Mat_Sub"):
     """+Z を向いた平たい輪（ノズルの縁）"""
     return {"kind": "ring", "z": z, "r": (r_in, r_out), "mat": mat}
 
 
 def nozzle(z_throat, z_exit, r_throat, r_exit, thickness=0.03):
-    """外側（Mat_Detail）・内側（Mat_Thruster）・縁・奥の面からなるノズル"""
+    """外側（Mat_Sub）・内側（Mat_Thruster）・縁・奥の面からなるノズル"""
     t = thickness
     return [
-        tube(z_throat, z_exit, r_throat + t, r_exit + t, "Mat_Detail", cap0=True, cap1=False),
+        tube(z_throat, z_exit, r_throat + t, r_exit + t, "Mat_Sub", cap0=True, cap1=False),
         tube(z_throat + t, z_exit, r_throat, r_exit, "Mat_Thruster", cap0=False, cap1=False, inside=True),
         ring(z_throat + t, 0.0, r_throat, "Mat_Thruster"),
-        ring(z_exit, r_exit, r_exit + t, "Mat_Detail"),
+        ring(z_exit, r_exit, r_exit + t, "Mat_Sub"),
     ]
 
 
@@ -66,11 +66,11 @@ def _booster_standard():
     """標準: 円筒の本体に、細めのノズル。長さ 1.55 m（取り付け部 0.35 m を含む）"""
     return {
         "shapes": [
-            box((0, 0, -0.15), (0.3, 0.26, 0.4), "Mat_Detail"),
-            tube(0.0, 0.85, 0.24, 0.24, "Mat_Body"),
-            tube(0.70, 0.85, 0.27, 0.27, "Mat_Detail"),
-            box((0.27, 0, 0.35), (0.06, 0.12, 0.5), "Mat_Detail", top=(1.0, 0.5)),
-            box((-0.27, 0, 0.35), (0.06, 0.12, 0.5), "Mat_Detail", top=(1.0, 0.5)),
+            box((0, 0, -0.15), (0.3, 0.26, 0.4), "Mat_Sub"),
+            tube(0.0, 0.85, 0.24, 0.24, "Mat_Main"),
+            tube(0.70, 0.85, 0.27, 0.27, "Mat_Sub"),
+            box((0.27, 0, 0.35), (0.06, 0.12, 0.5), "Mat_Sub", top=(1.0, 0.5)),
+            box((-0.27, 0, 0.35), (0.06, 0.12, 0.5), "Mat_Sub", top=(1.0, 0.5)),
             *nozzle(0.85, 1.2, 0.15, 0.25),
         ],
         "nozzle_exit": (0, 0, 1.2),
@@ -81,11 +81,11 @@ def _booster_heavy():
     """重量: 角張った太い本体に、大きなノズル。長さ 1.5 m（取り付け部 0.35 m を含む）"""
     return {
         "shapes": [
-            box((0, 0, -0.15), (0.45, 0.36, 0.4), "Mat_Detail"),
-            box((0, 0, 0.45), (0.64, 0.56, 0.9), "Mat_Body", top=(0.85, 0.85)),
-            box((0.34, 0, 0.4), (0.06, 0.46, 0.7), "Mat_Detail"),
-            box((-0.34, 0, 0.4), (0.06, 0.46, 0.7), "Mat_Detail"),
-            box((0, 0.3, 0.5), (0.3, 0.06, 0.5), "Mat_Detail"),
+            box((0, 0, -0.15), (0.45, 0.36, 0.4), "Mat_Sub"),
+            box((0, 0, 0.45), (0.64, 0.56, 0.9), "Mat_Main", top=(0.85, 0.85)),
+            box((0.34, 0, 0.4), (0.06, 0.46, 0.7), "Mat_Sub"),
+            box((-0.34, 0, 0.4), (0.06, 0.46, 0.7), "Mat_Sub"),
+            box((0, 0.3, 0.5), (0.3, 0.06, 0.5), "Mat_Sub"),
             *nozzle(0.9, 1.3, 0.22, 0.34, thickness=0.04),
         ],
         "nozzle_exit": (0, 0, 1.3),

@@ -88,7 +88,7 @@ NAME_PATTERNS = {
 }
 
 # docs/blender-unity-pipeline.md の「マテリアルスロット名」
-ALLOWED_MATERIALS = ("Mat_Body", "Mat_Detail", "Mat_Visor", "Mat_Thruster")
+ALLOWED_MATERIALS = ("Mat_Main", "Mat_Sub", "Mat_Light", "Mat_Thruster")
 
 EXPORT_OBJECT_TYPES = {"ARMATURE", "MESH"}
 
