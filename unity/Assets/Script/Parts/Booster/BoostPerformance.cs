@@ -8,7 +8,7 @@ namespace AdvancedGears
     /// </summary>
     public readonly struct BoostPerformance
     {
-        /// <summary>ブースト出力。ブースト ON の間、通常の水平の移動スピードに掛ける倍率</summary>
+        /// <summary>ブースト出力。ブースト ON の間、本体のスピード（MobilityPerformance）に掛ける倍率</summary>
         public readonly float BoostSpeedRate;
 
         /// <summary>クイックブーストの出力（移動の速さ）</summary>

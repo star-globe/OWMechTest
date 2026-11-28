@@ -47,6 +47,16 @@ namespace AdvancedGears
         [SerializeField]
         float quickYdelta = 0.1f;
         public float QuickYDelta => quickYdelta;
+
+        [SerializeField, Min(0f)]
+        [Tooltip("積載量の超過による減速の強さ。重量補正 = 1 − これ × (積載率 − 1)。積載量以内なら減速しない")]
+        float overweightSlowRate = MobilityConst.DefaultOverweightSlowRate;
+        public float OverweightSlowRate => overweightSlowRate;
+
+        [SerializeField, Range(0f, 1f)]
+        [Tooltip("重量補正の下限（積載量を大きく超えたときの最低の倍率）")]
+        float minWeightRate = MobilityConst.DefaultMinWeightRate;
+        public float MinWeightRate => minWeightRate;
     }
 
     public class PlayerControllerConst : Singleton<PlayerControllerConst>
@@ -78,6 +88,9 @@ namespace AdvancedGears
         public float AirBrakeRate => this.Settings.AirBrakeRate;
         public float TouchBrakeRateAdd => this.Settings.TouchBrakeRateAdd;
         public float QuickYDelta => this.Settings.QuickYDelta;
+
+        /// <summary>重量補正の計算に使う定数</summary>
+        public MobilityConst Mobility => new MobilityConst(this.Settings.OverweightSlowRate, this.Settings.MinWeightRate);
 
         public void Load()
         {

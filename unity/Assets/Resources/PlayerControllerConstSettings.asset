@@ -22,3 +22,5 @@ MonoBehaviour:
   airBrakeRate: 1
   touchBrakeRateAdd: 0.5
   quickYdelta: 0.2
+  overweightSlowRate: 2
+  minWeightRate: 0.2

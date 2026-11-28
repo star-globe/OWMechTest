@@ -8,7 +8,7 @@ namespace AdvancedGears
     [CreateAssetMenu(menuName = "TestProject/Parts/BoosterSettings", order = 0)]
     public class BoosterSettings : PartSettings
     {
-        /// <summary>ブースト出力。ブースト ON の間、通常の水平の移動スピードに掛ける倍率（暫定。本体のスピードとの関係は #218 で決める）</summary>
+        /// <summary>ブースト出力。ブースト ON の間、本体のスピード（MobilityPerformance）に掛ける倍率</summary>
         [SerializeField, Min(0f)]
         float boostSpeedRate = 2.0f;
         public float BoostSpeedRate => boostSpeedRate;

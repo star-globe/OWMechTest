@@ -55,6 +55,21 @@ namespace AdvancedGears
         /// <summary>属性ごとの装甲値</summary>
         public ArmorValues Armor => new ArmorValues(physicalArmor, energyArmor);
 
+        [SerializeField, Min(0)]
+        [Tooltip("重量。脚部以外のパーツの合計を、脚部の積載量と比べる（MobilityPerformanceResolver）")]
+        int weight = 0;
+        public int Weight => weight;
+
+        [SerializeField, Min(0f)]
+        [Tooltip("歩行速度（本体のスピードの基準。Unity の単位）。脚部だけが使う")]
+        float walkSpeed = 0f;
+        public float WalkSpeed => walkSpeed;
+
+        [SerializeField, Min(0)]
+        [Tooltip("積載量。脚部だけが使う。脚部以外の総重量がこれを超えると遅くなる")]
+        int loadCapacity = 0;
+        public int LoadCapacity => loadCapacity;
+
         public int ID => PartID;
 
         public PartComponent InstantiatePart()
