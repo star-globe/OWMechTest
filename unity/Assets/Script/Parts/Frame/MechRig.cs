@@ -110,6 +110,27 @@ namespace AdvancedGears
             attached[slot] = container;
         }
 
+        /// <summary>
+        /// 取り付け位置（ブースターなど）をボーンの子に付け替え、アニメーションに追従させる。
+        /// すでにスケルトンの子なら何もしない。プレハブ上の配置は待機姿勢を基準にしているので、
+        /// 現在の状態を評価してから見た目の位置を保ったまま付け替える
+        /// </summary>
+        public void FollowBone(Transform target, string boneName)
+        {
+            if (target == null || target.IsChildOf(skeletonRoot))
+                return;
+
+            if (!Bones.TryGetValue(boneName, out var bone))
+            {
+                Debug.LogErrorFormat(this, "[MechRig] {0} を付け替えるボーン {1} が基準リグにありません", target.name, boneName);
+                return;
+            }
+
+            // 時間を進めずに現在の状態の姿勢をボーンに反映する
+            animator.Update(0f);
+            target.SetParent(bone, true);
+        }
+
         /// <summary>水平方向の移動速度と接地状態を Animator に渡す</summary>
         public void SetMove(float horizontalSpeed, bool isGrounded)
         {

@@ -10,6 +10,9 @@ namespace AdvancedGears
     /// </summary>
     public readonly struct MechPartsAssembler
     {
+        /// <summary>コアのパーツが付く胴体のボーン</summary>
+        const string CoreBoneName = "Chest";
+
         readonly MechRig rig;
         readonly BoosterContainer booster;
         readonly GunAttach rightGun;
@@ -51,7 +54,10 @@ namespace AdvancedGears
             {
                 case PartsAttachType.Booster:
                     if (booster != null)
+                    {
+                        FollowCore(booster.transform);
                         booster.SetBoosters(partId);
+                    }
                     break;
                 case PartsAttachType.Weapon_Right:
                     if (rightGun != null)
@@ -63,9 +69,22 @@ namespace AdvancedGears
                     break;
                 case PartsAttachType.Weapon_Sub:
                     if (subPart != null)
+                    {
+                        FollowCore(subPart.transform);
                         subPart.SetPart(partId);
+                    }
                     break;
             }
+        }
+
+        /// <summary>
+        /// コアに付く取り付け位置を胴体のボーンの子にして、アニメーションに追従させる。
+        /// サブの取り付け位置はブースターの取り付け位置（Core）の子なので、先に Core が付け替わっていれば何もしない
+        /// </summary>
+        void FollowCore(Transform attach)
+        {
+            if (rig != null)
+                rig.FollowBone(attach, CoreBoneName);
         }
 
         void AssembleFrame(PartsAttachType slot, int partId)
